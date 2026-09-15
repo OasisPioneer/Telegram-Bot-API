@@ -1,0 +1,5 @@
+# CLion project files
+.idea/
+
+# CMake build directory
+Build/
