@@ -2,6 +2,7 @@
 #define TELEGRAMBOTAPI_VIDEO_HPP
 
 #include <string>
+#include <optional>
 
 #include "PhotoSize.HPP"
 
@@ -11,10 +12,10 @@ namespace TelegramBotAPI::Type {
         long long Width{};
         long long Height{};
         long long Duration{};
-        PhotoSize Thumb{};
-        std::string FileName{};
-        std::string MimeType{};
-        long long FileSize{};
+        std::optional<TelegramBotAPI::Type::PhotoSize> Thumb{};
+        std::optional<std::string> FileName{};
+        std::optional<std::string> MimeType{};
+        std::optional<long long> FileSize{};
     };
 }
 

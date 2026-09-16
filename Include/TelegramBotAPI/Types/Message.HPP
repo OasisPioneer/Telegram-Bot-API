@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include <optional>
 
 #include "User.HPP"
 #include "Chat.HPP"
@@ -22,35 +21,35 @@
 namespace TelegramBotAPI::Type {
     struct Message {
         long long MessageID{};
-        User From{};
+        TelegramBotAPI::Type::User From{};
         long long Date{};
-        Chat Chat{};
-        User ForwardFrom{};
+        TelegramBotAPI::Type::Chat Chat{};
+        TelegramBotAPI::Type::User ForwardFrom{};
         long long ForwardDate{};
-        std::optional<std::shared_ptr<Message>>  ReplyToMessage{};
+        std::shared_ptr<Message> ReplyToMessage{};
         std::string Text{};
         std::vector<MessageEntity> Entities{};
-        Audio Audio{};
-        Document Document{};
+        TelegramBotAPI::Type::Audio Audio{};
+        TelegramBotAPI::Type::Document Document{};
         std::vector<PhotoSize> Photo{};
-        Sticker Sticker{};
-        Video Video{};
-        Voice Voice{};
+        TelegramBotAPI::Type::Sticker Sticker{};
+        TelegramBotAPI::Type::Video Video{};
+        TelegramBotAPI::Type::Voice Voice{};
         std::string Caption{};
-        Contact Contact{};
-        Location Location{};
-        Venue Venue{};
-        User NewChatMember{};
-        User LeftChatMember{};
+        TelegramBotAPI::Type::Contact Contact{};
+        TelegramBotAPI::Type::Location Location{};
+        TelegramBotAPI::Type::Venue Venue{};
+        TelegramBotAPI::Type::User NewChatMember{};
+        TelegramBotAPI::Type::User LeftChatMember{};
         std::string NewChatTitle{};
-        PhotoSize NewChatPhoto{};
+        TelegramBotAPI::Type::PhotoSize NewChatPhoto{};
         bool DeleteChatPhoto{true};
         bool GroupChatCreated{true};
         bool SupergroupChatCreated{true};
         bool ChannelChatCreated{true};
         long long MigrateToChatID{};
         long long MigrateFromChatID{};
-        std::optional<std::shared_ptr<Message>> PinnedMessage{};
+        std::shared_ptr<Message> PinnedMessage{};
     };
 }
 

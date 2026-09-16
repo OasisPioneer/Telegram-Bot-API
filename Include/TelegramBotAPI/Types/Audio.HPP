@@ -2,15 +2,16 @@
 #define TELEGRAMBOTAPI_AUDIO_HPP
 
 #include <string>
+#include <optional>
 
 namespace TelegramBotAPI::Type {
     struct Audio {
         std::string FileID{};
         long long Duration{};
-        std::string Performer{};
-        std::string Title{};
-        std::string MimeType{};
-        long long FileSize{};
+        std::optional<std::string> Performer{};
+        std::optional<std::string> Title{};
+        std::optional<std::string> MimeType{};
+        std::optional<long long> FileSize{};
     };
 }
 

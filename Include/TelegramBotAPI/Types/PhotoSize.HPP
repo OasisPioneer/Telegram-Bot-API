@@ -2,13 +2,14 @@
 #define TELEGRAMBOTAPI_PHOTOSIZE_HPP
 
 #include <string>
+#include <optional>
 
 namespace TelegramBotAPI::Type {
     struct PhotoSize {
         std::string FileID{};
         long long Width{};
         long long Height{};
-        long long FileSize{};
+        std::optional<long long> FileSize{};
     };
 }
 

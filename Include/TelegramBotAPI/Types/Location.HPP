@@ -3,8 +3,8 @@
 
 namespace TelegramBotAPI::Type {
     struct Location {
-        float Longitude{};
-        float Latitude{};
+        double Longitude{};
+        double Latitude{};
     };
 }
 

@@ -2,13 +2,14 @@
 #define TELEGRAMBOTAPI_VOICE_HPP
 
 #include <string>
+#include <optional>
 
 namespace TelegramBotAPI::Type {
     struct Voice {
         std::string FileID{};
         long long Duration{};
-        std::string MimeType{};
-        long long FileSize{};
+        std::optional<std::string> MimeType{};
+        std::optional<long long> FileSize{};
     };
 }
 

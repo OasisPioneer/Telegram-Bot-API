@@ -2,13 +2,14 @@
 #define TELEGRAMBOTAPI_MESSAGEENTITY_HPP
 
 #include <string>
+#include <optional>
 
 namespace TelegramBotAPI::Type {
     struct MessageEntity {
         std::string Type{};
         long long Offset{};
         long long Length{};
-        std::string URL{};
+        std::optional<std::string> URL{};
     };
 }
 
