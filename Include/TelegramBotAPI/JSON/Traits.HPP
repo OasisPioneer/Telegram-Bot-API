@@ -20,6 +20,7 @@
 #include "TelegramBotAPI/Types/MessageEntity.HPP"
 #include "TelegramBotAPI/Types/PhotoSize.HPP"
 #include "TelegramBotAPI/Types/Sticker.HPP"
+#include "TelegramBotAPI/Types/Update.HPP"
 #include "TelegramBotAPI/Types/User.HPP"
 #include "TelegramBotAPI/Types/Venue.HPP"
 #include "TelegramBotAPI/Types/Video.HPP"
@@ -157,6 +158,10 @@ namespace TelegramBotAPI::JSON::Detail {
     template <typename Type>
     inline constexpr bool IsMessageV =
         std::is_same_v<RemoveCVRefT<Type>, TelegramBotAPI::Type::Message>;
+
+    template <typename Type>
+    inline constexpr bool IsUpdateV =
+        std::is_same_v<RemoveCVRefT<Type>, TelegramBotAPI::Type::Update>;
 } // namespace TelegramBotAPI::JSON::Detail
 
 #endif // TELEGRAMBOTAPI_TRAITS_HPP

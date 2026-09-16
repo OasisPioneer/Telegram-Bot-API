@@ -60,4 +60,34 @@ namespace TelegramBotAPI {
 
         return Call<Type::Chat>("getChat", Parameters);
     }
+    std::vector<Type::Update>
+    TelegramClient::GetUpdates(std::optional<long long> Offset,
+                               std::optional<long long> Limit,
+                               std::optional<long long> Timeout) {
+        JSON::Object Parameters;
+
+        if (Offset.has_value()) {
+            Parameters["offset"] = Offset.value();
+        }
+
+        if (Limit.has_value()) {
+            Parameters["limit"] = Limit.value();
+        }
+
+        if (Timeout.has_value()) {
+            Parameters["timeout"] = Timeout.value();
+        }
+
+        return Call<std::vector<Type::Update>>("getUpdates", Parameters);
+    }
+
+    Type::Message TelegramClient::SendMessage(long long          ChatID,
+                                              const std::string &Text) {
+        JSON::Object Parameters;
+
+        Parameters["chat_id"] = ChatID;
+        Parameters["text"]    = Text;
+
+        return Call<Type::Message>("sendMessage", Parameters);
+    }
 } // namespace TelegramBotAPI

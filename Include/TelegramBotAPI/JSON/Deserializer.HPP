@@ -614,6 +614,31 @@ namespace TelegramBotAPI::JSON {
                 Detail::GetOptionalField<std::string>(JsonObject, "data");
 
             return ObjectValue;
+        } else if constexpr (Detail::IsUpdateV<CleanType>) {
+            const Object &JsonObject = Detail::RequireObject(JsonValue);
+
+            CleanType ObjectValue;
+
+            ObjectValue.UpdateID =
+                Detail::GetRequiredField<long long>(JsonObject, "update_id");
+
+            ObjectValue.Message =
+                Detail::GetOptionalField<TelegramBotAPI::Type::Message>(
+                    JsonObject, "message");
+
+            ObjectValue.InlineQuery =
+                Detail::GetOptionalField<TelegramBotAPI::Type::InlineQuery>(
+                    JsonObject, "inline_query");
+
+            ObjectValue.ChosenInlineResult = Detail::GetOptionalField<
+                TelegramBotAPI::Type::ChosenInlineResult>(
+                JsonObject, "chosen_inline_result");
+
+            ObjectValue.CallbackQuery =
+                Detail::GetOptionalField<TelegramBotAPI::Type::CallbackQuery>(
+                    JsonObject, "callback_query");
+
+            return ObjectValue;
         } else {
             throw JsonException("Unsupported JSON deserialization type");
         }

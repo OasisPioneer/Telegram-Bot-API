@@ -47,3 +47,9 @@ add_telegram_test(CallbackQueryTraitsTest)
 
 add_telegram_test(CallbackQuerySerializerTest)
 add_telegram_test(CallbackQueryDeserializerTest)
+
+add_telegram_test(UpdateDeserializerTest)
+add_telegram_test(UpdateCallbackQueryDeserializerTest)
+
+add_telegram_test(SendMessageTest)
+add_telegram_test(GetUpdatesTest)

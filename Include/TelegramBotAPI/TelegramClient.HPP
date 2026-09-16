@@ -2,13 +2,17 @@
 #define TELEGRAMBOTAPI_TELEGRAMCLIENT_HPP
 
 #include <chrono>
+#include <optional>
 #include <string>
+#include <vector>
 
 #include "TelegramBotAPI/JSON/Json.HPP"
 #include "TelegramBotAPI/Network/HTTPClient.HPP"
 #include "TelegramBotAPI/Network/HTTPResponse.HPP"
 #include "TelegramBotAPI/TelegramAPIException.HPP"
 #include "TelegramBotAPI/Types/Chat.HPP"
+#include "TelegramBotAPI/Types/Message.HPP"
+#include "TelegramBotAPI/Types/Update.HPP"
 #include "TelegramBotAPI/Types/User.HPP"
 
 namespace TelegramBotAPI {
@@ -21,6 +25,14 @@ namespace TelegramBotAPI {
 
             Type::User GetMe();
             Type::Chat GetChat(long long ChatID);
+
+            std::vector<Type::Update>
+            GetUpdates(std::optional<long long> Offset  = std::nullopt,
+                       std::optional<long long> Limit   = std::nullopt,
+                       std::optional<long long> Timeout = std::nullopt);
+
+            Type::Message SendMessage(long long          ChatID,
+                                      const std::string &Text);
 
         private:
             std::string         BotToken;
