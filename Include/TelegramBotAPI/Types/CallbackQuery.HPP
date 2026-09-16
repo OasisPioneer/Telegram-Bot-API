@@ -11,8 +11,8 @@ namespace TelegramBotAPI::Type {
             std::string                                      ID{};
             std::optional<TelegramBotAPI::Type::User>        From{};
             std::optional<TelegramBotAPI::Type::Message>     Message{};
-            std::optional<TelegramBotAPI::Type::std::string> InlineMessageID{};
-            std::optional<TelegramBotAPI::Type::std::string> Data{};
+            std::optional<std::string> InlineMessageID{};
+            std::optional<std::string> Data{};
     };
 } // namespace TelegramBotAPI::Type
 
