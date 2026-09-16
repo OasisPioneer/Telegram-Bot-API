@@ -55,3 +55,11 @@ add_telegram_test(GetMeTest)
 add_telegram_test(GetChatTest)
 add_telegram_test(GetUpdatesTest)
 add_telegram_test(SendMessageTest)
+
+add_telegram_test(SendMessageParametersTest)
+add_telegram_test(SendMessageParametersJsonTest)
+
+add_telegram_test(GetChatParametersJsonTest)
+
+add_telegram_test(GetUpdatesParametersJsonTest)
+add_telegram_test(GetMeParametersJsonTest)

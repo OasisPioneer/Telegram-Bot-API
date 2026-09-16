@@ -7,14 +7,32 @@
 namespace TelegramBotAPI::Methods {
     class getChat {
         public:
+            struct Parameters {
+                    long long ChatID = 0;
+
+                    JSON::Object ToJson() const {
+                        JSON::Object ParametersObject;
+
+                        ParametersObject["chat_id"] = ChatID;
+
+                        return ParametersObject;
+                    }
+            };
+
             explicit getChat(TelegramClient &ClientValue)
                 : Client(ClientValue) {}
+
+            Type::Chat Get(const Parameters &ParametersValue) {
+                return Client.Call<Type::Chat>("getChat",
+                                               ParametersValue.ToJson());
+            }
+
             Type::Chat GetChat(long long ChatID) {
-                JSON::Object Parameters;
+                Parameters ParametersValue;
 
-                Parameters["chat_id"] = ChatID;
+                ParametersValue.ChatID = ChatID;
 
-                return Client.Call<Type::Chat>("getChat", Parameters);
+                return Get(ParametersValue);
             }
 
         private:
