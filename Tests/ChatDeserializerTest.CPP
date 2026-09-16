@@ -40,11 +40,11 @@ int main()
             << Chat.Type
             << std::endl;
 
-        if (Chat.Username.has_value())
+        if (Chat.UserName.has_value())
         {
             std::cout
                 << "Username: "
-                << Chat.Username.value()
+                << Chat.UserName.value()
                 << std::endl;
         }
 

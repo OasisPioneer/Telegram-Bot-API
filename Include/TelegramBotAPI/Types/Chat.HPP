@@ -10,7 +10,7 @@ namespace TelegramBotAPI::Type {
             std::string Type{};
 
             std::optional<std::string> Title{};
-            std::optional<std::string> Username{};
+            std::optional<std::string> UserName{};
             std::optional<std::string> FirstName{};
             std::optional<std::string> LastName{};
     };

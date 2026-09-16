@@ -193,7 +193,7 @@ namespace TelegramBotAPI::JSON {
                     SetOptionalField(JsonObject, "title", ObjectValue.Title);
 
                     SetOptionalField(JsonObject, "username",
-                                     ObjectValue.Username);
+                                     ObjectValue.UserName);
 
                     SetOptionalField(JsonObject, "first_name",
                                      ObjectValue.FirstName);

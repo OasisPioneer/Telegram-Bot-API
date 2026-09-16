@@ -1,13 +1,16 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "TelegramBotAPI/TelegramClient.HPP"
+#include "TelegramBotAPI/Methods/getMe.HPP"
 #include "TelegramBotAPI/Network/HTTPException.HPP"
+#include "TelegramBotAPI/TelegramAPIException.HPP"
+#include "TelegramBotAPI/TelegramClient.HPP"
 
 int main()
 {
-    std::cout << "TelegramClientTest started"
-              << std::endl;
+    std::cout
+        << "TelegramClientTest started"
+        << std::endl;
 
     const char* BotTokenEnvironment =
         std::getenv("TELEGRAM_BOT_TOKEN");
@@ -21,14 +24,27 @@ int main()
         return 1;
     }
 
+    if (*BotTokenEnvironment == '\0')
+    {
+        std::cerr
+            << "TELEGRAM_BOT_TOKEN is empty"
+            << std::endl;
+
+        return 1;
+    }
+
     try
     {
         TelegramBotAPI::TelegramClient Client(
             BotTokenEnvironment
         );
 
+        TelegramBotAPI::Methods::getMe GetMe(
+            Client
+        );
+
         TelegramBotAPI::Type::User User =
-            Client.GetMe();
+            GetMe.GetMe();
 
         std::cout
             << "ID: "
@@ -67,8 +83,14 @@ int main()
                 << "UserName: <null>"
                 << std::endl;
         }
+
+        std::cout
+            << "TelegramClientTest passed"
+            << std::endl;
     }
-    catch (const TelegramBotAPI::TelegramAPIException& Exception)
+    catch (
+        const TelegramBotAPI::TelegramAPIException& Exception
+    )
     {
         std::cerr
             << "Telegram API error"
@@ -86,7 +108,9 @@ int main()
 
         return 1;
     }
-    catch (const TelegramBotAPI::Network::HTTPException& Exception)
+    catch (
+        const TelegramBotAPI::Network::HTTPException& Exception
+    )
     {
         std::cerr
             << "HTTP error"
@@ -116,8 +140,9 @@ int main()
         return 1;
     }
 
-    std::cout << "TelegramClientTest finished"
-              << std::endl;
+    std::cout
+        << "TelegramClientTest finished"
+        << std::endl;
 
     return 0;
 }

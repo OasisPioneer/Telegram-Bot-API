@@ -15,7 +15,7 @@ int main()
 
     Chat.ID = 123456789;
     Chat.Type = "private";
-    Chat.Username = "OasisPioneer";
+    Chat.UserName = "OasisPioneer";
     Chat.FirstName = "Oasis";
     Chat.LastName = "Pioneer";
 

@@ -3,23 +3,16 @@
 #include <string>
 
 #include "TelegramBotAPI/Methods/getChat.HPP"
-#include "TelegramBotAPI/TelegramAPIException.HPP"
-#include "TelegramBotAPI/TelegramClient.HPP"
 
 int main()
 {
-    std::cout
-        << "ChatTest started"
-        << std::endl;
-
     const char* BotTokenEnvironment =
         std::getenv("TELEGRAM_BOT_TOKEN");
 
     const char* ChatIDEnvironment =
         std::getenv("TELEGRAM_CHAT_ID");
 
-    if (BotTokenEnvironment == nullptr ||
-        std::string(BotTokenEnvironment).empty())
+    if (BotTokenEnvironment == nullptr)
     {
         std::cerr
             << "TELEGRAM_BOT_TOKEN is not set"
@@ -28,8 +21,7 @@ int main()
         return 1;
     }
 
-    if (ChatIDEnvironment == nullptr ||
-        std::string(ChatIDEnvironment).empty())
+    if (ChatIDEnvironment == nullptr)
     {
         std::cerr
             << "TELEGRAM_CHAT_ID is not set"
@@ -41,35 +33,14 @@ int main()
     const std::string BotToken =
         BotTokenEnvironment;
 
-    long long ChatID = 0;
+    const std::string ChatIDString =
+        ChatIDEnvironment;
 
     try
     {
-        ChatID = std::stoll(
-            ChatIDEnvironment
-        );
-    }
-    catch (const std::invalid_argument&)
-    {
-        std::cerr
-            << "Invalid TELEGRAM_CHAT_ID: "
-            << ChatIDEnvironment
-            << std::endl;
+        const long long ChatID =
+            std::stoll(ChatIDString);
 
-        return 1;
-    }
-    catch (const std::out_of_range&)
-    {
-        std::cerr
-            << "TELEGRAM_CHAT_ID is out of range: "
-            << ChatIDEnvironment
-            << std::endl;
-
-        return 1;
-    }
-
-    try
-    {
         TelegramBotAPI::TelegramClient Client(
             BotToken
         );
@@ -86,19 +57,7 @@ int main()
         if (Chat.ID != ChatID)
         {
             std::cerr
-                << "ChatTest failed: "
-                << "returned chat ID does not match "
-                << "requested chat ID"
-                << std::endl;
-
-            std::cerr
-                << "Expected ID: "
-                << ChatID
-                << std::endl;
-
-            std::cerr
-                << "Actual ID: "
-                << Chat.ID
+                << "GetChatTest failed: Chat ID mismatch"
                 << std::endl;
 
             return 1;
@@ -107,15 +66,18 @@ int main()
         if (Chat.Type.empty())
         {
             std::cerr
-                << "ChatTest failed: "
-                << "chat type is empty"
+                << "GetChatTest failed: empty chat type"
                 << std::endl;
 
             return 1;
         }
 
         std::cout
-            << "ID: "
+            << "GetChatTest passed"
+            << std::endl;
+
+        std::cout
+            << "ChatID: "
             << Chat.ID
             << std::endl;
 
@@ -156,31 +118,12 @@ int main()
                 << std::endl;
         }
 
-        std::cout
-            << "ChatTest passed"
-            << std::endl;
-
-        std::cout
-            << "ChatTest finished"
-            << std::endl;
-
         return 0;
-    }
-    catch (const TelegramBotAPI::TelegramAPIException& Exception)
-    {
-        std::cerr
-            << "Telegram API error ["
-            << Exception.GetErrorCode()
-            << "]: "
-            << Exception.GetDescription()
-            << std::endl;
-
-        return 1;
     }
     catch (const std::exception& Exception)
     {
         std::cerr
-            << "Error: "
+            << "GetChatTest failed: "
             << Exception.what()
             << std::endl;
 

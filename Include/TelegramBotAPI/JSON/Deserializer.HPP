@@ -205,7 +205,7 @@ namespace TelegramBotAPI::JSON {
             ObjectValue.Title =
                 Detail::GetOptionalField<std::string>(JsonObject, "title");
 
-            ObjectValue.Username =
+            ObjectValue.UserName =
                 Detail::GetOptionalField<std::string>(JsonObject, "username");
 
             ObjectValue.FirstName =
