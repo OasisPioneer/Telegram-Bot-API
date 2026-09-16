@@ -5,11 +5,11 @@
 
 namespace TelegramBotAPI::Type {
     struct Contact {
-        std::string PhoneNumber{};
-        std::string FirstName{};
-        std::string LastName{};
-        long long UserID{};
+            std::string                PhoneNumber{};
+            std::string                FirstName{};
+            std::optional<std::string> LastName{};
+            std::optional<long long>   UserID{};
     };
-}
+} // namespace TelegramBotAPI::Type
 
 #endif // TELEGRAMBOTAPI_CONTACT_HPP

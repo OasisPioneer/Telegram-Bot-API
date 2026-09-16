@@ -1,19 +1,19 @@
 #ifndef TELEGRAMBOTAPI_STICKER_HPP
 #define TELEGRAMBOTAPI_STICKER_HPP
 
-#include <string>
 #include <optional>
+#include <string>
 
 #include "PhotoSize.HPP"
 
 namespace TelegramBotAPI::Type {
     struct Sticker {
-        std::string FileID{};
-        long long Width{};
-        long long Height{};
-        std::optional<TelegramBotAPI::Type::PhotoSize> Thumb{};
-        long long FileSize{};
+            std::string                                    FileID{};
+            long long                                      Width{};
+            long long                                      Height{};
+            std::optional<TelegramBotAPI::Type::PhotoSize> Thumb{};
+            long long                                      FileSize{};
     };
-}
+} // namespace TelegramBotAPI::Type
 
 #endif // TELEGRAMBOTAPI_STICKER_HPP

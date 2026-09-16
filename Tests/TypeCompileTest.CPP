@@ -17,7 +17,56 @@
 #include "TelegramBotAPI/Types/MessageEntity.HPP"
 #include "TelegramBotAPI/Types/Venue.HPP"
 
+/*
+    clang++-22 \
+    -std=c++17 \
+    -Wall \
+    -Wextra \
+    -Wpedantic \
+    -I../Include \
+    TypeCompileTest.CPP \
+    -o TypeCompileTest
+ */
+
 int main()
 {
+    TelegramBotAPI::Type::User User{};
+    TelegramBotAPI::Type::Chat Chat{};
+    TelegramBotAPI::Type::Message Message{};
+    TelegramBotAPI::Type::Update Update{};
+    TelegramBotAPI::Type::Audio Audio{};
+    TelegramBotAPI::Type::InlineQuery InlineQuery{};
+    TelegramBotAPI::Type::ChosenInlineResult ChosenInlineResult{};
+    TelegramBotAPI::Type::CallbackQuery CallbackQuery{};
+    TelegramBotAPI::Type::Location Location{};
+    TelegramBotAPI::Type::PhotoSize PhotoSize{};
+    TelegramBotAPI::Type::Document Document{};
+    TelegramBotAPI::Type::Video Video{};
+    TelegramBotAPI::Type::Voice Voice{};
+    TelegramBotAPI::Type::Contact Contact{};
+    TelegramBotAPI::Type::File File{};
+    TelegramBotAPI::Type::Sticker Sticker{};
+    TelegramBotAPI::Type::MessageEntity MessageEntity{};
+    TelegramBotAPI::Type::Venue Venue{};
+
+    (void)User;
+    (void)Chat;
+    (void)Message;
+    (void)Update;
+    (void)Audio;
+    (void)InlineQuery;
+    (void)ChosenInlineResult;
+    (void)CallbackQuery;
+    (void)Location;
+    (void)PhotoSize;
+    (void)Document;
+    (void)Video;
+    (void)Voice;
+    (void)Contact;
+    (void)File;
+    (void)Sticker;
+    (void)MessageEntity;
+    (void)Venue;
+
     return 0;
 }
