@@ -251,6 +251,40 @@ namespace TelegramBotAPI::JSON {
                 Detail::GetOptionalField<long long>(JsonObject, "file_size");
 
             return ObjectValue;
+        } else if constexpr (Detail::IsAnimationV<CleanType>) {
+            const Object &JsonObject = Detail::RequireObject(JsonValue);
+
+            CleanType ObjectValue;
+
+            ObjectValue.FileID =
+                Detail::GetRequiredField<std::string>(JsonObject, "file_id");
+
+            ObjectValue.FileUniqueID = Detail::GetRequiredField<std::string>(
+                JsonObject, "file_unique_id");
+
+            ObjectValue.Width =
+                Detail::GetRequiredField<int>(JsonObject, "width");
+
+            ObjectValue.Height =
+                Detail::GetRequiredField<int>(JsonObject, "height");
+
+            ObjectValue.Duration =
+                Detail::GetRequiredField<int>(JsonObject, "duration");
+
+            ObjectValue.Thumbnail =
+                Detail::GetOptionalField<TelegramBotAPI::Type::PhotoSize>(
+                    JsonObject, "thumbnail");
+
+            ObjectValue.FileName =
+                Detail::GetOptionalField<std::string>(JsonObject, "file_name");
+
+            ObjectValue.MimeType =
+                Detail::GetOptionalField<std::string>(JsonObject, "mime_type");
+
+            ObjectValue.FileSize =
+                Detail::GetOptionalField<long long>(JsonObject, "file_size");
+
+            return ObjectValue;
         } else if constexpr (Detail::IsAudioV<CleanType>) {
             const Object &JsonObject = Detail::RequireObject(JsonValue);
 
@@ -386,6 +420,37 @@ namespace TelegramBotAPI::JSON {
                 Detail::GetOptionalField<long long>(JsonObject, "user_id");
 
             return ObjectValue;
+        } else if constexpr (Detail::IsLivePhotoV<CleanType>) {
+            const Object &JsonObject = Detail::RequireObject(JsonValue);
+
+            CleanType ObjectValue;
+
+            ObjectValue.Photo = Detail::GetOptionalField<
+                std::vector<TelegramBotAPI::Type::PhotoSize>>(JsonObject,
+                                                              "photo");
+
+            ObjectValue.FileID =
+                Detail::GetRequiredField<std::string>(JsonObject, "file_id");
+
+            ObjectValue.FileUniqueID = Detail::GetRequiredField<std::string>(
+                JsonObject, "file_unique_id");
+
+            ObjectValue.Width =
+                Detail::GetRequiredField<int>(JsonObject, "width");
+
+            ObjectValue.Height =
+                Detail::GetRequiredField<int>(JsonObject, "height");
+
+            ObjectValue.Duration =
+                Detail::GetRequiredField<int>(JsonObject, "duration");
+
+            ObjectValue.MimeType =
+                Detail::GetOptionalField<std::string>(JsonObject, "mime_type");
+
+            ObjectValue.FileSize =
+                Detail::GetOptionalField<long long>(JsonObject, "file_size");
+
+            return ObjectValue;
         } else if constexpr (Detail::IsLocationV<CleanType>) {
             const Object &JsonObject = Detail::RequireObject(JsonValue);
 
@@ -396,6 +461,15 @@ namespace TelegramBotAPI::JSON {
 
             ObjectValue.Latitude =
                 Detail::GetRequiredField<double>(JsonObject, "latitude");
+
+            return ObjectValue;
+        } else if constexpr (Detail::IsLinkV<CleanType>) {
+            const Object &JsonObject = Detail::RequireObject(JsonValue);
+
+            CleanType ObjectValue;
+
+            ObjectValue.URL =
+                Detail::GetRequiredField<std::string>(JsonObject, "url");
 
             return ObjectValue;
         } else if constexpr (Detail::IsVenueV<CleanType>) {
@@ -765,7 +839,52 @@ namespace TelegramBotAPI::JSON {
                     JsonObject, "order_info");
 
             return ObjectValue;
+        } else if constexpr (Detail::IsPollMediaV<CleanType>) {
+            const Object &JsonObject = Detail::RequireObject(JsonValue);
 
+            CleanType ObjectValue;
+
+            ObjectValue.Animation =
+                Detail::GetOptionalField<TelegramBotAPI::Type::Animation>(
+                    JsonObject, "animation");
+
+            ObjectValue.Audio =
+                Detail::GetOptionalField<TelegramBotAPI::Type::Audio>(
+                    JsonObject, "audio");
+
+            ObjectValue.Document =
+                Detail::GetOptionalField<TelegramBotAPI::Type::Document>(
+                    JsonObject, "document");
+
+            ObjectValue.Link =
+                Detail::GetOptionalField<TelegramBotAPI::Type::Link>(JsonObject,
+                                                                     "link");
+
+            ObjectValue.LivePhoto =
+                Detail::GetOptionalField<TelegramBotAPI::Type::LivePhoto>(
+                    JsonObject, "live_photo");
+
+            ObjectValue.Location =
+                Detail::GetOptionalField<TelegramBotAPI::Type::Location>(
+                    JsonObject, "location");
+
+            ObjectValue.Photo = Detail::GetOptionalField<
+                std::vector<TelegramBotAPI::Type::PhotoSize>>(JsonObject,
+                                                              "photo");
+
+            ObjectValue.Sticker =
+                Detail::GetOptionalField<TelegramBotAPI::Type::Sticker>(
+                    JsonObject, "sticker");
+
+            ObjectValue.Venue =
+                Detail::GetOptionalField<TelegramBotAPI::Type::Venue>(
+                    JsonObject, "venue");
+
+            ObjectValue.Video =
+                Detail::GetOptionalField<TelegramBotAPI::Type::Video>(
+                    JsonObject, "video");
+
+            return ObjectValue;
         } else if constexpr (Detail::IsPollOptionV<CleanType>) {
             const Object &JsonObject = Detail::RequireObject(JsonValue);
 
@@ -783,7 +902,9 @@ namespace TelegramBotAPI::JSON {
                     JsonObject, "text_entities")
                     .value_or(
                         std::vector<TelegramBotAPI::Type::MessageEntity>{});
-
+            ObjectValue.Media =
+                Detail::GetOptionalField<TelegramBotAPI::Type::PollMedia>(
+                    JsonObject, "media");
             ObjectValue.VoterCount =
                 Detail::GetRequiredField<int>(JsonObject, "voter_count");
 
@@ -859,7 +980,9 @@ namespace TelegramBotAPI::JSON {
                     JsonObject, "explanation_entities")
                     .value_or(
                         std::vector<TelegramBotAPI::Type::MessageEntity>{});
-
+            ObjectValue.ExplanationMedia =
+                Detail::GetOptionalField<TelegramBotAPI::Type::PollMedia>(
+                    JsonObject, "explanation_media");
             ObjectValue.OpenPeriod =
                 Detail::GetOptionalField<long long>(JsonObject, "open_period");
 
@@ -876,6 +999,9 @@ namespace TelegramBotAPI::JSON {
                     .value_or(
                         std::vector<TelegramBotAPI::Type::MessageEntity>{});
 
+            ObjectValue.Media =
+                Detail::GetOptionalField<TelegramBotAPI::Type::PollMedia>(
+                    JsonObject, "media");
             return ObjectValue;
         } else if constexpr (Detail::IsPollAnswerV<CleanType>) {
             const Object &JsonObject = Detail::RequireObject(JsonValue);

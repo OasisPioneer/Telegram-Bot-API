@@ -6,47 +6,61 @@
 #include "TelegramBotAPI/JSON/Deserializer.HPP"
 #include "TelegramBotAPI/Types/Poll.HPP"
 
-int main()
-{
+int main() {
     {
         const std::string JSONText = R"({
             "id": "poll-123",
-            "question": "Which option do you prefer?",
+            "question": "What is your favorite option?",
             "question_entities": [],
             "options": [
                 {
-                    "persistent_id": "option-1",
-                    "text": "First",
+                    "persistent_id": "option-a",
+                    "text": "First option",
                     "text_entities": [],
-                    "voter_count": 10
+                    "media": {
+                        "link": {
+                            "url": "https://example.com/option"
+                        }
+                    },
+                    "voter_count": 42
                 },
                 {
-                    "persistent_id": "option-2",
-                    "text": "Second",
+                    "persistent_id": "option-b",
+                    "text": "Second option",
                     "text_entities": [],
-                    "voter_count": 20
+                    "voter_count": 10
                 }
             ],
-            "total_voter_count": 30,
+            "total_voter_count": 52,
             "is_closed": false,
             "is_anonymous": true,
-            "type": "regular",
-            "allows_multiple_answers": true,
+            "type": "quiz",
+            "allows_multiple_answers": false,
             "allows_revoting": true,
             "members_only": false,
             "country_codes": [
                 "US",
-                "CA"
+                "CN"
             ],
             "correct_option_ids": [
                 0
             ],
             "explanation": "The first option is correct.",
             "explanation_entities": [],
+            "explanation_media": {
+                "link": {
+                    "url": "https://example.com/explanation"
+                }
+            },
             "open_period": 300,
             "close_date": 1750000300,
-            "description": "Test poll description",
-            "description_entities": []
+            "description": "Poll description",
+            "description_entities": [],
+            "media": {
+                "link": {
+                    "url": "https://example.com/description"
+                }
+            }
         })";
 
         const TelegramBotAPI::JSON::Value JsonValue =
@@ -61,7 +75,7 @@ int main()
 
         assert(
             Result.Question ==
-            "Which option do you prefer?"
+            "What is your favorite option?"
         );
 
         assert(Result.QuestionEntities.empty());
@@ -70,43 +84,54 @@ int main()
 
         assert(
             Result.Options[0].PersistentID ==
-            "option-1"
+            "option-a"
         );
 
         assert(
             Result.Options[0].Text ==
-            "First"
+            "First option"
+        );
+
+        assert(Result.Options[0].Media.has_value());
+
+        assert(Result.Options[0].Media->Link.has_value());
+
+        assert(
+            Result.Options[0].Media->Link->URL ==
+            "https://example.com/option"
         );
 
         assert(
             Result.Options[0].VoterCount ==
-            10
+            42
         );
 
         assert(
             Result.Options[1].PersistentID ==
-            "option-2"
+            "option-b"
         );
 
         assert(
             Result.Options[1].Text ==
-            "Second"
+            "Second option"
         );
+
+        assert(!Result.Options[1].Media.has_value());
 
         assert(
             Result.Options[1].VoterCount ==
-            20
+            10
         );
 
-        assert(Result.TotalVoterCount == 30);
+        assert(Result.TotalVoterCount == 52);
 
         assert(!Result.IsClosed);
 
         assert(Result.IsAnonymous);
 
-        assert(Result.Type == "regular");
+        assert(Result.Type == "quiz");
 
-        assert(Result.AllowsMultipleAnswers);
+        assert(!Result.AllowsMultipleAnswers);
 
         assert(Result.AllowsRevoting);
 
@@ -123,7 +148,7 @@ int main()
 
         assert(
             Result.CountryCodes->at(1) ==
-            "CA"
+            "CN"
         );
 
         assert(Result.CorrectOptionIDS.has_value());
@@ -144,28 +169,40 @@ int main()
 
         assert(Result.ExplanationEntities.empty());
 
-        assert(Result.OpenPeriod.has_value());
+        assert(Result.ExplanationMedia.has_value());
+
+        assert(Result.ExplanationMedia->Link.has_value());
 
         assert(
-            Result.OpenPeriod.value() ==
-            300
+            Result.ExplanationMedia->Link->URL ==
+            "https://example.com/explanation"
         );
+
+        assert(Result.OpenPeriod.has_value());
+
+        assert(Result.OpenPeriod.value() == 300);
 
         assert(Result.CloseDate.has_value());
 
-        assert(
-            Result.CloseDate.value() ==
-            1750000300
-        );
+        assert(Result.CloseDate.value() == 1750000300);
 
         assert(Result.Description.has_value());
 
         assert(
             Result.Description.value() ==
-            "Test poll description"
+            "Poll description"
         );
 
         assert(Result.DescriptionEntities.empty());
+
+        assert(Result.Media.has_value());
+
+        assert(Result.Media->Link.has_value());
+
+        assert(
+            Result.Media->Link->URL ==
+            "https://example.com/description"
+        );
     }
 
     {
@@ -214,6 +251,8 @@ int main()
             "Yes"
         );
 
+        assert(!Result.Options[0].Media.has_value());
+
         assert(Result.Options[0].VoterCount == 0);
 
         assert(Result.TotalVoterCount == 0);
@@ -238,6 +277,8 @@ int main()
 
         assert(Result.ExplanationEntities.empty());
 
+        assert(!Result.ExplanationMedia.has_value());
+
         assert(!Result.OpenPeriod.has_value());
 
         assert(!Result.CloseDate.has_value());
@@ -245,6 +286,8 @@ int main()
         assert(!Result.Description.has_value());
 
         assert(Result.DescriptionEntities.empty());
+
+        assert(!Result.Media.has_value());
     }
 
     return 0;

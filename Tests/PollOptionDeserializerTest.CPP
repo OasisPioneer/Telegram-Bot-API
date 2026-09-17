@@ -6,13 +6,17 @@
 #include "TelegramBotAPI/JSON/Deserializer.HPP"
 #include "TelegramBotAPI/Types/PollOption.HPP"
 
-int main()
-{
+int main() {
     {
         const std::string JSONText = R"({
             "persistent_id": "option-123",
             "text": "First option",
             "text_entities": [],
+            "media": {
+                "link": {
+                    "url": "https://example.com/option"
+                }
+            },
             "voter_count": 42,
             "added_by_user": {
                 "id": 123456,
@@ -41,16 +45,21 @@ int main()
 
         assert(Result.TextEntities.empty());
 
+        assert(Result.Media.has_value());
+        assert(Result.Media->Link.has_value());
+
+        assert(
+            Result.Media->Link->URL ==
+            "https://example.com/option"
+        );
+
         assert(Result.VoterCount == 42);
 
         assert(Result.AddedByUser.has_value());
 
         assert(Result.AddedByUser->ID == 123456);
 
-        assert(
-            Result.AddedByUser->FirstName ==
-            "Test"
-        );
+        assert(Result.AddedByUser->FirstName == "Test");
 
         assert(Result.AddedByUser->UserName.has_value());
 
@@ -61,15 +70,9 @@ int main()
 
         assert(Result.AddedByChat.has_value());
 
-        assert(
-            Result.AddedByChat->ID ==
-            -1001234567890LL
-        );
+        assert(Result.AddedByChat->ID == -1001234567890LL);
 
-        assert(
-            Result.AddedByChat->Type ==
-            "supergroup"
-        );
+        assert(Result.AddedByChat->Type == "supergroup");
 
         assert(Result.AddedByChat->Title.has_value());
 
@@ -80,10 +83,7 @@ int main()
 
         assert(Result.AdditionDate.has_value());
 
-        assert(
-            Result.AdditionDate.value() ==
-            1750000000
-        );
+        assert(Result.AdditionDate.value() == 1750000000);
     }
 
     {
@@ -108,10 +108,14 @@ int main()
 
         assert(Result.TextEntities.empty());
 
+        assert(!Result.Media.has_value());
+
         assert(Result.VoterCount == 0);
 
         assert(!Result.AddedByUser.has_value());
+
         assert(!Result.AddedByChat.has_value());
+
         assert(!Result.AdditionDate.has_value());
     }
 

@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "MessageEntity.HPP"
+#include "PollMedia.HPP"
 #include "PollOption.HPP"
 
 namespace TelegramBotAPI::Type {
@@ -35,14 +36,15 @@ namespace TelegramBotAPI::Type {
             std::optional<std::string> Explanation{};
 
             std::vector<TelegramBotAPI::Type::MessageEntity>
-                ExplanationEntities{};
-
+                                     ExplanationEntities{};
+            std::optional<PollMedia> ExplanationMedia{};
             std::optional<long long> OpenPeriod{};
             std::optional<long long> CloseDate{};
 
             std::optional<std::string> Description{};
             std::vector<TelegramBotAPI::Type::MessageEntity>
-                DescriptionEntities{};
+                                     DescriptionEntities{};
+            std::optional<PollMedia> Media{};
     };
 } // namespace TelegramBotAPI::Type
 

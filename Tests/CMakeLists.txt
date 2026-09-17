@@ -108,3 +108,7 @@ add_telegram_test(PollOptionDeserializerTest)
 add_telegram_test(PollDeserializerTest)
 add_telegram_test(PollAnswerDeserializerTest)
 add_telegram_test(UpdatePollDeserializerTest)
+
+add_telegram_test(LinkTraitsTest)
+add_telegram_test(LinkDeserializerTest)
+add_telegram_test(PollMediaDeserializerTest)

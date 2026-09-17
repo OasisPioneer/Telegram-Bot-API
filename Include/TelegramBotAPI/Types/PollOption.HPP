@@ -7,6 +7,7 @@
 
 #include "Chat.HPP"
 #include "MessageEntity.HPP"
+#include "PollMedia.HPP"
 #include "User.HPP"
 
 namespace TelegramBotAPI::Type {
@@ -14,13 +15,13 @@ namespace TelegramBotAPI::Type {
             std::string                                      PersistentID{};
             std::string                                      Text{};
             std::vector<TelegramBotAPI::Type::MessageEntity> TextEntities{};
+            std::optional<PollMedia>                         Media{};
 
             int VoterCount{};
 
             std::optional<TelegramBotAPI::Type::User> AddedByUser{};
             std::optional<TelegramBotAPI::Type::Chat> AddedByChat{};
-
-            std::optional<long long> AdditionDate{};
+            std::optional<long long>                  AdditionDate{};
     };
 
 } // namespace TelegramBotAPI::Type
