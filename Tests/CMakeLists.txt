@@ -54,10 +54,13 @@ add_telegram_test(UpdateCallbackQueryDeserializerTest)
 add_telegram_test(GetMeTest)
 add_telegram_test(GetChatTest)
 add_telegram_test(GetUpdatesTest)
+add_telegram_test(GetUpdatesEmptyTest)
 add_telegram_test(SendMessageTest)
 
 add_telegram_test(SendMessageParametersTest)
 add_telegram_test(SendMessageParametersJsonTest)
+
+add_telegram_test(AnswerCallbackQueryTest)
 
 add_telegram_test(GetChatParametersJsonTest)
 
@@ -65,5 +68,43 @@ add_telegram_test(GetUpdatesParametersJsonTest)
 add_telegram_test(GetMeParametersJsonTest)
 
 add_telegram_test(TelegramClientAPIURLTest)
+add_telegram_test(TelegramClientTransportTest)
+add_telegram_test(TelegramClientSendMessageTransportTest)
+
+add_telegram_test(TelegramAPIErrorTest)
+add_telegram_test(TelegramClientHTTPErrorTest)
+add_telegram_test(TelegramClientJSONParseErrorTest)
+add_telegram_test(TelegramClientInvalidResponseTest)
+add_telegram_test(TelegramClientDeserializeErrorTest)
+
+add_telegram_test(TelegramBotAPIIntegrationTest)
+add_telegram_test(TelegramBotAPIRunTest)
+add_telegram_test(TelegramBotAPIOffsetTest)
+add_telegram_test(TelegramBotAPIUpdateDispatchTest)
+add_telegram_test(TelegramBotAPICallbackQueryTest)
+add_telegram_test(TelegramBotAPIAnswerCallbackQueryTest)
+add_telegram_test(TelegramBotAPIRunErrorTest)
+add_telegram_test(InlineQueryTraitsTest)
+add_telegram_test(UpdateEditedMessageDeserializerTest)
+add_telegram_test(UpdateChannelPostDeserializerTest)
+add_telegram_test(UpdateEditedChannelPostDeserializerTest)
+add_telegram_test(InlineQueryDeserializerTest)
+add_telegram_test(UpdateInlineQueryDeserializerTest)
+
+add_telegram_test(TelegramAPIErrorParametersTest)
+add_telegram_test(ChosenInlineResultDeserializerTest)
+add_telegram_test(UpdateChosenInlineResultDeserializerTest)
 
 add_telegram_test(TelegramBotAPITest)
+
+add_telegram_test(ShippingAddressTraitsTest)
+add_telegram_test(ShippingAddressDeserializerTest)
+add_telegram_test(ShippingQueryDeserializerTest)
+add_telegram_test(PreCheckoutQueryDeserializerTest)
+add_telegram_test(UpdatePaymentQueryDeserializerTest)
+
+add_telegram_test(PollOptionTraitsTest)
+add_telegram_test(PollOptionDeserializerTest)
+add_telegram_test(PollDeserializerTest)
+add_telegram_test(PollAnswerDeserializerTest)
+add_telegram_test(UpdatePollDeserializerTest)

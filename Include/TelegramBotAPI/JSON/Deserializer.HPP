@@ -444,15 +444,18 @@ namespace TelegramBotAPI::JSON {
                 Detail::GetRequiredField<TelegramBotAPI::Type::User>(JsonObject,
                                                                      "from");
 
-            ObjectValue.Location =
-                Detail::GetOptionalField<TelegramBotAPI::Type::Location>(
-                    JsonObject, "location");
-
             ObjectValue.Query =
                 Detail::GetRequiredField<std::string>(JsonObject, "query");
 
             ObjectValue.Offset =
                 Detail::GetRequiredField<std::string>(JsonObject, "offset");
+
+            ObjectValue.ChatType =
+                Detail::GetOptionalField<std::string>(JsonObject, "chat_type");
+
+            ObjectValue.Location =
+                Detail::GetOptionalField<TelegramBotAPI::Type::Location>(
+                    JsonObject, "location");
 
             return ObjectValue;
         } else if constexpr (Detail::IsChosenInlineResultV<CleanType>) {
@@ -626,6 +629,18 @@ namespace TelegramBotAPI::JSON {
                 Detail::GetOptionalField<TelegramBotAPI::Type::Message>(
                     JsonObject, "message");
 
+            ObjectValue.EditedMessage =
+                Detail::GetOptionalField<TelegramBotAPI::Type::Message>(
+                    JsonObject, "edited_message");
+
+            ObjectValue.ChannelPost =
+                Detail::GetOptionalField<TelegramBotAPI::Type::Message>(
+                    JsonObject, "channel_post");
+
+            ObjectValue.EditedChannelPost =
+                Detail::GetOptionalField<TelegramBotAPI::Type::Message>(
+                    JsonObject, "edited_channel_post");
+
             ObjectValue.InlineQuery =
                 Detail::GetOptionalField<TelegramBotAPI::Type::InlineQuery>(
                     JsonObject, "inline_query");
@@ -637,6 +652,254 @@ namespace TelegramBotAPI::JSON {
             ObjectValue.CallbackQuery =
                 Detail::GetOptionalField<TelegramBotAPI::Type::CallbackQuery>(
                     JsonObject, "callback_query");
+
+            ObjectValue.ShippingQuery =
+                Detail::GetOptionalField<TelegramBotAPI::Type::ShippingQuery>(
+                    JsonObject, "shipping_query");
+
+            ObjectValue.PreCheckoutQuery = Detail::GetOptionalField<
+                TelegramBotAPI::Type::PreCheckoutQuery>(JsonObject,
+                                                        "pre_checkout_query");
+
+            ObjectValue.Poll =
+                Detail::GetOptionalField<TelegramBotAPI::Type::Poll>(JsonObject,
+                                                                     "poll");
+
+            ObjectValue.PollAnswer =
+                Detail::GetOptionalField<TelegramBotAPI::Type::PollAnswer>(
+                    JsonObject, "poll_answer");
+
+            return ObjectValue;
+
+        } else if constexpr (Detail::IsShippingAddressV<CleanType>) {
+            const Object &JsonObject = Detail::RequireObject(JsonValue);
+
+            CleanType ObjectValue;
+
+            ObjectValue.CountryCode = Detail::GetRequiredField<std::string>(
+                JsonObject, "country_code");
+
+            ObjectValue.State =
+                Detail::GetRequiredField<std::string>(JsonObject, "state");
+
+            ObjectValue.City =
+                Detail::GetRequiredField<std::string>(JsonObject, "city");
+
+            ObjectValue.StreetLine1 = Detail::GetRequiredField<std::string>(
+                JsonObject, "street_line1");
+
+            ObjectValue.StreetLine2 = Detail::GetRequiredField<std::string>(
+                JsonObject, "street_line2");
+
+            ObjectValue.PostCode =
+                Detail::GetRequiredField<std::string>(JsonObject, "post_code");
+
+            return ObjectValue;
+
+        } else if constexpr (Detail::IsShippingQueryV<CleanType>) {
+            const Object &JsonObject = Detail::RequireObject(JsonValue);
+
+            CleanType ObjectValue;
+
+            ObjectValue.ID =
+                Detail::GetRequiredField<std::string>(JsonObject, "id");
+
+            ObjectValue.From =
+                Detail::GetRequiredField<TelegramBotAPI::Type::User>(JsonObject,
+                                                                     "from");
+
+            ObjectValue.InvoicePayload = Detail::GetRequiredField<std::string>(
+                JsonObject, "invoice_payload");
+
+            ObjectValue.ShippingAddress =
+                Detail::GetRequiredField<TelegramBotAPI::Type::ShippingAddress>(
+                    JsonObject, "shipping_address");
+
+            return ObjectValue;
+        } else if constexpr (Detail::IsOrderInfoV<CleanType>) {
+            const Object &JsonObject = Detail::RequireObject(JsonValue);
+
+            CleanType ObjectValue;
+
+            ObjectValue.Name =
+                Detail::GetOptionalField<std::string>(JsonObject, "name");
+
+            ObjectValue.PhoneNumber = Detail::GetOptionalField<std::string>(
+                JsonObject, "phone_number");
+
+            ObjectValue.Email =
+                Detail::GetOptionalField<std::string>(JsonObject, "email");
+
+            ObjectValue.ShippingAddress =
+                Detail::GetOptionalField<TelegramBotAPI::Type::ShippingAddress>(
+                    JsonObject, "shipping_address");
+
+            return ObjectValue;
+        } else if constexpr (Detail::IsPreCheckoutQueryV<CleanType>) {
+            const Object &JsonObject = Detail::RequireObject(JsonValue);
+
+            CleanType ObjectValue;
+
+            ObjectValue.ID =
+                Detail::GetRequiredField<std::string>(JsonObject, "id");
+
+            ObjectValue.From =
+                Detail::GetRequiredField<TelegramBotAPI::Type::User>(JsonObject,
+                                                                     "from");
+
+            ObjectValue.Currency =
+                Detail::GetRequiredField<std::string>(JsonObject, "currency");
+
+            ObjectValue.TotalAmount =
+                Detail::GetRequiredField<long long>(JsonObject, "total_amount");
+
+            ObjectValue.InvoicePayload = Detail::GetRequiredField<std::string>(
+                JsonObject, "invoice_payload");
+
+            ObjectValue.ShippingOptionID =
+                Detail::GetOptionalField<std::string>(JsonObject,
+                                                      "shipping_option_id");
+
+            ObjectValue.OrderInfo =
+                Detail::GetOptionalField<TelegramBotAPI::Type::OrderInfo>(
+                    JsonObject, "order_info");
+
+            return ObjectValue;
+
+        } else if constexpr (Detail::IsPollOptionV<CleanType>) {
+            const Object &JsonObject = Detail::RequireObject(JsonValue);
+
+            CleanType ObjectValue;
+
+            ObjectValue.PersistentID = Detail::GetRequiredField<std::string>(
+                JsonObject, "persistent_id");
+
+            ObjectValue.Text =
+                Detail::GetRequiredField<std::string>(JsonObject, "text");
+
+            ObjectValue.TextEntities =
+                Detail::GetOptionalField<
+                    std::vector<TelegramBotAPI::Type::MessageEntity>>(
+                    JsonObject, "text_entities")
+                    .value_or(
+                        std::vector<TelegramBotAPI::Type::MessageEntity>{});
+
+            ObjectValue.VoterCount =
+                Detail::GetRequiredField<int>(JsonObject, "voter_count");
+
+            ObjectValue.AddedByUser =
+                Detail::GetOptionalField<TelegramBotAPI::Type::User>(
+                    JsonObject, "added_by_user");
+
+            ObjectValue.AddedByChat =
+                Detail::GetOptionalField<TelegramBotAPI::Type::Chat>(
+                    JsonObject, "added_by_chat");
+
+            ObjectValue.AdditionDate = Detail::GetOptionalField<long long>(
+                JsonObject, "addition_date");
+
+            return ObjectValue;
+        } else if constexpr (Detail::IsPollV<CleanType>) {
+            const Object &JsonObject = Detail::RequireObject(JsonValue);
+
+            CleanType ObjectValue;
+
+            ObjectValue.ID =
+                Detail::GetRequiredField<std::string>(JsonObject, "id");
+
+            ObjectValue.Question =
+                Detail::GetRequiredField<std::string>(JsonObject, "question");
+
+            ObjectValue.QuestionEntities =
+                Detail::GetOptionalField<
+                    std::vector<TelegramBotAPI::Type::MessageEntity>>(
+                    JsonObject, "question_entities")
+                    .value_or(
+                        std::vector<TelegramBotAPI::Type::MessageEntity>{});
+
+            ObjectValue.Options = Detail::GetRequiredField<
+                std::vector<TelegramBotAPI::Type::PollOption>>(JsonObject,
+                                                               "options");
+
+            ObjectValue.TotalVoterCount =
+                Detail::GetRequiredField<int>(JsonObject, "total_voter_count");
+
+            ObjectValue.IsClosed =
+                Detail::GetRequiredField<bool>(JsonObject, "is_closed");
+
+            ObjectValue.IsAnonymous =
+                Detail::GetRequiredField<bool>(JsonObject, "is_anonymous");
+
+            ObjectValue.Type =
+                Detail::GetRequiredField<std::string>(JsonObject, "type");
+
+            ObjectValue.AllowsMultipleAnswers = Detail::GetRequiredField<bool>(
+                JsonObject, "allows_multiple_answers");
+
+            ObjectValue.AllowsRevoting =
+                Detail::GetRequiredField<bool>(JsonObject, "allows_revoting");
+
+            ObjectValue.MembersOnly =
+                Detail::GetRequiredField<bool>(JsonObject, "members_only");
+
+            ObjectValue.CountryCodes =
+                Detail::GetOptionalField<std::vector<std::string>>(
+                    JsonObject, "country_codes");
+
+            ObjectValue.CorrectOptionIDS =
+                Detail::GetOptionalField<std::vector<long long>>(
+                    JsonObject, "correct_option_ids");
+
+            ObjectValue.Explanation = Detail::GetOptionalField<std::string>(
+                JsonObject, "explanation");
+
+            ObjectValue.ExplanationEntities =
+                Detail::GetOptionalField<
+                    std::vector<TelegramBotAPI::Type::MessageEntity>>(
+                    JsonObject, "explanation_entities")
+                    .value_or(
+                        std::vector<TelegramBotAPI::Type::MessageEntity>{});
+
+            ObjectValue.OpenPeriod =
+                Detail::GetOptionalField<long long>(JsonObject, "open_period");
+
+            ObjectValue.CloseDate =
+                Detail::GetOptionalField<long long>(JsonObject, "close_date");
+
+            ObjectValue.Description = Detail::GetOptionalField<std::string>(
+                JsonObject, "description");
+
+            ObjectValue.DescriptionEntities =
+                Detail::GetOptionalField<
+                    std::vector<TelegramBotAPI::Type::MessageEntity>>(
+                    JsonObject, "description_entities")
+                    .value_or(
+                        std::vector<TelegramBotAPI::Type::MessageEntity>{});
+
+            return ObjectValue;
+        } else if constexpr (Detail::IsPollAnswerV<CleanType>) {
+            const Object &JsonObject = Detail::RequireObject(JsonValue);
+
+            CleanType ObjectValue;
+
+            ObjectValue.PollID =
+                Detail::GetRequiredField<std::string>(JsonObject, "poll_id");
+
+            ObjectValue.VoterChat =
+                Detail::GetOptionalField<TelegramBotAPI::Type::Chat>(
+                    JsonObject, "voter_chat");
+
+            ObjectValue.User =
+                Detail::GetOptionalField<TelegramBotAPI::Type::User>(JsonObject,
+                                                                     "user");
+
+            ObjectValue.OptionIDS =
+                Detail::GetRequiredField<std::vector<long long>>(JsonObject,
+                                                                 "option_ids");
+
+            ObjectValue.OptionPersistentIDS =
+                Detail::GetRequiredField<std::vector<std::string>>(
+                    JsonObject, "option_persistent_ids");
 
             return ObjectValue;
         } else {

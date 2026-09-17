@@ -95,7 +95,7 @@ namespace TelegramBotAPI {
             }
 
             if (PathPosition == std::string::npos) {
-                Result.BasePath = "";
+                Result.BasePath.clear();
             } else {
                 Result.BasePath = URL.substr(PathPosition);
 
@@ -115,49 +115,63 @@ namespace TelegramBotAPI {
 
             const ParsedURL Parsed = ParseAPIURL(URL);
 
+            const bool IsDefaultPort =
+                (Parsed.Scheme == "https" && Parsed.Port == "443") ||
+                (Parsed.Scheme == "http" && Parsed.Port == "80");
+
             return Parsed.Scheme + "://" + Parsed.Host +
-                   (((Parsed.Scheme == "https" && Parsed.Port == "443") ||
-                     (Parsed.Scheme == "http" && Parsed.Port == "80"))
-                        ? ""
-                        : ":" + Parsed.Port) +
-                   Parsed.BasePath;
+                   (IsDefaultPort ? "" : ":" + Parsed.Port) + Parsed.BasePath;
+        }
+
+        void ValidateBotToken(const std::string &BotToken) {
+            if (BotToken.empty()) {
+                throw TelegramAPIException(
+                    0, "Telegram Bot token cannot be empty");
+            }
         }
     } // namespace
 
     TelegramClient::TelegramClient(const std::string &BotTokenValue)
         : BotToken(BotTokenValue), APIURL("https://api.telegram.org"),
-          HTTPClient() {
-        if (BotToken.empty()) {
-            throw TelegramAPIException(0, "Telegram Bot token cannot be empty");
-        }
+          DefaultHTTPClient(), HTTPClient(&DefaultHTTPClient) {
+        ValidateBotToken(BotToken);
     }
 
     TelegramClient::TelegramClient(const std::string &BotTokenValue,
                                    const std::string &APIURLValue)
         : BotToken(BotTokenValue), APIURL(NormalizeAPIURL(APIURLValue)),
-          HTTPClient() {
-        if (BotToken.empty()) {
-            throw TelegramAPIException(0, "Telegram Bot token cannot be empty");
-        }
+          DefaultHTTPClient(), HTTPClient(&DefaultHTTPClient) {
+        ValidateBotToken(BotToken);
     }
 
     TelegramClient::TelegramClient(const std::string   &BotTokenValue,
                                    std::chrono::seconds Timeout)
         : BotToken(BotTokenValue), APIURL("https://api.telegram.org"),
-          HTTPClient(Timeout) {
-        if (BotToken.empty()) {
-            throw TelegramAPIException(0, "Telegram Bot token cannot be empty");
-        }
+          DefaultHTTPClient(Timeout), HTTPClient(&DefaultHTTPClient) {
+        ValidateBotToken(BotToken);
     }
 
     TelegramClient::TelegramClient(const std::string   &BotTokenValue,
                                    const std::string   &APIURLValue,
                                    std::chrono::seconds Timeout)
         : BotToken(BotTokenValue), APIURL(NormalizeAPIURL(APIURLValue)),
-          HTTPClient(Timeout) {
-        if (BotToken.empty()) {
-            throw TelegramAPIException(0, "Telegram Bot token cannot be empty");
-        }
+          DefaultHTTPClient(Timeout), HTTPClient(&DefaultHTTPClient) {
+        ValidateBotToken(BotToken);
+    }
+
+    TelegramClient::TelegramClient(const std::string    &BotTokenValue,
+                                   Network::IHTTPClient &HTTPClientValue)
+        : BotToken(BotTokenValue), APIURL("https://api.telegram.org"),
+          DefaultHTTPClient(), HTTPClient(&HTTPClientValue) {
+        ValidateBotToken(BotToken);
+    }
+
+    TelegramClient::TelegramClient(const std::string    &BotTokenValue,
+                                   const std::string    &APIURLValue,
+                                   Network::IHTTPClient &HTTPClientValue)
+        : BotToken(BotTokenValue), APIURL(NormalizeAPIURL(APIURLValue)),
+          DefaultHTTPClient(), HTTPClient(&HTTPClientValue) {
+        ValidateBotToken(BotToken);
     }
 
     Network::HTTPResponse
@@ -168,10 +182,8 @@ namespace TelegramBotAPI {
         Network::HTTPRequest Request;
 
         Request.Scheme = Parsed.Scheme;
-
-        Request.Host = Parsed.Host;
-
-        Request.Port = Parsed.Port;
+        Request.Host   = Parsed.Host;
+        Request.Port   = Parsed.Port;
 
         Request.Target = Parsed.BasePath + "/bot" + BotToken + "/" + Method;
 
@@ -194,6 +206,6 @@ namespace TelegramBotAPI {
             Request.Body = boost::json::serialize(Parameters);
         }
 
-        return HTTPClient.PerformHTTPS(Request);
+        return HTTPClient->PerformHTTPS(Request);
     }
 } // namespace TelegramBotAPI

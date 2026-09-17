@@ -25,6 +25,9 @@
 #include "TelegramBotAPI/Types/Venue.HPP"
 #include "TelegramBotAPI/Types/Video.HPP"
 #include "TelegramBotAPI/Types/Voice.HPP"
+#include "TelegramBotAPI/Types/PollOption.HPP"
+#include "TelegramBotAPI/Types/Poll.HPP"
+#include "TelegramBotAPI/Types/PollAnswer.HPP"
 
 namespace TelegramBotAPI::JSON::Detail {
     template <typename Type>
@@ -162,6 +165,36 @@ namespace TelegramBotAPI::JSON::Detail {
     template <typename Type>
     inline constexpr bool IsUpdateV =
         std::is_same_v<RemoveCVRefT<Type>, TelegramBotAPI::Type::Update>;
+
+    template <typename Type>
+    inline constexpr bool IsShippingAddressV =
+        std::is_same_v<RemoveCVRefT<Type>,
+                       TelegramBotAPI::Type::ShippingAddress>;
+
+    template <typename Type>
+    inline constexpr bool IsShippingQueryV =
+        std::is_same_v<RemoveCVRefT<Type>, TelegramBotAPI::Type::ShippingQuery>;
+
+    template <typename Type>
+    inline constexpr bool IsOrderInfoV =
+        std::is_same_v<RemoveCVRefT<Type>, TelegramBotAPI::Type::OrderInfo>;
+
+    template <typename Type>
+    inline constexpr bool IsPreCheckoutQueryV =
+        std::is_same_v<RemoveCVRefT<Type>,
+                       TelegramBotAPI::Type::PreCheckoutQuery>;
+
+    template <typename Type>
+    inline constexpr bool IsPollOptionV =
+        std::is_same_v<RemoveCVRefT<Type>, TelegramBotAPI::Type::PollOption>;
+
+    template <typename Type>
+    inline constexpr bool IsPollV =
+        std::is_same_v<RemoveCVRefT<Type>, TelegramBotAPI::Type::Poll>;
+
+    template <typename Type>
+    inline constexpr bool IsPollAnswerV =
+        std::is_same_v<RemoveCVRefT<Type>, TelegramBotAPI::Type::PollAnswer>;
 } // namespace TelegramBotAPI::JSON::Detail
 
 #endif // TELEGRAMBOTAPI_TRAITS_HPP

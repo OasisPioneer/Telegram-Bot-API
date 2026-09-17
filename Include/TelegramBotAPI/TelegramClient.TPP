@@ -60,6 +60,8 @@ namespace TelegramBotAPI {
             int         ErrorCode = 0;
             std::string Description;
 
+            std::optional<Type::ResponseParameters> Parameters;
+
             const boost::json::object::const_iterator ErrorCodeIterator =
                 JsonObject.find("error_code");
 
@@ -78,11 +80,45 @@ namespace TelegramBotAPI {
                     std::string(DescriptionIterator->value().as_string());
             }
 
+            const boost::json::object::const_iterator ParametersIterator =
+                JsonObject.find("parameters");
+
+            if (ParametersIterator != JsonObject.end() &&
+                ParametersIterator->value().is_object()) {
+                Type::ResponseParameters ResponseParameters;
+
+                const boost::json::object &ParametersObject =
+                    ParametersIterator->value().as_object();
+
+                const boost::json::object::const_iterator RetryAfterIterator =
+                    ParametersObject.find("retry_after");
+
+                if (RetryAfterIterator != ParametersObject.end() &&
+                    RetryAfterIterator->value().is_int64()) {
+                    ResponseParameters.RetryAfter =
+                        RetryAfterIterator->value().as_int64();
+                }
+
+                const boost::json::object::const_iterator MigrateIterator =
+                    ParametersObject.find("migrate_to_chat_id");
+
+                if (MigrateIterator != ParametersObject.end() &&
+                    MigrateIterator->value().is_int64()) {
+                    ResponseParameters.MigrateToChatID =
+                        MigrateIterator->value().as_int64();
+                }
+
+                if (ResponseParameters.RetryAfter.has_value() ||
+                    ResponseParameters.MigrateToChatID.has_value()) {
+                    Parameters = ResponseParameters;
+                }
+            }
+
             if (Description.empty()) {
                 Description = "Telegram API request failed";
             }
 
-            throw TelegramAPIException(ErrorCode, Description);
+            throw TelegramAPIException(ErrorCode, Description, Parameters);
         }
 
         const boost::json::object::const_iterator ResultIterator =

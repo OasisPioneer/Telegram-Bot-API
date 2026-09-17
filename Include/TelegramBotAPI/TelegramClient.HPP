@@ -7,6 +7,7 @@
 #include "TelegramBotAPI/JSON/Json.HPP"
 #include "TelegramBotAPI/Network/HTTPClient.HPP"
 #include "TelegramBotAPI/Network/HTTPResponse.HPP"
+#include "TelegramBotAPI/Network/IHTTPClient.HPP"
 #include "TelegramBotAPI/TelegramAPIException.HPP"
 
 namespace TelegramBotAPI::Methods {
@@ -14,6 +15,7 @@ namespace TelegramBotAPI::Methods {
     class getChat;
     class getUpdates;
     class sendMessage;
+    class answerCallbackQuery;
 } // namespace TelegramBotAPI::Methods
 
 namespace TelegramBotAPI {
@@ -22,6 +24,7 @@ namespace TelegramBotAPI {
             friend class Methods::getChat;
             friend class Methods::getUpdates;
             friend class Methods::sendMessage;
+            friend class Methods::answerCallbackQuery;
 
         public:
             explicit TelegramClient(const std::string &BotToken);
@@ -36,12 +39,20 @@ namespace TelegramBotAPI {
                            const std::string   &APIURL,
                            std::chrono::seconds Timeout);
 
+            TelegramClient(const std::string    &BotToken,
+                           Network::IHTTPClient &HTTPClient);
+
+            TelegramClient(const std::string    &BotToken,
+                           const std::string    &APIURL,
+                           Network::IHTTPClient &HTTPClient);
+
         private:
             std::string BotToken;
-
             std::string APIURL;
 
-            Network::HTTPClient HTTPClient;
+            Network::HTTPClient DefaultHTTPClient;
+
+            Network::IHTTPClient *HTTPClient;
 
             Network::HTTPResponse
             PerformRequest(const std::string  &Method,

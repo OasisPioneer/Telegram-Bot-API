@@ -10,7 +10,7 @@
 namespace TelegramBotAPI::Type {
     struct ChosenInlineResult {
             std::string                                   ResultID{};
-            std::optional<TelegramBotAPI::Type::User>     From{};
+            TelegramBotAPI::Type::User                    From{};
             std::optional<TelegramBotAPI::Type::Location> Location{};
             std::optional<std::string>                    InlineMessageID{};
             std::optional<std::string>                    Query{};

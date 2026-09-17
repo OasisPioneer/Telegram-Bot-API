@@ -10,10 +10,11 @@
 namespace TelegramBotAPI::Type {
     struct InlineQuery {
             std::string                                   ID{};
-            std::optional<TelegramBotAPI::Type::User>     From{};
-            std::optional<TelegramBotAPI::Type::Location> Location{};
+            TelegramBotAPI::Type::User                    From{};
             std::string                                   Query{};
             std::string                                   Offset{};
+            std::optional<std::string>                    ChatType{};
+            std::optional<TelegramBotAPI::Type::Location> Location{};
     };
 } // namespace TelegramBotAPI::Type
 

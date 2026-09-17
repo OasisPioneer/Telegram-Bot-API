@@ -5,15 +5,16 @@
 
 #include "HTTPRequest.HPP"
 #include "HTTPResponse.HPP"
+#include "IHTTPClient.HPP"
 
 namespace TelegramBotAPI::Network {
-    class HTTPClient {
+    class HTTPClient : public IHTTPClient {
         public:
             HTTPClient();
 
             explicit HTTPClient(std::chrono::seconds Timeout);
 
-            HTTPResponse PerformHTTPS(const HTTPRequest &Request);
+            HTTPResponse PerformHTTPS(const HTTPRequest &Request) override;
 
         private:
             std::chrono::seconds Timeout;
