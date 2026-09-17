@@ -839,6 +839,18 @@ namespace TelegramBotAPI::JSON {
                     JsonObject, "order_info");
 
             return ObjectValue;
+        } else if constexpr (Detail::IsResponseParametersV<CleanType>) {
+            const Object &JsonObject = Detail::RequireObject(JsonValue);
+
+            CleanType ObjectValue;
+
+            ObjectValue.MigrateToChatID = Detail::GetOptionalField<long long>(
+                JsonObject, "migrate_to_chat_id");
+
+            ObjectValue.RetryAfter =
+                Detail::GetOptionalField<long long>(JsonObject, "retry_after");
+
+            return ObjectValue;
         } else if constexpr (Detail::IsPollMediaV<CleanType>) {
             const Object &JsonObject = Detail::RequireObject(JsonValue);
 

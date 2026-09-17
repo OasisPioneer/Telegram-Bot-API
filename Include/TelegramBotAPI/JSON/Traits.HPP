@@ -7,6 +7,7 @@
 #include <type_traits>
 #include <vector>
 
+#include "TelegramBotAPI/Types/Animation.HPP"
 #include "TelegramBotAPI/Types/Audio.HPP"
 #include "TelegramBotAPI/Types/CallbackQuery.HPP"
 #include "TelegramBotAPI/Types/Chat.HPP"
@@ -15,6 +16,7 @@
 #include "TelegramBotAPI/Types/Document.HPP"
 #include "TelegramBotAPI/Types/File.HPP"
 #include "TelegramBotAPI/Types/InlineQuery.HPP"
+#include "TelegramBotAPI/Types/LivePhoto.HPP"
 #include "TelegramBotAPI/Types/Location.HPP"
 #include "TelegramBotAPI/Types/Message.HPP"
 #include "TelegramBotAPI/Types/MessageEntity.HPP"
@@ -28,8 +30,7 @@
 #include "TelegramBotAPI/Types/Venue.HPP"
 #include "TelegramBotAPI/Types/Video.HPP"
 #include "TelegramBotAPI/Types/Voice.HPP"
-#include "TelegramBotAPI/Types/Animation.HPP"
-#include "TelegramBotAPI/Types/LivePhoto.HPP"
+#include "TelegramBotAPI/Types/ResponseParameters.HPP"
 
 namespace TelegramBotAPI::JSON::Detail {
     template <typename Type>
@@ -213,6 +214,11 @@ namespace TelegramBotAPI::JSON::Detail {
     template <typename Type>
     inline constexpr bool IsPollMediaV =
         std::is_same_v<RemoveCVRefT<Type>, TelegramBotAPI::Type::PollMedia>;
+
+    template <typename Type>
+    inline constexpr bool IsResponseParametersV =
+        std::is_same_v<RemoveCVRefT<Type>,
+                       TelegramBotAPI::Type::ResponseParameters>;
 
 } // namespace TelegramBotAPI::JSON::Detail
 
