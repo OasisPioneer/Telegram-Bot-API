@@ -7,22 +7,17 @@
 #include "HTTPResponse.HPP"
 
 namespace TelegramBotAPI::Network {
-    class HTTPClient
-    {
+    class HTTPClient {
         public:
             HTTPClient();
 
-            explicit HTTPClient(
-                std::chrono::seconds Timeout
-            );
+            explicit HTTPClient(std::chrono::seconds Timeout);
 
-            HTTPResponse PerformHTTPS(
-                const HTTPRequest& Request
-            );
+            HTTPResponse PerformHTTPS(const HTTPRequest &Request);
 
         private:
             std::chrono::seconds Timeout;
     };
-}
+} // namespace TelegramBotAPI::Network
 
 #endif // TELEGRAMBOTAPI_HTTPCLIENT_HPP

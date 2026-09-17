@@ -9,55 +9,52 @@
 #include "TelegramBotAPI/Network/HTTPResponse.HPP"
 #include "TelegramBotAPI/TelegramAPIException.HPP"
 
-namespace TelegramBotAPI::Methods
-{
+namespace TelegramBotAPI::Methods {
     class getMe;
     class getChat;
     class getUpdates;
     class sendMessage;
-}
+} // namespace TelegramBotAPI::Methods
 
-namespace TelegramBotAPI
-{
-    class TelegramClient
-    {
-        friend class Methods::getMe;
-        friend class Methods::getChat;
-        friend class Methods::getUpdates;
-        friend class Methods::sendMessage;
+namespace TelegramBotAPI {
+    class TelegramClient {
+            friend class Methods::getMe;
+            friend class Methods::getChat;
+            friend class Methods::getUpdates;
+            friend class Methods::sendMessage;
 
         public:
-            explicit TelegramClient(
-                const std::string& BotToken
-            );
+            explicit TelegramClient(const std::string &BotToken);
 
-            TelegramClient(
-                const std::string& BotToken,
-                std::chrono::seconds Timeout
-            );
+            TelegramClient(const std::string &BotToken,
+                           const std::string &APIURL);
+
+            TelegramClient(const std::string   &BotToken,
+                           std::chrono::seconds Timeout);
+
+            TelegramClient(const std::string   &BotToken,
+                           const std::string   &APIURL,
+                           std::chrono::seconds Timeout);
 
         private:
             std::string BotToken;
 
+            std::string APIURL;
+
             Network::HTTPClient HTTPClient;
 
-            Network::HTTPResponse PerformRequest(
-                const std::string& Method,
-                const JSON::Object& Parameters
-            );
+            Network::HTTPResponse
+            PerformRequest(const std::string  &Method,
+                           const JSON::Object &Parameters);
 
             template <typename ReturnType>
-            ReturnType Call(
-                const std::string& Method
-            );
+            ReturnType Call(const std::string &Method);
 
             template <typename ReturnType>
-            ReturnType Call(
-                const std::string& Method,
-                const JSON::Object& Parameters
-            );
+            ReturnType Call(const std::string  &Method,
+                            const JSON::Object &Parameters);
     };
-}
+} // namespace TelegramBotAPI
 
 #include "TelegramBotAPI/TelegramClient.TPP"
 

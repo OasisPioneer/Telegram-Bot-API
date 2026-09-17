@@ -9,11 +9,12 @@
 namespace TelegramBotAPI::Network {
     class HTTPResponse {
         public:
-            unsigned int StatusCode{0};
-            std::string ReasonPhrase{};
+            unsigned int            StatusCode{0};
+            std::string             Reason{};
+            std::string             ReasonPhrase{};
             std::vector<HTTPHeader> Headers{};
-            std::string Body{};
+            std::string             Body{};
     };
-}
+} // namespace TelegramBotAPI::Network
 
 #endif // TELEGRAMBOTAPI_HTTPRESPONSE_HPP

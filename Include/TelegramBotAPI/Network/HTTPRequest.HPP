@@ -9,18 +9,16 @@
 namespace TelegramBotAPI::Network {
     class HTTPRequest {
         public:
-            std::string Method{"GET"};
-            std::string Target{"/"};
+            std::string Scheme = "https";
             std::string Host{};
-            std::string Body{};
+            std::string Port = "443";
+            std::string Target{"/"};
+            std::string Method{"GET"};
 
             std::vector<HTTPHeader> Headers{};
 
-            bool HasBody() const noexcept
-            {
-                return !Body.empty();
-            }
+            std::string Body{};
     };
-}
+} // namespace TelegramBotAPI::Network
 
 #endif // TELEGRAMBOTAPI_HTTPREQUEST_HPP

@@ -7,10 +7,10 @@ find_package(Boost REQUIRED CONFIG COMPONENTS system json)
 find_package(OpenSSL REQUIRED)
 find_package(Threads REQUIRED)
 
-add_library(${PROJECT_NAME}
+add_library(${PROJECT_NAME} STATIC
         Src/TelegramBotAPI.CPP
-        Lib/Network/HTTPClient.CPP
-        Lib/TelegramClient.CPP
+        Src/TelegramClient.CPP
+        Src/Network/HTTPClient.CPP
 )
 add_library(TelegramBotAPI::TelegramBotAPI ALIAS ${PROJECT_NAME})
 

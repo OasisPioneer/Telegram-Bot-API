@@ -63,3 +63,5 @@ add_telegram_test(GetChatParametersJsonTest)
 
 add_telegram_test(GetUpdatesParametersJsonTest)
 add_telegram_test(GetMeParametersJsonTest)
+
+add_telegram_test(TelegramClientAPIURLTest)

@@ -5,28 +5,31 @@
 #include <string>
 
 namespace TelegramBotAPI::Network {
-    enum class HTTPErrorType {
-        Unknown,
-        DNS,
-        Connection,
-        TLS,
-        Timeout,
-        Write,
-        Read,
-        HTTP
-    };
-
     class HTTPException : public std::runtime_error {
         public:
-            HTTPException(HTTPErrorType ErrorType, const std::string &Message)
-                : std::runtime_error(Message), ErrorTypeValue(ErrorType) {}
+            enum class ErrorType {
+                Unknown,
+                Resolve,
+                Connect,
+                SSL,
+                Handshake,
+                Write,
+                Read,
+                Shutdown,
+                InvalidRequest,
+                UnsupportedScheme
+            };
 
-            HTTPErrorType GetErrorType() const noexcept {
-                return ErrorTypeValue;
-            }
+            explicit HTTPException(const std::string &Message)
+                : std::runtime_error(Message), Type(ErrorType::Unknown) {}
+
+            HTTPException(ErrorType TypeValue, const std::string &Message)
+                : std::runtime_error(Message), Type(TypeValue) {}
+
+            ErrorType GetErrorType() const noexcept { return Type; }
 
         private:
-            HTTPErrorType ErrorTypeValue;
+            ErrorType Type;
     };
 } // namespace TelegramBotAPI::Network
 
