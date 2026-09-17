@@ -36,3 +36,5 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 enable_testing()
 
 add_subdirectory(Tests)
+
+add_subdirectory(Examples/EchoBot)
