@@ -5,27 +5,35 @@
 #include "TelegramBotAPI/TelegramBotAPI.HPP"
 
 int main() {
-    const char *BotTokenEnvironment = std::getenv("TELEGRAM_BOT_TOKEN");
+    const char *TokenEnvironment = std::getenv("TELEGRAM_BOT_TOKEN");
 
-    if (BotTokenEnvironment == nullptr) {
-        std::cerr << "TELEGRAM_BOT_TOKEN is not set." << std::endl;
+    if (TokenEnvironment == nullptr) {
+        std::cerr << "TELEGRAM_BOT_TOKEN is not set\n";
+
         return 1;
     }
 
-    TelegramBotAPI::TelegramBotAPI Bot(BotTokenEnvironment);
+    const std::string BotToken(TokenEnvironment);
 
-    Bot.OnMessage(
-        [&Bot](const TelegramBotAPI::Type::Message &Message) {
-            if (!Message.Text.has_value()) {
-                return;
-            }
+    if (BotToken.empty()) {
+        std::cerr << "TELEGRAM_BOT_TOKEN is empty\n";
 
-            Bot.SendMessage(
-                Message.Chat.ID,
-                Message.Text.value()
-            );
+        return 1;
+    }
+
+    TelegramBotAPI::TelegramBotAPI Bot(BotToken);
+
+    Bot.OnMessage([&](const TelegramBotAPI::Type::Message &Message) {
+        if (!Message.Text.has_value()) {
+            return;
         }
-    );
+
+        std::cout << "Received: " << Message.Text.value() << '\n';
+
+        Bot.SendMessage(Message.Chat.ID, Message.Text.value());
+    });
+
+    std::cout << "EchoBot started\n";
 
     Bot.Run();
 
