@@ -18,81 +18,79 @@ namespace TelegramBotAPI {
     }
 
     template <typename ReturnType>
-    ReturnType TelegramClient::Call(
-        const std::string  &Method,
-        const JSON::Object &Parameters
-    ) {
-        Network::HTTPResponse Response =
-            PerformRequest(Method, Parameters);
+    ReturnType TelegramClient::Call(const std::string  &Method,
+                                    const JSON::Object &Parameters) {
+        Network::HTTPResponse Response = PerformRequest(Method, Parameters);
 
+        return ParseResponse<ReturnType>(Response);
+    }
+
+    template <typename ReturnType>
+    ReturnType TelegramClient::CallMultipart(
+        const std::string                       &Method,
+        const Network::Multipart::MultipartForm &Form) {
+        Network::HTTPResponse Response = PerformMultipartRequest(Method, Form);
+
+        return ParseResponse<ReturnType>(Response);
+    }
+
+    template <typename ReturnType>
+    ReturnType
+    TelegramClient::ParseResponse(const Network::HTTPResponse &Response) {
         boost::json::value JsonValue;
 
         try {
             JsonValue = boost::json::parse(Response.Body);
         } catch (const boost::system::system_error &Exception) {
-            if (Response.StatusCode < 200 ||
-                Response.StatusCode >= 300) {
+            if (Response.StatusCode < 200 || Response.StatusCode >= 300) {
                 throw TelegramAPIException(
                     static_cast<int>(Response.StatusCode),
                     "Telegram API returned HTTP status " +
-                        std::to_string(Response.StatusCode)
-                );
+                        std::to_string(Response.StatusCode));
             }
 
-            throw TelegramAPIException(
-                0,
-                "Failed to parse Telegram API JSON: " +
-                    std::string(Exception.what())
-            );
+            throw TelegramAPIException(0,
+                                       "Failed to parse Telegram API JSON: " +
+                                           std::string(Exception.what()));
         }
 
         if (!JsonValue.is_object()) {
-            if (Response.StatusCode < 200 ||
-                Response.StatusCode >= 300) {
+            if (Response.StatusCode < 200 || Response.StatusCode >= 300) {
                 throw TelegramAPIException(
                     static_cast<int>(Response.StatusCode),
                     "Telegram API returned HTTP status " +
-                        std::to_string(Response.StatusCode)
-                );
+                        std::to_string(Response.StatusCode));
             }
 
             throw TelegramAPIException(
-                0,
-                "Telegram API response is not a JSON object"
-            );
+                0, "Telegram API response is not a JSON object");
         }
 
-        const boost::json::object &JsonObject =
-            JsonValue.as_object();
+        const boost::json::object &JsonObject = JsonValue.as_object();
 
         const boost::json::object::const_iterator OkIterator =
             JsonObject.find("ok");
 
         if (OkIterator == JsonObject.end()) {
-            if (Response.StatusCode < 200 ||
-                Response.StatusCode >= 300) {
+            if (Response.StatusCode < 200 || Response.StatusCode >= 300) {
                 throw TelegramAPIException(
                     static_cast<int>(Response.StatusCode),
                     "Telegram API returned HTTP status " +
-                        std::to_string(Response.StatusCode)
-                );
+                        std::to_string(Response.StatusCode));
             }
 
             throw TelegramAPIException(
-                0,
-                "Telegram API response is missing field: ok"
-            );
+                0, "Telegram API response is missing field: ok");
         }
 
         if (!OkIterator->value().is_bool()) {
             throw TelegramAPIException(
                 static_cast<int>(Response.StatusCode),
-                "Telegram API field 'ok' is not a boolean"
-            );
+                "Telegram API field 'ok' is not a boolean");
         }
 
         if (!OkIterator->value().as_bool()) {
-            int ErrorCode = 0;
+            int         ErrorCode = 0;
             std::string Description;
 
             std::optional<Type::ResponseParameters> ParametersValue;
@@ -103,9 +101,7 @@ namespace TelegramBotAPI {
             if (ErrorCodeIterator != JsonObject.end() &&
                 ErrorCodeIterator->value().is_int64()) {
                 ErrorCode =
-                    static_cast<int>(
-                        ErrorCodeIterator->value().as_int64()
-                    );
+                    static_cast<int>(ErrorCodeIterator->value().as_int64());
             }
 
             const boost::json::object::const_iterator DescriptionIterator =
@@ -114,9 +110,7 @@ namespace TelegramBotAPI {
             if (DescriptionIterator != JsonObject.end() &&
                 DescriptionIterator->value().is_string()) {
                 Description =
-                    std::string(
-                        DescriptionIterator->value().as_string()
-                    );
+                    std::string(DescriptionIterator->value().as_string());
             }
 
             const boost::json::object::const_iterator ParametersIterator =
@@ -158,20 +152,13 @@ namespace TelegramBotAPI {
                 Description = "Telegram API request failed";
             }
 
-            throw TelegramAPIException(
-                ErrorCode,
-                Description,
-                ParametersValue
-            );
+            throw TelegramAPIException(ErrorCode, Description, ParametersValue);
         }
 
-        if (Response.StatusCode < 200 ||
-            Response.StatusCode >= 300) {
-            throw TelegramAPIException(
-                static_cast<int>(Response.StatusCode),
-                "Telegram API returned HTTP status " +
-                    std::to_string(Response.StatusCode)
-            );
+        if (Response.StatusCode < 200 || Response.StatusCode >= 300) {
+            throw TelegramAPIException(static_cast<int>(Response.StatusCode),
+                                       "Telegram API returned HTTP status " +
+                                           std::to_string(Response.StatusCode));
         }
 
         const boost::json::object::const_iterator ResultIterator =
@@ -179,23 +166,17 @@ namespace TelegramBotAPI {
 
         if (ResultIterator == JsonObject.end()) {
             throw TelegramAPIException(
-                0,
-                "Telegram API response is missing field: result"
-            );
+                0, "Telegram API response is missing field: result");
         }
 
         try {
-            return JSON::FromJson<ReturnType>(
-                ResultIterator->value()
-            );
+            return JSON::FromJson<ReturnType>(ResultIterator->value());
         } catch (const JSON::JsonException &Exception) {
             throw TelegramAPIException(
-                0,
-                "Failed to deserialize Telegram API result: " +
-                    std::string(Exception.what())
-            );
+                0, "Failed to deserialize Telegram API result: " +
+                       std::string(Exception.what()));
         }
     }
-}
+} // namespace TelegramBotAPI
 
 #endif

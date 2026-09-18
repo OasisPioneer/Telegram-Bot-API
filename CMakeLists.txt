@@ -11,6 +11,7 @@ add_library(${PROJECT_NAME} STATIC
         Src/TelegramBotAPI.CPP
         Src/TelegramClient.CPP
         Src/Network/HTTPClient.CPP
+        Src/Network/Multipart/MultipartForm.CPP
 )
 add_library(TelegramBotAPI::TelegramBotAPI ALIAS ${PROJECT_NAME})
 

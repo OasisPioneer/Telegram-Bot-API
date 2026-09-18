@@ -9,6 +9,7 @@
 #include "TelegramBotAPI/Network/IHTTPClient.HPP"
 #include "TelegramBotAPI/TelegramClient.HPP"
 #include "TelegramBotAPI/Types/CallbackQuery.HPP"
+#include "TelegramBotAPI/Types/InputFile.HPP"
 #include "TelegramBotAPI/Types/Message.HPP"
 #include "TelegramBotAPI/Types/Update.HPP"
 
@@ -41,6 +42,18 @@ namespace TelegramBotAPI {
 
             Type::Message SendMessage(long long          ChatID,
                                       const std::string &Text);
+
+            Type::Message SendPhoto(long long              ChatID,
+                                    const Type::InputFile &Photo);
+
+            Type::Message SendPhoto(long long              ChatID,
+                                    const Type::InputFile &Photo,
+                                    const std::string     &Caption);
+
+            Type::Message SendPhoto(long long              ChatID,
+                                    const Type::InputFile &Photo,
+                                    const std::string     &Caption,
+                                    const std::string     &ParseMode);
 
             void Run();
 

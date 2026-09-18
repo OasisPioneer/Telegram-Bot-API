@@ -208,4 +208,35 @@ namespace TelegramBotAPI {
 
         return HTTPClient->PerformHTTPS(Request);
     }
+
+    Network::HTTPResponse TelegramClient::PerformMultipartRequest(
+        const std::string                       &Method,
+        const Network::Multipart::MultipartForm &Form) {
+        const ParsedURL Parsed = ParseAPIURL(APIURL);
+
+        Network::HTTPRequest Request;
+
+        Request.Scheme = Parsed.Scheme;
+        Request.Host   = Parsed.Host;
+        Request.Port   = Parsed.Port;
+
+        Request.Target = Parsed.BasePath + "/bot" + BotToken + "/" + Method;
+
+        Request.Method = "POST";
+
+        Request.Headers.push_back(Network::HTTPHeader{"Host", Parsed.Host});
+
+        Request.Headers.push_back(
+            Network::HTTPHeader{"User-Agent", "TelegramBotAPI-Cpp/0.1"});
+
+        Request.Headers.push_back(
+            Network::HTTPHeader{"Accept", "application/json"});
+
+        Request.Headers.push_back(
+            Network::HTTPHeader{"Content-Type", Form.GetContentType()});
+
+        Request.Body = Form.Build();
+
+        return HTTPClient->PerformHTTPS(Request);
+    }
 } // namespace TelegramBotAPI

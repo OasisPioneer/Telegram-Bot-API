@@ -5,32 +5,39 @@
 #include "TelegramBotAPI/TelegramBotAPI.HPP"
 
 int main() {
-    const char *TokenEnvironment = std::getenv("TELEGRAM_BOT_TOKEN");
+    const char *BotTokenEnvironment = std::getenv("TELEGRAM_BOT_TOKEN");
 
-    if (TokenEnvironment == nullptr) {
+    if (BotTokenEnvironment == nullptr) {
         std::cerr << "TELEGRAM_BOT_TOKEN is not set\n";
-
         return 1;
     }
 
-    const std::string BotToken(TokenEnvironment);
+    TelegramBotAPI::TelegramBotAPI Bot(BotTokenEnvironment);
 
-    if (BotToken.empty()) {
-        std::cerr << "TELEGRAM_BOT_TOKEN is empty\n";
+    Bot.OnMessage([&Bot](const TelegramBotAPI::Type::Message &Message) {
+        if (Message.Photo.has_value() && !Message.Photo->empty()) {
 
-        return 1;
-    }
+            const TelegramBotAPI::Type::PhotoSize &Photo =
+                Message.Photo->back();
 
-    TelegramBotAPI::TelegramBotAPI Bot(BotToken);
+            std::cout << "Received photo: " << Photo.FileID << '\n';
 
-    Bot.OnMessage([&](const TelegramBotAPI::Type::Message &Message) {
-        if (!Message.Text.has_value()) {
+            Bot.SendPhoto(
+                Message.Chat.ID,
+                TelegramBotAPI::Type::InputFile::FromFileID(Photo.FileID));
+
             return;
         }
 
-        std::cout << "Received: " << Message.Text.value() << '\n';
+        if (Message.Text.has_value()) {
+            std::cout << "Received: " << Message.Text.value() << '\n';
 
-        Bot.SendMessage(Message.Chat.ID, Message.Text.value());
+            Bot.SendMessage(Message.Chat.ID, Message.Text.value());
+
+            return;
+        }
+
+        std::cout << "Received unsupported message type" << '\n';
     });
 
     std::cout << "EchoBot started\n";

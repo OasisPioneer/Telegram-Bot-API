@@ -8,6 +8,7 @@
 #include "TelegramBotAPI/Network/HTTPClient.HPP"
 #include "TelegramBotAPI/Network/HTTPResponse.HPP"
 #include "TelegramBotAPI/Network/IHTTPClient.HPP"
+#include "TelegramBotAPI/Network/Multipart/MultipartForm.HPP"
 #include "TelegramBotAPI/TelegramAPIException.HPP"
 
 namespace TelegramBotAPI::Methods {
@@ -16,6 +17,7 @@ namespace TelegramBotAPI::Methods {
     class getUpdates;
     class sendMessage;
     class answerCallbackQuery;
+    class sendPhoto;
 } // namespace TelegramBotAPI::Methods
 
 namespace TelegramBotAPI {
@@ -25,6 +27,7 @@ namespace TelegramBotAPI {
             friend class Methods::getUpdates;
             friend class Methods::sendMessage;
             friend class Methods::answerCallbackQuery;
+            friend class Methods::sendPhoto;
 
         public:
             explicit TelegramClient(const std::string &BotToken);
@@ -50,13 +53,19 @@ namespace TelegramBotAPI {
             std::string BotToken;
             std::string APIURL;
 
-            Network::HTTPClient DefaultHTTPClient;
-
+            Network::HTTPClient   DefaultHTTPClient;
             Network::IHTTPClient *HTTPClient;
 
             Network::HTTPResponse
             PerformRequest(const std::string  &Method,
                            const JSON::Object &Parameters);
+
+            Network::HTTPResponse PerformMultipartRequest(
+                const std::string                       &Method,
+                const Network::Multipart::MultipartForm &Form);
+
+            template <typename ReturnType>
+            ReturnType ParseResponse(const Network::HTTPResponse &Response);
 
             template <typename ReturnType>
             ReturnType Call(const std::string &Method);
@@ -64,6 +73,11 @@ namespace TelegramBotAPI {
             template <typename ReturnType>
             ReturnType Call(const std::string  &Method,
                             const JSON::Object &Parameters);
+
+            template <typename ReturnType>
+            ReturnType
+            CallMultipart(const std::string                       &Method,
+                          const Network::Multipart::MultipartForm &Form);
     };
 } // namespace TelegramBotAPI
 

@@ -162,9 +162,9 @@ namespace TelegramBotAPI::JSON {
             SetField(JsonObject, FieldName, *FieldValue);
         }
 
-        template <> struct Serializer<TelegramBotAPI::Type::User> {
+        template <> struct Serializer<::TelegramBotAPI::Type::User> {
                 static Value
-                Serialize(const TelegramBotAPI::Type::User &ObjectValue) {
+                Serialize(const ::TelegramBotAPI::Type::User &ObjectValue) {
                     Object JsonObject;
 
                     SetField(JsonObject, "id", ObjectValue.ID);
@@ -181,9 +181,9 @@ namespace TelegramBotAPI::JSON {
                 }
         };
 
-        template <> struct Serializer<TelegramBotAPI::Type::Chat> {
+        template <> struct Serializer<::TelegramBotAPI::Type::Chat> {
                 static Value
-                Serialize(const TelegramBotAPI::Type::Chat &ObjectValue) {
+                Serialize(const ::TelegramBotAPI::Type::Chat &ObjectValue) {
                     Object JsonObject;
 
                     SetField(JsonObject, "id", ObjectValue.ID);
@@ -205,9 +205,9 @@ namespace TelegramBotAPI::JSON {
                 }
         };
 
-        template <> struct Serializer<TelegramBotAPI::Type::MessageEntity> {
+        template <> struct Serializer<::TelegramBotAPI::Type::MessageEntity> {
                 static Value Serialize(
-                    const TelegramBotAPI::Type::MessageEntity &ObjectValue) {
+                    const ::TelegramBotAPI::Type::MessageEntity &ObjectValue) {
                     Object JsonObject;
 
                     SetField(JsonObject, "type", ObjectValue.Type);
@@ -222,9 +222,9 @@ namespace TelegramBotAPI::JSON {
                 }
         };
 
-        template <> struct Serializer<TelegramBotAPI::Type::PhotoSize> {
+        template <> struct Serializer<::TelegramBotAPI::Type::PhotoSize> {
                 static Value
-                Serialize(const TelegramBotAPI::Type::PhotoSize &ObjectValue) {
+                Serialize(const ::TelegramBotAPI::Type::PhotoSize &ObjectValue) {
                     Object JsonObject;
 
                     SetField(JsonObject, "file_id", ObjectValue.FileID);
@@ -240,9 +240,9 @@ namespace TelegramBotAPI::JSON {
                 }
         };
 
-        template <> struct Serializer<TelegramBotAPI::Type::Audio> {
+        template <> struct Serializer<::TelegramBotAPI::Type::Audio> {
                 static Value
-                Serialize(const TelegramBotAPI::Type::Audio &ObjectValue) {
+                Serialize(const ::TelegramBotAPI::Type::Audio &ObjectValue) {
                     Object JsonObject;
 
                     SetField(JsonObject, "file_id", ObjectValue.FileID);
@@ -264,9 +264,9 @@ namespace TelegramBotAPI::JSON {
                 }
         };
 
-        template <> struct Serializer<TelegramBotAPI::Type::Document> {
+        template <> struct Serializer<::TelegramBotAPI::Type::Document> {
                 static Value
-                Serialize(const TelegramBotAPI::Type::Document &ObjectValue) {
+                Serialize(const ::TelegramBotAPI::Type::Document &ObjectValue) {
                     Object JsonObject;
 
                     SetField(JsonObject, "file_id", ObjectValue.FileID);
@@ -283,9 +283,9 @@ namespace TelegramBotAPI::JSON {
                 }
         };
 
-        template <> struct Serializer<TelegramBotAPI::Type::Sticker> {
+        template <> struct Serializer<::TelegramBotAPI::Type::Sticker> {
                 static Value
-                Serialize(const TelegramBotAPI::Type::Sticker &ObjectValue) {
+                Serialize(const ::TelegramBotAPI::Type::Sticker &ObjectValue) {
                     Object JsonObject;
 
                     SetField(JsonObject, "file_id", ObjectValue.FileID);
@@ -302,9 +302,9 @@ namespace TelegramBotAPI::JSON {
                 }
         };
 
-        template <> struct Serializer<TelegramBotAPI::Type::Video> {
+        template <> struct Serializer<::TelegramBotAPI::Type::Video> {
                 static Value
-                Serialize(const TelegramBotAPI::Type::Video &ObjectValue) {
+                Serialize(const ::TelegramBotAPI::Type::Video &ObjectValue) {
                     Object JsonObject;
 
                     SetField(JsonObject, "file_id", ObjectValue.FileID);
@@ -330,9 +330,9 @@ namespace TelegramBotAPI::JSON {
                 }
         };
 
-        template <> struct Serializer<TelegramBotAPI::Type::Voice> {
+        template <> struct Serializer<::TelegramBotAPI::Type::Voice> {
                 static Value
-                Serialize(const TelegramBotAPI::Type::Voice &ObjectValue) {
+                Serialize(const ::TelegramBotAPI::Type::Voice &ObjectValue) {
                     Object JsonObject;
 
                     SetField(JsonObject, "file_id", ObjectValue.FileID);
@@ -349,9 +349,9 @@ namespace TelegramBotAPI::JSON {
                 }
         };
 
-        template <> struct Serializer<TelegramBotAPI::Type::Contact> {
+        template <> struct Serializer<::TelegramBotAPI::Type::Contact> {
                 static Value
-                Serialize(const TelegramBotAPI::Type::Contact &ObjectValue) {
+                Serialize(const ::TelegramBotAPI::Type::Contact &ObjectValue) {
                     Object JsonObject;
 
                     SetField(JsonObject, "phone_number",
@@ -368,9 +368,9 @@ namespace TelegramBotAPI::JSON {
                 }
         };
 
-        template <> struct Serializer<TelegramBotAPI::Type::Location> {
+        template <> struct Serializer<::TelegramBotAPI::Type::Location> {
                 static Value
-                Serialize(const TelegramBotAPI::Type::Location &ObjectValue) {
+                Serialize(const ::TelegramBotAPI::Type::Location &ObjectValue) {
                     Object JsonObject;
 
                     SetField(JsonObject, "longitude", ObjectValue.Longitude);
@@ -381,9 +381,9 @@ namespace TelegramBotAPI::JSON {
                 }
         };
 
-        template <> struct Serializer<TelegramBotAPI::Type::Venue> {
+        template <> struct Serializer<::TelegramBotAPI::Type::Venue> {
                 static Value
-                Serialize(const TelegramBotAPI::Type::Venue &ObjectValue) {
+                Serialize(const ::TelegramBotAPI::Type::Venue &ObjectValue) {
                     Object JsonObject;
 
                     SetField(JsonObject, "location", ObjectValue.Location);
@@ -399,9 +399,9 @@ namespace TelegramBotAPI::JSON {
                 }
         };
 
-        template <> struct Serializer<TelegramBotAPI::Type::File> {
+        template <> struct Serializer<::TelegramBotAPI::Type::File> {
                 static Value
-                Serialize(const TelegramBotAPI::Type::File &ObjectValue) {
+                Serialize(const ::TelegramBotAPI::Type::File &ObjectValue) {
                     Object JsonObject;
 
                     SetField(JsonObject, "file_id", ObjectValue.FileID);
@@ -416,9 +416,9 @@ namespace TelegramBotAPI::JSON {
                 }
         };
 
-        template <> struct Serializer<TelegramBotAPI::Type::InlineQuery> {
+        template <> struct Serializer<::TelegramBotAPI::Type::InlineQuery> {
                 static Value Serialize(
-                    const TelegramBotAPI::Type::InlineQuery &ObjectValue) {
+                    const ::TelegramBotAPI::Type::InlineQuery &ObjectValue) {
                     Object JsonObject;
 
                     SetField(JsonObject, "id", ObjectValue.ID);
@@ -437,9 +437,9 @@ namespace TelegramBotAPI::JSON {
         };
 
         template <>
-        struct Serializer<TelegramBotAPI::Type::ChosenInlineResult> {
+        struct Serializer<::TelegramBotAPI::Type::ChosenInlineResult> {
                 static Value
-                Serialize(const TelegramBotAPI::Type::ChosenInlineResult
+                Serialize(const ::TelegramBotAPI::Type::ChosenInlineResult
                               &ObjectValue) {
                     Object JsonObject;
 
@@ -459,9 +459,9 @@ namespace TelegramBotAPI::JSON {
                 }
         };
 
-        template <> struct Serializer<TelegramBotAPI::Type::Message> {
+        template <> struct Serializer<::TelegramBotAPI::Type::Message> {
                 static Value
-                Serialize(const TelegramBotAPI::Type::Message &ObjectValue) {
+                Serialize(const ::TelegramBotAPI::Type::Message &ObjectValue) {
                     Object JsonObject;
 
                     SetField(JsonObject, "message_id", ObjectValue.MessageID);
@@ -548,9 +548,9 @@ namespace TelegramBotAPI::JSON {
                 }
         };
 
-        template <> struct Serializer<TelegramBotAPI::Type::CallbackQuery> {
+        template <> struct Serializer<::TelegramBotAPI::Type::CallbackQuery> {
                 static Value Serialize(
-                    const TelegramBotAPI::Type::CallbackQuery &ObjectValue) {
+                    const ::TelegramBotAPI::Type::CallbackQuery &ObjectValue) {
                     Object JsonObject;
 
                     SetField(JsonObject, "id", ObjectValue.ID);

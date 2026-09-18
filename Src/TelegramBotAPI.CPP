@@ -5,6 +5,7 @@
 #include "TelegramBotAPI/Methods/answerCallbackQuery.HPP"
 #include "TelegramBotAPI/Methods/getUpdates.HPP"
 #include "TelegramBotAPI/Methods/sendMessage.HPP"
+#include "TelegramBotAPI/Methods/sendPhoto.HPP"
 
 namespace TelegramBotAPI {
     TelegramBotAPI::TelegramBotAPI(const std::string &BotToken)
@@ -43,6 +44,35 @@ namespace TelegramBotAPI {
         Methods::sendMessage SendMessageMethod(Client);
 
         return SendMessageMethod.SendMessage(ChatID, Text);
+    }
+
+    Type::Message TelegramBotAPI::SendPhoto(long long              ChatID,
+                                            const Type::InputFile &Photo) {
+        return SendPhoto(ChatID, Photo, "");
+    }
+
+    Type::Message TelegramBotAPI::SendPhoto(long long              ChatID,
+                                            const Type::InputFile &Photo,
+                                            const std::string     &Caption) {
+
+        return SendPhoto(ChatID, Photo, Caption, "");
+    }
+
+    Type::Message TelegramBotAPI::SendPhoto(long long              ChatID,
+                                            const Type::InputFile &Photo,
+                                            const std::string     &Caption,
+                                            const std::string     &ParseMode) {
+
+        Methods::sendPhoto             SendPhotoMethod(Client);
+        Methods::sendPhoto::Parameters Parameters(ChatID, Photo);
+
+        Parameters.Caption = Caption;
+
+        if (!ParseMode.empty()) {
+            Parameters.ParseMode = ParseMode;
+        }
+
+        return SendPhotoMethod.Send(Parameters);
     }
 
     void TelegramBotAPI::Run() {
