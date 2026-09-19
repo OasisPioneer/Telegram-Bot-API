@@ -22,9 +22,21 @@ int main() {
 
             std::cout << "Received photo: " << Photo.FileID << '\n';
 
+            if (Message.Caption.has_value()) {
+                std::cout << "Caption: " << Message.Caption.value() << '\n';
+            }
+
+            if (Message.CaptionEntities.has_value()) {
+                std::cout << "Caption entities: "
+                          << Message.CaptionEntities->size() << '\n';
+            }
+
             Bot.SendPhoto(
                 Message.Chat.ID,
-                TelegramBotAPI::Type::InputFile::FromFileID(Photo.FileID));
+                TelegramBotAPI::Type::InputFile::FromFileID(Photo.FileID),
+                Message.Caption.value_or(""),
+                Message.CaptionEntities.value_or(
+                    std::vector<TelegramBotAPI::Type::MessageEntity>{}));
 
             return;
         }

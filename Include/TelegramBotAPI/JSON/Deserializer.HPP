@@ -618,6 +618,10 @@ namespace TelegramBotAPI::JSON {
             ObjectValue.Caption =
                 Detail::GetOptionalField<std::string>(JsonObject, "caption");
 
+            ObjectValue.CaptionEntities = Detail::GetOptionalField<
+                std::vector<TelegramBotAPI::Type::MessageEntity>>(
+                JsonObject, "caption_entities");
+
             ObjectValue.Contact =
                 Detail::GetOptionalField<TelegramBotAPI::Type::Contact>(
                     JsonObject, "contact");

@@ -22,86 +22,86 @@ namespace TelegramBotAPI::JSON {
 
         template <> struct JsonConverter<bool> {
                 static Value Convert(const bool &ObjectValue) {
-                    return {ObjectValue};
+                    return Value(ObjectValue);
                 }
         };
 
         template <> struct JsonConverter<short> {
                 static Value Convert(const short &ObjectValue) {
-                    return {static_cast<std::int64_t>(ObjectValue)};
+                    return Value(static_cast<std::int64_t>(ObjectValue));
                 }
         };
 
         template <> struct JsonConverter<unsigned short> {
                 static Value Convert(const unsigned short &ObjectValue) {
-                    return {static_cast<std::uint64_t>(ObjectValue)};
+                    return Value(static_cast<std::uint64_t>(ObjectValue));
                 }
         };
 
         template <> struct JsonConverter<int> {
                 static Value Convert(const int &ObjectValue) {
-                    return {static_cast<std::int64_t>(ObjectValue)};
+                    return Value(static_cast<std::int64_t>(ObjectValue));
                 }
         };
 
         template <> struct JsonConverter<unsigned int> {
                 static Value Convert(const unsigned int &ObjectValue) {
-                    return {static_cast<std::uint64_t>(ObjectValue)};
+                    return Value(static_cast<std::uint64_t>(ObjectValue));
                 }
         };
 
         template <> struct JsonConverter<long> {
                 static Value Convert(const long &ObjectValue) {
-                    return {static_cast<std::int64_t>(ObjectValue)};
+                    return Value(static_cast<std::int64_t>(ObjectValue));
                 }
         };
 
         template <> struct JsonConverter<unsigned long> {
                 static Value Convert(const unsigned long &ObjectValue) {
-                    return {static_cast<std::uint64_t>(ObjectValue)};
+                    return Value(static_cast<std::uint64_t>(ObjectValue));
                 }
         };
 
         template <> struct JsonConverter<long long> {
                 static Value Convert(const long long &ObjectValue) {
-                    return {static_cast<std::int64_t>(ObjectValue)};
+                    return Value(static_cast<std::int64_t>(ObjectValue));
                 }
         };
 
         template <> struct JsonConverter<unsigned long long> {
                 static Value Convert(const unsigned long long &ObjectValue) {
-                    return {static_cast<std::uint64_t>(ObjectValue)};
+                    return Value(static_cast<std::uint64_t>(ObjectValue));
                 }
         };
 
         template <> struct JsonConverter<float> {
                 static Value Convert(const float &ObjectValue) {
-                    return {static_cast<double>(ObjectValue)};
+                    return Value(static_cast<double>(ObjectValue));
                 }
         };
 
         template <> struct JsonConverter<double> {
                 static Value Convert(const double &ObjectValue) {
-                    return {ObjectValue};
+                    return Value(ObjectValue);
                 }
         };
 
         template <> struct JsonConverter<long double> {
                 static Value Convert(const long double &ObjectValue) {
-                    return {static_cast<double>(ObjectValue)};
+                    return Value(static_cast<double>(ObjectValue));
                 }
         };
 
         template <> struct JsonConverter<std::string> {
                 static Value Convert(const std::string &ObjectValue) {
-                    return {ObjectValue};
+                    return Value(ObjectValue);
                 }
         };
 
         template <typename Type> struct JsonConverter<std::optional<Type>> {
                 static Value Convert(const std::optional<Type> &ObjectValue) {
                     if (!ObjectValue.has_value()) {
-                        return {nullptr};
+                        return Value(nullptr);
                     }
 
                     return JsonConverter<Type>::Convert(ObjectValue.value());
@@ -111,7 +111,7 @@ namespace TelegramBotAPI::JSON {
         template <typename Type> struct JsonConverter<std::shared_ptr<Type>> {
                 static Value Convert(const std::shared_ptr<Type> &ObjectValue) {
                     if (!ObjectValue) {
-                        return {nullptr};
+                        return Value(nullptr);
                     }
 
                     return JsonConverter<Type>::Convert(*ObjectValue);
@@ -129,7 +129,7 @@ namespace TelegramBotAPI::JSON {
                             JsonConverter<Type>::Convert(Element));
                     }
 
-                    return {std::move(JsonArray)};
+                    return Value(std::move(JsonArray));
                 }
         };
 
@@ -177,7 +177,7 @@ namespace TelegramBotAPI::JSON {
                     SetOptionalField(JsonObject, "username",
                                      ObjectValue.UserName);
 
-                    return {std::move(JsonObject)};
+                    return Value(std::move(JsonObject));
                 }
         };
 
@@ -201,7 +201,7 @@ namespace TelegramBotAPI::JSON {
                     SetOptionalField(JsonObject, "last_name",
                                      ObjectValue.LastName);
 
-                    return {std::move(JsonObject)};
+                    return Value(std::move(JsonObject));
                 }
         };
 
@@ -218,7 +218,7 @@ namespace TelegramBotAPI::JSON {
 
                     SetOptionalField(JsonObject, "url", ObjectValue.URL);
 
-                    return {std::move(JsonObject)};
+                    return Value(std::move(JsonObject));
                 }
         };
 
@@ -236,7 +236,7 @@ namespace TelegramBotAPI::JSON {
                     SetOptionalField(JsonObject, "file_size",
                                      ObjectValue.FileSize);
 
-                    return {std::move(JsonObject)};
+                    return Value(std::move(JsonObject));
                 }
         };
 
@@ -260,7 +260,7 @@ namespace TelegramBotAPI::JSON {
                     SetOptionalField(JsonObject, "file_size",
                                      ObjectValue.FileSize);
 
-                    return {std::move(JsonObject)};
+                    return Value(std::move(JsonObject));
                 }
         };
 
@@ -279,7 +279,7 @@ namespace TelegramBotAPI::JSON {
 
                     SetField(JsonObject, "file_size", ObjectValue.FileSize);
 
-                    return {std::move(JsonObject)};
+                    return Value(std::move(JsonObject));
                 }
         };
 
@@ -298,7 +298,7 @@ namespace TelegramBotAPI::JSON {
 
                     SetField(JsonObject, "file_size", ObjectValue.FileSize);
 
-                    return {std::move(JsonObject)};
+                    return Value(std::move(JsonObject));
                 }
         };
 
@@ -326,7 +326,7 @@ namespace TelegramBotAPI::JSON {
                     SetOptionalField(JsonObject, "file_size",
                                      ObjectValue.FileSize);
 
-                    return {std::move(JsonObject)};
+                    return Value(std::move(JsonObject));
                 }
         };
 
@@ -345,7 +345,7 @@ namespace TelegramBotAPI::JSON {
                     SetOptionalField(JsonObject, "file_size",
                                      ObjectValue.FileSize);
 
-                    return {std::move(JsonObject)};
+                    return Value(std::move(JsonObject));
                 }
         };
 
@@ -364,7 +364,7 @@ namespace TelegramBotAPI::JSON {
 
                     SetOptionalField(JsonObject, "user_id", ObjectValue.UserID);
 
-                    return {std::move(JsonObject)};
+                    return Value(std::move(JsonObject));
                 }
         };
 
@@ -377,7 +377,7 @@ namespace TelegramBotAPI::JSON {
 
                     SetField(JsonObject, "latitude", ObjectValue.Latitude);
 
-                    return {std::move(JsonObject)};
+                    return Value(std::move(JsonObject));
                 }
         };
 
@@ -395,7 +395,7 @@ namespace TelegramBotAPI::JSON {
                     SetOptionalField(JsonObject, "foursquare_id",
                                      ObjectValue.FoursquareID);
 
-                    return {std::move(JsonObject)};
+                    return Value(std::move(JsonObject));
                 }
         };
 
@@ -412,7 +412,7 @@ namespace TelegramBotAPI::JSON {
                     SetOptionalField(JsonObject, "file_path",
                                      ObjectValue.FilePath);
 
-                    return {std::move(JsonObject)};
+                    return Value(std::move(JsonObject));
                 }
         };
 
@@ -432,7 +432,7 @@ namespace TelegramBotAPI::JSON {
 
                     SetField(JsonObject, "offset", ObjectValue.Offset);
 
-                    return {std::move(JsonObject)};
+                    return Value(std::move(JsonObject));
                 }
         };
 
@@ -455,7 +455,7 @@ namespace TelegramBotAPI::JSON {
 
                     SetField(JsonObject, "query", ObjectValue.Query);
 
-                    return {std::move(JsonObject)};
+                    return Value(std::move(JsonObject));
                 }
         };
 
@@ -544,7 +544,7 @@ namespace TelegramBotAPI::JSON {
                     SetOptionalField(JsonObject, "pinned_message",
                                      ObjectValue.PinnedMessage);
 
-                    return {std::move(JsonObject)};
+                    return Value(std::move(JsonObject));
                 }
         };
 
@@ -565,7 +565,7 @@ namespace TelegramBotAPI::JSON {
 
                     SetOptionalField(JsonObject, "data", ObjectValue.Data);
 
-                    return {std::move(JsonObject)};
+                    return Value(std::move(JsonObject));
                 }
         };
     } // namespace Detail
@@ -577,4 +577,4 @@ namespace TelegramBotAPI::JSON {
     }
 } // namespace TelegramBotAPI::JSON
 
-#endif
+#endif // TELEGRAMBOTAPI_SERIALIZER_HPP

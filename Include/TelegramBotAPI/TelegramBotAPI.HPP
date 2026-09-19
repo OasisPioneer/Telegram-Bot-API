@@ -55,6 +55,11 @@ namespace TelegramBotAPI {
                                     const std::string     &Caption,
                                     const std::string     &ParseMode);
 
+            Type::Message
+            SendPhoto(long long ChatID, const Type::InputFile &Photo,
+                      const std::string                      &Caption,
+                      const std::vector<Type::MessageEntity> &CaptionEntities);
+
             void Run();
 
             void Stop();

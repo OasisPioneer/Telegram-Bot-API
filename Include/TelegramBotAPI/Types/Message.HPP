@@ -34,10 +34,12 @@ namespace TelegramBotAPI::Type {
             std::optional<TelegramBotAPI::Type::Audio>    Audio{};
             std::optional<TelegramBotAPI::Type::Document> Document{};
             std::optional<std::vector<TelegramBotAPI::Type::PhotoSize>> Photo{};
-            std::optional<TelegramBotAPI::Type::Sticker>   Sticker{};
-            std::optional<TelegramBotAPI::Type::Video>     Video{};
-            std::optional<TelegramBotAPI::Type::Voice>     Voice{};
-            std::optional<std::string>                     Caption{};
+            std::optional<TelegramBotAPI::Type::Sticker> Sticker{};
+            std::optional<TelegramBotAPI::Type::Video>   Video{};
+            std::optional<TelegramBotAPI::Type::Voice>   Voice{};
+            std::optional<std::string>                   Caption{};
+            std::optional<std::vector<TelegramBotAPI::Type::MessageEntity>>
+                                                           CaptionEntities{};
             std::optional<TelegramBotAPI::Type::Contact>   Contact{};
             std::optional<TelegramBotAPI::Type::Location>  Location{};
             std::optional<TelegramBotAPI::Type::Venue>     Venue{};
