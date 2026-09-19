@@ -75,6 +75,21 @@ namespace TelegramBotAPI {
         return SendPhotoMethod.Send(Parameters);
     }
 
+    Type::Message TelegramBotAPI::SendPhoto(
+        long long ChatID, const Type::InputFile &Photo,
+        const std::string                      &Caption,
+        const std::vector<Type::MessageEntity> &CaptionEntities) {
+
+        Methods::sendPhoto SendPhotoMethod(Client);
+
+        Methods::sendPhoto::Parameters Parameters(ChatID, Photo);
+
+        Parameters.Caption         = Caption;
+        Parameters.CaptionEntities = CaptionEntities;
+
+        return SendPhotoMethod.Send(Parameters);
+    }
+
     void TelegramBotAPI::Run() {
         Running.store(true);
 
