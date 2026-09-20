@@ -1,0 +1,11 @@
+#ifndef TELEGRAMBOTAPI_INPUTRICHBLOCK_HPP
+#define TELEGRAMBOTAPI_INPUTRICHBLOCK_HPP
+
+namespace TelegramBotAPI::Type {
+
+struct InputRichBlock {
+};
+
+}
+
+#endif // TELEGRAMBOTAPI_INPUTRICHBLOCK_HPP

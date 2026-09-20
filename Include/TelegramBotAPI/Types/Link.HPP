@@ -4,9 +4,11 @@
 #include <string>
 
 namespace TelegramBotAPI::Type {
-    struct Link {
-        std::string URL{};
-    };
+
+struct Link {
+    std::string URL;
+};
+
 }
 
 #endif // TELEGRAMBOTAPI_LINK_HPP

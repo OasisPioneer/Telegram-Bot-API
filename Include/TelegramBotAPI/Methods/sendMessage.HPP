@@ -1,87 +1,280 @@
-#ifndef TELEGRAMBOTAPI_SENDMESSAGE_HPP
-#define TELEGRAMBOTAPI_SENDMESSAGE_HPP
+#ifndef TELEGRAMBOTAPI_METHOD_SENDMESSAGE_HPP
+#define TELEGRAMBOTAPI_METHOD_SENDMESSAGE_HPP
 
+#include "TelegramBotAPI/JSON/Request.HPP"
+#include "TelegramBotAPI/JSON/Serializer.HPP"
+#include "TelegramBotAPI/TelegramClient.HPP"
+#include "TelegramBotAPI/Types/EphemeralMessageParameters.HPP"
+#include "TelegramBotAPI/Types/ForceReply.HPP"
+#include "TelegramBotAPI/Types/InlineKeyboardMarkup.HPP"
+#include "TelegramBotAPI/Types/LinkPreviewOptions.HPP"
+#include "TelegramBotAPI/Types/Message.HPP"
+#include "TelegramBotAPI/Types/MessageEntity.HPP"
+#include "TelegramBotAPI/Types/ReplyKeyboardMarkup.HPP"
+#include "TelegramBotAPI/Types/ReplyKeyboardRemove.HPP"
+#include "TelegramBotAPI/Types/ReplyParameters.HPP"
+#include "TelegramBotAPI/Types/SuggestedPostParameters.HPP"
+#include <boost/json.hpp>
 #include <optional>
 #include <string>
-
-#include "TelegramBotAPI/TelegramClient.HPP"
-#include "TelegramBotAPI/Types/Message.HPP"
+#include <variant>
+#include <vector>
 
 namespace TelegramBotAPI::Methods {
-    class sendMessage {
-        public:
-            struct Parameters {
-                    long long ChatID = 0;
 
-                    std::string Text;
+        // Use this method to send text messages. On success, the sent Message is returned.
 
-                    std::optional<std::string> BusinessConnectionID;
+class sendMessage {
+    public:
+        struct Parameters {
+            // Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance.
+            std::optional<bool> AllowPaidBroadcast{};
 
-                    std::optional<long long> MessageThreadID;
+            // Unique identifier of the business connection on behalf of which the message will be sent
+            std::optional<std::string> BusinessConnectionID{};
 
-                    std::optional<long long> DirectMessagesTopicID;
+            // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+            std::variant<long long, std::string> ChatID;
 
-                    std::optional<bool> DisableNotification;
+            // Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
+            std::optional<long long> DirectMessagesTopicID{};
 
-                    std::optional<bool> ProtectContent;
+            // Sends the message silently. Users will receive a notification with no sound.
+            std::optional<bool> DisableNotification{};
 
-                    JSON::Object ToJson() const {
-                        JSON::Object ParametersObject;
+            // A JSON-serialized list of special entities that appear in message text, which can be specified instead of parse_mode
+            std::optional<std::vector<::TelegramBotAPI::Type::MessageEntity>> Entities{};
 
-                        ParametersObject["chat_id"] = ChatID;
+            // A JSON-serialized object containing the parameters of the ephemeral message to send
+            std::optional<::TelegramBotAPI::Type::EphemeralMessageParameters> EphemeralMessageParameters{};
 
-                        ParametersObject["text"] = Text;
+            // Link preview generation options for the message
+            std::optional<::TelegramBotAPI::Type::LinkPreviewOptions> LinkPreviewOptions{};
 
-                        if (BusinessConnectionID.has_value()) {
-                            ParametersObject["business_connection_id"] =
-                                BusinessConnectionID.value();
-                        }
+            // Unique identifier of the message effect to be added to the message; for private chats only
+            std::optional<std::string> MessageEffectID{};
 
-                        if (MessageThreadID.has_value()) {
-                            ParametersObject["message_thread_id"] =
-                                MessageThreadID.value();
-                        }
+            // Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
+            std::optional<long long> MessageThreadID{};
 
-                        if (DirectMessagesTopicID.has_value()) {
-                            ParametersObject["direct_messages_topic_id"] =
-                                DirectMessagesTopicID.value();
-                        }
+            // Mode for parsing entities in the message text. See formatting options for more details.
+            std::optional<std::string> ParseMode{};
 
-                        if (DisableNotification.has_value()) {
-                            ParametersObject["disable_notification"] =
-                                DisableNotification.value();
-                        }
+            // Protects the contents of the sent message from forwarding and saving
+            std::optional<bool> ProtectContent{};
 
-                        if (ProtectContent.has_value()) {
-                            ParametersObject["protect_content"] =
-                                ProtectContent.value();
-                        }
+            // Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove a reply keyboard or to force a reply from the user.
+            std::optional<std::variant<::TelegramBotAPI::Type::InlineKeyboardMarkup, ::TelegramBotAPI::Type::ReplyKeyboardMarkup, ::TelegramBotAPI::Type::ReplyKeyboardRemove, ::TelegramBotAPI::Type::ForceReply>> ReplyMarkup{};
 
-                        return ParametersObject;
-                    }
-            };
+            // Description of the message to reply to
+            std::optional<::TelegramBotAPI::Type::ReplyParameters> ReplyParameters{};
 
-            explicit sendMessage(TelegramClient &ClientValue)
-                : Client(ClientValue) {}
+            // A JSON-serialized object containing the parameters of the suggested post to send; for direct messages chats only. If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.
+            std::optional<::TelegramBotAPI::Type::SuggestedPostParameters> SuggestedPostParameters{};
 
-            Type::Message Send(const Parameters &ParametersValue) {
-                return Client.Call<Type::Message>("sendMessage",
-                                                  ParametersValue.ToJson());
+            // Text of the message to be sent, 1-4096 characters after entities parsing
+            std::string Text;
+
+            Parameters(const std::variant<long long, std::string> &ChatIDValue, const std::string &TextValue)
+                : ChatID(ChatIDValue), Text(TextValue) {}
+
+            JSON::Object ToJson() const {
+                JSON::Object Object;
+
+                if (AllowPaidBroadcast.has_value()) {
+                    Object["allow_paid_broadcast"] = JSON::ToJson(AllowPaidBroadcast.value());
+                }
+
+                if (BusinessConnectionID.has_value()) {
+                    Object["business_connection_id"] = JSON::ToJson(BusinessConnectionID.value());
+                }
+
+                Object["chat_id"] = JSON::ToJson(ChatID);
+
+                if (DirectMessagesTopicID.has_value()) {
+                    Object["direct_messages_topic_id"] = JSON::ToJson(DirectMessagesTopicID.value());
+                }
+
+                if (DisableNotification.has_value()) {
+                    Object["disable_notification"] = JSON::ToJson(DisableNotification.value());
+                }
+
+                if (Entities.has_value()) {
+                    Object["entities"] = JSON::ToJson(Entities.value());
+                }
+
+                if (EphemeralMessageParameters.has_value()) {
+                    Object["ephemeral_message_parameters"] = JSON::ToJson(EphemeralMessageParameters.value());
+                }
+
+                if (LinkPreviewOptions.has_value()) {
+                    Object["link_preview_options"] = JSON::ToJson(LinkPreviewOptions.value());
+                }
+
+                if (MessageEffectID.has_value()) {
+                    Object["message_effect_id"] = JSON::ToJson(MessageEffectID.value());
+                }
+
+                if (MessageThreadID.has_value()) {
+                    Object["message_thread_id"] = JSON::ToJson(MessageThreadID.value());
+                }
+
+                if (ParseMode.has_value()) {
+                    Object["parse_mode"] = JSON::ToJson(ParseMode.value());
+                }
+
+                if (ProtectContent.has_value()) {
+                    Object["protect_content"] = JSON::ToJson(ProtectContent.value());
+                }
+
+                if (ReplyMarkup.has_value()) {
+                    Object["reply_markup"] = JSON::ToJson(ReplyMarkup.value());
+                }
+
+                if (ReplyParameters.has_value()) {
+                    Object["reply_parameters"] = JSON::ToJson(ReplyParameters.value());
+                }
+
+                if (SuggestedPostParameters.has_value()) {
+                    Object["suggested_post_parameters"] = JSON::ToJson(SuggestedPostParameters.value());
+                }
+
+                Object["text"] = JSON::ToJson(Text);
+
+                return Object;
             }
 
-            Type::Message SendMessage(long long          ChatID,
-                                      const std::string &Text) {
-                Parameters ParametersValue;
-
-                ParametersValue.ChatID = ChatID;
-                ParametersValue.Text   = Text;
-
-                return Send(ParametersValue);
+            bool RequiresMultipart() const {
+                return (AllowPaidBroadcast.has_value() && JSON::RequiresMultipart(AllowPaidBroadcast.value())) || (BusinessConnectionID.has_value() && JSON::RequiresMultipart(BusinessConnectionID.value())) || JSON::RequiresMultipart(ChatID) || (DirectMessagesTopicID.has_value() && JSON::RequiresMultipart(DirectMessagesTopicID.value())) || (DisableNotification.has_value() && JSON::RequiresMultipart(DisableNotification.value())) || (Entities.has_value() && JSON::RequiresMultipart(Entities.value())) || (EphemeralMessageParameters.has_value() && JSON::RequiresMultipart(EphemeralMessageParameters.value())) || (LinkPreviewOptions.has_value() && JSON::RequiresMultipart(LinkPreviewOptions.value())) || (MessageEffectID.has_value() && JSON::RequiresMultipart(MessageEffectID.value())) || (MessageThreadID.has_value() && JSON::RequiresMultipart(MessageThreadID.value())) || (ParseMode.has_value() && JSON::RequiresMultipart(ParseMode.value())) || (ProtectContent.has_value() && JSON::RequiresMultipart(ProtectContent.value())) || (ReplyMarkup.has_value() && JSON::RequiresMultipart(ReplyMarkup.value())) || (ReplyParameters.has_value() && JSON::RequiresMultipart(ReplyParameters.value())) || (SuggestedPostParameters.has_value() && JSON::RequiresMultipart(SuggestedPostParameters.value())) || JSON::RequiresMultipart(Text);
             }
 
-        private:
-            TelegramClient &Client;
-    };
+            ::TelegramBotAPI::Network::Multipart::MultipartForm
+            ToMultipart() const {
+                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+                if (AllowPaidBroadcast.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "allow_paid_broadcast",
+                        AllowPaidBroadcast.value());
+                }
+
+                if (BusinessConnectionID.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "business_connection_id",
+                        BusinessConnectionID.value());
+                }
+
+                JSON::AddMultipartField(
+                    Form, "chat_id",
+                    ChatID);
+
+                if (DirectMessagesTopicID.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "direct_messages_topic_id",
+                        DirectMessagesTopicID.value());
+                }
+
+                if (DisableNotification.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "disable_notification",
+                        DisableNotification.value());
+                }
+
+                if (Entities.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "entities",
+                        Entities.value());
+                }
+
+                if (EphemeralMessageParameters.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "ephemeral_message_parameters",
+                        EphemeralMessageParameters.value());
+                }
+
+                if (LinkPreviewOptions.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "link_preview_options",
+                        LinkPreviewOptions.value());
+                }
+
+                if (MessageEffectID.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "message_effect_id",
+                        MessageEffectID.value());
+                }
+
+                if (MessageThreadID.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "message_thread_id",
+                        MessageThreadID.value());
+                }
+
+                if (ParseMode.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "parse_mode",
+                        ParseMode.value());
+                }
+
+                if (ProtectContent.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "protect_content",
+                        ProtectContent.value());
+                }
+
+                if (ReplyMarkup.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "reply_markup",
+                        ReplyMarkup.value());
+                }
+
+                if (ReplyParameters.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "reply_parameters",
+                        ReplyParameters.value());
+                }
+
+                if (SuggestedPostParameters.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "suggested_post_parameters",
+                        SuggestedPostParameters.value());
+                }
+
+                JSON::AddMultipartField(
+                    Form, "text",
+                    Text);
+
+                return Form;
+            }
+
+        };
+
+        explicit sendMessage(TelegramClient &ClientValue)
+            : Client(ClientValue) {}
+
+        ::TelegramBotAPI::Type::Message SendMessage(const Parameters &ParametersValue) {
+            if (ParametersValue.RequiresMultipart()) {
+                return Client.CallMultipart<::TelegramBotAPI::Type::Message>("sendMessage",
+                                                   ParametersValue.ToMultipart());
+            }
+
+            return Client.Call<::TelegramBotAPI::Type::Message>("sendMessage",
+                                      ParametersValue.ToJson());
+        }
+
+        ::TelegramBotAPI::Type::Message SendMessage(std::variant<long long, std::string> ChatID, std::string Text) {
+            Parameters ParametersValue(
+                ChatID,
+                Text
+            );
+
+            return SendMessage(ParametersValue);
+        }
+
+    private:
+        TelegramClient &Client;
+};
+
 } // namespace TelegramBotAPI::Methods
 
-#endif // TELEGRAMBOTAPI_SENDMESSAGE_HPP
+#endif // TELEGRAMBOTAPI_METHOD_SENDMESSAGE_HPP

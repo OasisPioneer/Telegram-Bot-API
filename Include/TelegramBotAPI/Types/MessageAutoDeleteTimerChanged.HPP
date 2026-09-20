@@ -1,0 +1,12 @@
+#ifndef TELEGRAMBOTAPI_MESSAGEAUTODELETETIMERCHANGED_HPP
+#define TELEGRAMBOTAPI_MESSAGEAUTODELETETIMERCHANGED_HPP
+
+namespace TelegramBotAPI::Type {
+
+struct MessageAutoDeleteTimerChanged {
+    long long MessageAutoDeleteTime;
+};
+
+}
+
+#endif // TELEGRAMBOTAPI_MESSAGEAUTODELETETIMERCHANGED_HPP

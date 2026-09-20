@@ -1,0 +1,14 @@
+#ifndef TELEGRAMBOTAPI_REVENUEWITHDRAWALSTATEPENDING_HPP
+#define TELEGRAMBOTAPI_REVENUEWITHDRAWALSTATEPENDING_HPP
+
+#include <string>
+
+namespace TelegramBotAPI::Type {
+
+struct RevenueWithdrawalStatePending {
+    std::string Type;
+};
+
+}
+
+#endif // TELEGRAMBOTAPI_REVENUEWITHDRAWALSTATEPENDING_HPP

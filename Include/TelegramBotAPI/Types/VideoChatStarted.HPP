@@ -1,0 +1,11 @@
+#ifndef TELEGRAMBOTAPI_VIDEOCHATSTARTED_HPP
+#define TELEGRAMBOTAPI_VIDEOCHATSTARTED_HPP
+
+namespace TelegramBotAPI::Type {
+
+struct VideoChatStarted {
+};
+
+}
+
+#endif // TELEGRAMBOTAPI_VIDEOCHATSTARTED_HPP

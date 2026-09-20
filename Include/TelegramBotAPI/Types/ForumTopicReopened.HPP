@@ -1,0 +1,11 @@
+#ifndef TELEGRAMBOTAPI_FORUMTOPICREOPENED_HPP
+#define TELEGRAMBOTAPI_FORUMTOPICREOPENED_HPP
+
+namespace TelegramBotAPI::Type {
+
+struct ForumTopicReopened {
+};
+
+}
+
+#endif // TELEGRAMBOTAPI_FORUMTOPICREOPENED_HPP

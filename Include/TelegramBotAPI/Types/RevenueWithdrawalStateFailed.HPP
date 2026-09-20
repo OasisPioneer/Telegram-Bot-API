@@ -1,0 +1,14 @@
+#ifndef TELEGRAMBOTAPI_REVENUEWITHDRAWALSTATEFAILED_HPP
+#define TELEGRAMBOTAPI_REVENUEWITHDRAWALSTATEFAILED_HPP
+
+#include <string>
+
+namespace TelegramBotAPI::Type {
+
+struct RevenueWithdrawalStateFailed {
+    std::string Type;
+};
+
+}
+
+#endif // TELEGRAMBOTAPI_REVENUEWITHDRAWALSTATEFAILED_HPP

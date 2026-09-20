@@ -1,0 +1,14 @@
+#ifndef TELEGRAMBOTAPI_BOTCOMMANDSCOPEALLCHATADMINISTRATORS_HPP
+#define TELEGRAMBOTAPI_BOTCOMMANDSCOPEALLCHATADMINISTRATORS_HPP
+
+#include <string>
+
+namespace TelegramBotAPI::Type {
+
+struct BotCommandScopeAllChatAdministrators {
+    std::string Type;
+};
+
+}
+
+#endif // TELEGRAMBOTAPI_BOTCOMMANDSCOPEALLCHATADMINISTRATORS_HPP

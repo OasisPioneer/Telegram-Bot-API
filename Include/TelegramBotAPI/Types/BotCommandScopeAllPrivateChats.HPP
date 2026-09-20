@@ -1,0 +1,14 @@
+#ifndef TELEGRAMBOTAPI_BOTCOMMANDSCOPEALLPRIVATECHATS_HPP
+#define TELEGRAMBOTAPI_BOTCOMMANDSCOPEALLPRIVATECHATS_HPP
+
+#include <string>
+
+namespace TelegramBotAPI::Type {
+
+struct BotCommandScopeAllPrivateChats {
+    std::string Type;
+};
+
+}
+
+#endif // TELEGRAMBOTAPI_BOTCOMMANDSCOPEALLPRIVATECHATS_HPP

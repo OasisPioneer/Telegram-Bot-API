@@ -3,3 +3,5 @@
 
 # CMake build directory
 Build/
+
+.telegram_codegen_manifest.json

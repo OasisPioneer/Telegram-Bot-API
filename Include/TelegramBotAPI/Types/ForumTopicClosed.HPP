@@ -1,0 +1,11 @@
+#ifndef TELEGRAMBOTAPI_FORUMTOPICCLOSED_HPP
+#define TELEGRAMBOTAPI_FORUMTOPICCLOSED_HPP
+
+namespace TelegramBotAPI::Type {
+
+struct ForumTopicClosed {
+};
+
+}
+
+#endif // TELEGRAMBOTAPI_FORUMTOPICCLOSED_HPP

@@ -1,0 +1,14 @@
+#ifndef TELEGRAMBOTAPI_TRANSACTIONPARTNERTELEGRAMADS_HPP
+#define TELEGRAMBOTAPI_TRANSACTIONPARTNERTELEGRAMADS_HPP
+
+#include <string>
+
+namespace TelegramBotAPI::Type {
+
+struct TransactionPartnerTelegramAds {
+    std::string Type;
+};
+
+}
+
+#endif // TELEGRAMBOTAPI_TRANSACTIONPARTNERTELEGRAMADS_HPP

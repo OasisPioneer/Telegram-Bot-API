@@ -1,0 +1,11 @@
+#ifndef TELEGRAMBOTAPI_CALLBACKGAME_HPP
+#define TELEGRAMBOTAPI_CALLBACKGAME_HPP
+
+namespace TelegramBotAPI::Type {
+
+struct CallbackGame {
+};
+
+}
+
+#endif // TELEGRAMBOTAPI_CALLBACKGAME_HPP

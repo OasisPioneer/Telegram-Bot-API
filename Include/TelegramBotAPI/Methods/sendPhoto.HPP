@@ -1,171 +1,306 @@
-#ifndef TELEGRAMBOTAPI_SENDPHOTO_HPP
-#define TELEGRAMBOTAPI_SENDPHOTO_HPP
+#ifndef TELEGRAMBOTAPI_METHOD_SENDPHOTO_HPP
+#define TELEGRAMBOTAPI_METHOD_SENDPHOTO_HPP
 
-#include <cstdint>
-#include <filesystem>
-#include <fstream>
-#include <iterator>
-#include <optional>
-#include <stdexcept>
-#include <string>
-#include <vector>
-
-#include <boost/json.hpp>
-
+#include "TelegramBotAPI/JSON/Request.HPP"
 #include "TelegramBotAPI/JSON/Serializer.HPP"
-#include "TelegramBotAPI/Network/Multipart/MultipartForm.HPP"
 #include "TelegramBotAPI/TelegramClient.HPP"
-#include "TelegramBotAPI/Types/InputFile.HPP"
+#include "TelegramBotAPI/Types/EphemeralMessageParameters.HPP"
+#include "TelegramBotAPI/Types/ForceReply.HPP"
+#include "TelegramBotAPI/Types/InlineKeyboardMarkup.HPP"
 #include "TelegramBotAPI/Types/Message.HPP"
 #include "TelegramBotAPI/Types/MessageEntity.HPP"
+#include "TelegramBotAPI/Types/ReplyKeyboardMarkup.HPP"
+#include "TelegramBotAPI/Types/ReplyKeyboardRemove.HPP"
+#include "TelegramBotAPI/Types/ReplyParameters.HPP"
+#include "TelegramBotAPI/Types/SuggestedPostParameters.HPP"
+#include <TelegramBotAPI/Types/InputFile.HPP>
+#include <boost/json.hpp>
+#include <optional>
+#include <string>
+#include <variant>
+#include <vector>
 
 namespace TelegramBotAPI::Methods {
-    class sendPhoto {
-        public:
-            struct Parameters {
-                    long long                  ChatID = 0;
-                    Type::InputFile            Photo;
-                    std::string                Caption{};
-                    std::optional<std::string> ParseMode;
-                    std::optional<std::vector<Type::MessageEntity>>
-                        CaptionEntities;
 
-                    Parameters(long long              ChatIDValue,
-                               const Type::InputFile &PhotoValue)
-                        : ChatID(ChatIDValue), Photo(PhotoValue) {}
+        // Use this method to send photos. On success, the sent Message is returned.
 
-                    JSON::Object ToJson() const {
-                        JSON::Object ParametersObject;
+class sendPhoto {
+    public:
+        struct Parameters {
+            // Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance.
+            std::optional<bool> AllowPaidBroadcast{};
 
-                        ParametersObject["chat_id"] = ChatID;
+            // Unique identifier of the business connection on behalf of which the message will be sent
+            std::optional<std::string> BusinessConnectionID{};
 
-                        if (Photo.IsFileID() || Photo.IsURL()) {
-                            ParametersObject["photo"] = Photo.GetValue();
-                        }
+            // Photo caption (may also be used when resending photos by file_id), 0-1024 characters after entities parsing
+            std::optional<std::string> Caption{};
 
-                        if (!Caption.empty()) {
-                            ParametersObject["caption"] = Caption;
-                        }
+            // A JSON-serialized list of special entities that appear in the caption, which can be specified instead of parse_mode
+            std::optional<std::vector<::TelegramBotAPI::Type::MessageEntity>> CaptionEntities{};
 
-                        if (ParseMode.has_value()) {
-                            ParametersObject["parse_mode"] = ParseMode.value();
-                        }
+            // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+            std::variant<long long, std::string> ChatID;
 
-                        if (CaptionEntities.has_value()) {
-                            ParametersObject["caption_entities"] =
-                                JSON::ToJson(CaptionEntities.value());
-                        }
+            // Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
+            std::optional<long long> DirectMessagesTopicID{};
 
-                        return ParametersObject;
-                    }
-            };
+            // Sends the message silently. Users will receive a notification with no sound.
+            std::optional<bool> DisableNotification{};
 
-            explicit sendPhoto(TelegramClient &ClientValue)
-                : Client(ClientValue) {}
+            // A JSON-serialized object containing the parameters of the ephemeral message to send
+            std::optional<::TelegramBotAPI::Type::EphemeralMessageParameters> EphemeralMessageParameters{};
 
-            Type::Message Send(const Parameters &ParametersValue) {
-                if (!ParametersValue.Photo.IsLocalFile()) {
-                    return Client.Call<Type::Message>("sendPhoto",
-                                                      ParametersValue.ToJson());
+            // Pass True if the photo needs to be covered with a spoiler animation
+            std::optional<bool> HasSpoiler{};
+
+            // Unique identifier of the message effect to be added to the message; for private chats only
+            std::optional<std::string> MessageEffectID{};
+
+            // Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
+            std::optional<long long> MessageThreadID{};
+
+            // Mode for parsing entities in the photo caption. See formatting options for more details.
+            std::optional<std::string> ParseMode{};
+
+            // Photo to send. Pass a file_id as String to send a photo that exists on the Telegram servers (recommended), pass an HTTP URL as a String for Telegram to get a photo from the Internet, or upload a new photo using multipart/form-data. The photo must be at most 10 MB in size. The photo's width and height must not exceed 10000 in total. Width and height ratio must be at most 20. More information on Sending Files »
+            std::variant<::TelegramBotAPI::Type::InputFile, std::string> Photo;
+
+            // Protects the contents of the sent message from forwarding and saving
+            std::optional<bool> ProtectContent{};
+
+            // Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove a reply keyboard or to force a reply from the user.
+            std::optional<std::variant<::TelegramBotAPI::Type::InlineKeyboardMarkup, ::TelegramBotAPI::Type::ReplyKeyboardMarkup, ::TelegramBotAPI::Type::ReplyKeyboardRemove, ::TelegramBotAPI::Type::ForceReply>> ReplyMarkup{};
+
+            // Description of the message to reply to
+            std::optional<::TelegramBotAPI::Type::ReplyParameters> ReplyParameters{};
+
+            // Pass True if the caption must be shown above the message media
+            std::optional<bool> ShowCaptionAboveMedia{};
+
+            // A JSON-serialized object containing the parameters of the suggested post to send; for direct messages chats only. If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.
+            std::optional<::TelegramBotAPI::Type::SuggestedPostParameters> SuggestedPostParameters{};
+
+            Parameters(const std::variant<long long, std::string> &ChatIDValue, const std::variant<::TelegramBotAPI::Type::InputFile, std::string> &PhotoValue)
+                : ChatID(ChatIDValue), Photo(PhotoValue) {}
+
+            JSON::Object ToJson() const {
+                JSON::Object Object;
+
+                if (AllowPaidBroadcast.has_value()) {
+                    Object["allow_paid_broadcast"] = JSON::ToJson(AllowPaidBroadcast.value());
                 }
 
-                return SendLocalFile(ParametersValue);
+                if (BusinessConnectionID.has_value()) {
+                    Object["business_connection_id"] = JSON::ToJson(BusinessConnectionID.value());
+                }
+
+                if (Caption.has_value()) {
+                    Object["caption"] = JSON::ToJson(Caption.value());
+                }
+
+                if (CaptionEntities.has_value()) {
+                    Object["caption_entities"] = JSON::ToJson(CaptionEntities.value());
+                }
+
+                Object["chat_id"] = JSON::ToJson(ChatID);
+
+                if (DirectMessagesTopicID.has_value()) {
+                    Object["direct_messages_topic_id"] = JSON::ToJson(DirectMessagesTopicID.value());
+                }
+
+                if (DisableNotification.has_value()) {
+                    Object["disable_notification"] = JSON::ToJson(DisableNotification.value());
+                }
+
+                if (EphemeralMessageParameters.has_value()) {
+                    Object["ephemeral_message_parameters"] = JSON::ToJson(EphemeralMessageParameters.value());
+                }
+
+                if (HasSpoiler.has_value()) {
+                    Object["has_spoiler"] = JSON::ToJson(HasSpoiler.value());
+                }
+
+                if (MessageEffectID.has_value()) {
+                    Object["message_effect_id"] = JSON::ToJson(MessageEffectID.value());
+                }
+
+                if (MessageThreadID.has_value()) {
+                    Object["message_thread_id"] = JSON::ToJson(MessageThreadID.value());
+                }
+
+                if (ParseMode.has_value()) {
+                    Object["parse_mode"] = JSON::ToJson(ParseMode.value());
+                }
+
+                Object["photo"] = JSON::EncodeRequestValue(Photo, "photo");
+
+                if (ProtectContent.has_value()) {
+                    Object["protect_content"] = JSON::ToJson(ProtectContent.value());
+                }
+
+                if (ReplyMarkup.has_value()) {
+                    Object["reply_markup"] = JSON::ToJson(ReplyMarkup.value());
+                }
+
+                if (ReplyParameters.has_value()) {
+                    Object["reply_parameters"] = JSON::ToJson(ReplyParameters.value());
+                }
+
+                if (ShowCaptionAboveMedia.has_value()) {
+                    Object["show_caption_above_media"] = JSON::ToJson(ShowCaptionAboveMedia.value());
+                }
+
+                if (SuggestedPostParameters.has_value()) {
+                    Object["suggested_post_parameters"] = JSON::ToJson(SuggestedPostParameters.value());
+                }
+
+                return Object;
             }
 
-        private:
-            TelegramClient &Client;
-
-            Type::Message SendLocalFile(const Parameters &ParametersValue) {
-                const std::filesystem::path FilePath =
-                    ParametersValue.Photo.GetValue();
-
-                if (!std::filesystem::exists(FilePath)) {
-                    throw TelegramAPIException(
-                        0, "Photo file does not exist: " + FilePath.string());
-                }
-
-                if (!std::filesystem::is_regular_file(FilePath)) {
-                    throw TelegramAPIException(
-                        0, "Photo path is not a regular file: " +
-                               FilePath.string());
-                }
-
-                const std::uintmax_t FileSize =
-                    std::filesystem::file_size(FilePath);
-
-                if (FileSize > 10ULL * 1024ULL * 1024ULL) {
-                    throw TelegramAPIException(
-                        0, "Photo file exceeds Telegram's 10 MB limit: " +
-                               FilePath.string());
-                }
-
-                std::ifstream File(FilePath, std::ios::binary);
-
-                if (!File.is_open()) {
-                    throw TelegramAPIException(
-                        0, "Failed to open photo file: " + FilePath.string());
-                }
-
-                std::string Content{std::istreambuf_iterator<char>(File),
-                                    std::istreambuf_iterator<char>()};
-
-                if (Content.empty()) {
-                    throw TelegramAPIException(0, "Photo file is empty: " +
-                                                      FilePath.string());
-                }
-
-                Network::Multipart::MultipartForm Form;
-
-                Form.AddField("chat_id",
-                              std::to_string(ParametersValue.ChatID));
-
-                if (!ParametersValue.Caption.empty()) {
-                    Form.AddField("caption", ParametersValue.Caption);
-                }
-
-                if (ParametersValue.ParseMode.has_value()) {
-                    Form.AddField("parse_mode",
-                                  ParametersValue.ParseMode.value());
-                }
-
-                if (ParametersValue.CaptionEntities.has_value()) {
-                    Form.AddField(
-                        "caption_entities",
-                        boost::json::serialize(
-                            JSON::ToJson(ParametersValue.CaptionEntities.value())
-                        )
-                    );
-                }
-
-                Form.AddFile("photo", FilePath.filename().string(),
-                             GetContentType(FilePath), Content);
-
-                return Client.CallMultipart<Type::Message>("sendPhoto", Form);
+            bool RequiresMultipart() const {
+                return (AllowPaidBroadcast.has_value() && JSON::RequiresMultipart(AllowPaidBroadcast.value())) || (BusinessConnectionID.has_value() && JSON::RequiresMultipart(BusinessConnectionID.value())) || (Caption.has_value() && JSON::RequiresMultipart(Caption.value())) || (CaptionEntities.has_value() && JSON::RequiresMultipart(CaptionEntities.value())) || JSON::RequiresMultipart(ChatID) || (DirectMessagesTopicID.has_value() && JSON::RequiresMultipart(DirectMessagesTopicID.value())) || (DisableNotification.has_value() && JSON::RequiresMultipart(DisableNotification.value())) || (EphemeralMessageParameters.has_value() && JSON::RequiresMultipart(EphemeralMessageParameters.value())) || (HasSpoiler.has_value() && JSON::RequiresMultipart(HasSpoiler.value())) || (MessageEffectID.has_value() && JSON::RequiresMultipart(MessageEffectID.value())) || (MessageThreadID.has_value() && JSON::RequiresMultipart(MessageThreadID.value())) || (ParseMode.has_value() && JSON::RequiresMultipart(ParseMode.value())) || JSON::RequiresMultipart(Photo) || (ProtectContent.has_value() && JSON::RequiresMultipart(ProtectContent.value())) || (ReplyMarkup.has_value() && JSON::RequiresMultipart(ReplyMarkup.value())) || (ReplyParameters.has_value() && JSON::RequiresMultipart(ReplyParameters.value())) || (ShowCaptionAboveMedia.has_value() && JSON::RequiresMultipart(ShowCaptionAboveMedia.value())) || (SuggestedPostParameters.has_value() && JSON::RequiresMultipart(SuggestedPostParameters.value()));
             }
 
-            static std::string
-            GetContentType(const std::filesystem::path &FilePath) {
-                const std::string Extension = FilePath.extension().string();
+            ::TelegramBotAPI::Network::Multipart::MultipartForm
+            ToMultipart() const {
+                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
 
-                if (Extension == ".jpg" || Extension == ".jpeg") {
-                    return "image/jpeg";
+                if (AllowPaidBroadcast.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "allow_paid_broadcast",
+                        AllowPaidBroadcast.value());
                 }
 
-                if (Extension == ".png") {
-                    return "image/png";
+                if (BusinessConnectionID.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "business_connection_id",
+                        BusinessConnectionID.value());
                 }
 
-                if (Extension == ".webp") {
-                    return "image/webp";
+                if (Caption.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "caption",
+                        Caption.value());
                 }
 
-                if (Extension == ".gif") {
-                    return "image/gif";
+                if (CaptionEntities.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "caption_entities",
+                        CaptionEntities.value());
                 }
 
-                return "application/octet-stream";
+                JSON::AddMultipartField(
+                    Form, "chat_id",
+                    ChatID);
+
+                if (DirectMessagesTopicID.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "direct_messages_topic_id",
+                        DirectMessagesTopicID.value());
+                }
+
+                if (DisableNotification.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "disable_notification",
+                        DisableNotification.value());
+                }
+
+                if (EphemeralMessageParameters.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "ephemeral_message_parameters",
+                        EphemeralMessageParameters.value());
+                }
+
+                if (HasSpoiler.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "has_spoiler",
+                        HasSpoiler.value());
+                }
+
+                if (MessageEffectID.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "message_effect_id",
+                        MessageEffectID.value());
+                }
+
+                if (MessageThreadID.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "message_thread_id",
+                        MessageThreadID.value());
+                }
+
+                if (ParseMode.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "parse_mode",
+                        ParseMode.value());
+                }
+
+                JSON::AddMultipartField(
+                    Form, "photo",
+                    Photo);
+
+                if (ProtectContent.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "protect_content",
+                        ProtectContent.value());
+                }
+
+                if (ReplyMarkup.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "reply_markup",
+                        ReplyMarkup.value());
+                }
+
+                if (ReplyParameters.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "reply_parameters",
+                        ReplyParameters.value());
+                }
+
+                if (ShowCaptionAboveMedia.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "show_caption_above_media",
+                        ShowCaptionAboveMedia.value());
+                }
+
+                if (SuggestedPostParameters.has_value()) {
+                    JSON::AddMultipartField(
+                        Form, "suggested_post_parameters",
+                        SuggestedPostParameters.value());
+                }
+
+                return Form;
             }
-    };
+
+        };
+
+        explicit sendPhoto(TelegramClient &ClientValue)
+            : Client(ClientValue) {}
+
+        ::TelegramBotAPI::Type::Message SendPhoto(const Parameters &ParametersValue) {
+            if (ParametersValue.RequiresMultipart()) {
+                return Client.CallMultipart<::TelegramBotAPI::Type::Message>("sendPhoto",
+                                                   ParametersValue.ToMultipart());
+            }
+
+            return Client.Call<::TelegramBotAPI::Type::Message>("sendPhoto",
+                                      ParametersValue.ToJson());
+        }
+
+        ::TelegramBotAPI::Type::Message SendPhoto(std::variant<long long, std::string> ChatID, std::variant<::TelegramBotAPI::Type::InputFile, std::string> Photo) {
+            Parameters ParametersValue(
+                ChatID,
+                Photo
+            );
+
+            return SendPhoto(ParametersValue);
+        }
+
+    private:
+        TelegramClient &Client;
+};
+
 } // namespace TelegramBotAPI::Methods
 
-#endif // TELEGRAMBOTAPI_SENDPHOTO_HPP
+#endif // TELEGRAMBOTAPI_METHOD_SENDPHOTO_HPP

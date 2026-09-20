@@ -1,0 +1,11 @@
+#ifndef TELEGRAMBOTAPI_DISABLEDBUTTON_HPP
+#define TELEGRAMBOTAPI_DISABLEDBUTTON_HPP
+
+namespace TelegramBotAPI::Type {
+
+struct DisabledButton {
+};
+
+}
+
+#endif // TELEGRAMBOTAPI_DISABLEDBUTTON_HPP

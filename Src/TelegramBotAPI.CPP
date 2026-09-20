@@ -72,7 +72,7 @@ namespace TelegramBotAPI {
             Parameters.ParseMode = ParseMode;
         }
 
-        return SendPhotoMethod.Send(Parameters);
+        return SendPhotoMethod.SendPhoto(Parameters);
     }
 
     Type::Message TelegramBotAPI::SendPhoto(
@@ -87,7 +87,7 @@ namespace TelegramBotAPI {
         Parameters.Caption         = Caption;
         Parameters.CaptionEntities = CaptionEntities;
 
-        return SendPhotoMethod.Send(Parameters);
+        return SendPhotoMethod.SendPhoto(Parameters);
     }
 
     void TelegramBotAPI::Run() {
@@ -103,7 +103,7 @@ namespace TelegramBotAPI {
                 Parameters.Limit   = 100;
                 Parameters.Timeout = 30;
 
-                std::vector<Type::Update> Updates = GetUpdates.Get(Parameters);
+                std::vector<Type::Update> Updates = GetUpdates.GetUpdates(Parameters);
 
                 ProcessUpdates(Updates);
             }

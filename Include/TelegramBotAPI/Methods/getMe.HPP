@@ -1,32 +1,57 @@
-#ifndef TELEGRAMBOTAPI_GETME_HPP
-#define TELEGRAMBOTAPI_GETME_HPP
+#ifndef TELEGRAMBOTAPI_METHOD_GETME_HPP
+#define TELEGRAMBOTAPI_METHOD_GETME_HPP
 
+#include "TelegramBotAPI/JSON/Request.HPP"
+#include "TelegramBotAPI/JSON/Serializer.HPP"
 #include "TelegramBotAPI/TelegramClient.HPP"
 #include "TelegramBotAPI/Types/User.HPP"
+#include <boost/json.hpp>
+#include <optional>
+#include <string>
 
 namespace TelegramBotAPI::Methods {
-    class getMe {
-        public:
-            struct Parameters {
-                    JSON::Object ToJson() const { return JSON::Object{}; }
-            };
 
-            explicit getMe(TelegramClient &ClientValue) : Client(ClientValue) {}
+        // A simple method for testing your bot's authentication token. Requires no parameters. Returns basic information about the bot in form of a User object.
 
-            Type::User Get(const Parameters &ParametersValue) {
-                return Client.Call<Type::User>("getMe",
-                                               ParametersValue.ToJson());
+class getMe {
+    public:
+        struct Parameters {
+            JSON::Object ToJson() const {
+                JSON::Object Object;
+
+                return Object;
             }
 
-            Type::User GetMe() {
-                Parameters ParametersValue;
-
-                return Get(ParametersValue);
+            bool RequiresMultipart() const {
+                return false;
             }
 
-        private:
-            TelegramClient &Client;
-    };
+            ::TelegramBotAPI::Network::Multipart::MultipartForm
+            ToMultipart() const {
+                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+                return Form;
+            }
+
+        };
+
+        explicit getMe(TelegramClient &ClientValue)
+            : Client(ClientValue) {}
+
+        ::TelegramBotAPI::Type::User GetMe(const Parameters &ParametersValue) {
+            if (ParametersValue.RequiresMultipart()) {
+                return Client.CallMultipart<::TelegramBotAPI::Type::User>("getMe",
+                                                   ParametersValue.ToMultipart());
+            }
+
+            return Client.Call<::TelegramBotAPI::Type::User>("getMe",
+                                      ParametersValue.ToJson());
+        }
+
+    private:
+        TelegramClient &Client;
+};
+
 } // namespace TelegramBotAPI::Methods
 
-#endif // TELEGRAMBOTAPI_GETME_HPP
+#endif // TELEGRAMBOTAPI_METHOD_GETME_HPP

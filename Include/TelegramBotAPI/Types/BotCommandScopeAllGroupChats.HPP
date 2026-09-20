@@ -1,0 +1,14 @@
+#ifndef TELEGRAMBOTAPI_BOTCOMMANDSCOPEALLGROUPCHATS_HPP
+#define TELEGRAMBOTAPI_BOTCOMMANDSCOPEALLGROUPCHATS_HPP
+
+#include <string>
+
+namespace TelegramBotAPI::Type {
+
+struct BotCommandScopeAllGroupChats {
+    std::string Type;
+};
+
+}
+
+#endif // TELEGRAMBOTAPI_BOTCOMMANDSCOPEALLGROUPCHATS_HPP

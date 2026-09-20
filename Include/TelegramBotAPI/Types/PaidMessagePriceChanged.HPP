@@ -1,0 +1,12 @@
+#ifndef TELEGRAMBOTAPI_PAIDMESSAGEPRICECHANGED_HPP
+#define TELEGRAMBOTAPI_PAIDMESSAGEPRICECHANGED_HPP
+
+namespace TelegramBotAPI::Type {
+
+struct PaidMessagePriceChanged {
+    long long PaidMessageStarCount;
+};
+
+}
+
+#endif // TELEGRAMBOTAPI_PAIDMESSAGEPRICECHANGED_HPP
