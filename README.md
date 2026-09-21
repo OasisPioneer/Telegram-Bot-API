@@ -166,6 +166,15 @@ int main() {
 
 `GetMe()` returns a `TelegramBotAPI::Type::User`.
 
+For applications using the higher-level runtime, the underlying client is available through `API()`:
+
+```cpp
+TelegramBotAPI::TelegramBotAPI Bot("YOUR_BOT_TOKEN");
+const auto Me = Bot.API().GetMe();
+```
+
+`API()` returns a reference to the underlying `TelegramClient`.
+
 ### Sending a message
 
 `ChatID` accepts either a numeric chat ID or a string such as `@channelusername`.
@@ -298,7 +307,23 @@ TelegramBotAPI::TelegramClient Client(
 
 ## Generated API
 
-The generator exposes all methods through `TelegramClient`.
+The generator exposes all Telegram Bot API methods through `TelegramClient`.
+
+For methods with parameters, the generated parameter structure is placed directly in the corresponding method header:
+
+```cpp
+#include <TelegramBotAPI/Methods/sendMessage.HPP>
+
+TelegramBotAPI::Methods::sendMessageParameters Parameters;
+Parameters.ChatID = 123456789LL;
+Parameters.Text = "Hello";
+
+const auto Message = Client.SendMessage(Parameters);
+```
+
+The method class also keeps the compatibility alias `using Parameters = sendMessageParameters;`, so `TelegramBotAPI::Methods::sendMessage::Parameters` remains valid. There is no separate `MethodParameters/` header tree; each method's parameter structure and method class are generated together in `Include/TelegramBotAPI/Methods/<method>.HPP`.
+
+For methods with no required parameters, a zero-argument convenience overload is generated. Methods with required parameters also expose convenience overloads for the required arguments.
 
 For example:
 
@@ -339,6 +364,17 @@ JSON support is available under:
 ```text
 Include/TelegramBotAPI/JSON/
 ```
+
+## Runtime and Long Polling
+
+`TelegramBotAPI::TelegramBotAPI` provides a higher-level long-polling runtime:
+
+```cpp
+TelegramBotAPI::TelegramBotAPI Bot("YOUR_BOT_TOKEN");
+Bot.Run();
+```
+
+Call `Bot.Stop()` to stop polling. The runtime advances the update offset after each processed update, and an exception from an individual update handler does not terminate the long-polling loop. Transport/API failures from `getUpdates` are still propagated to the caller.
 
 ## Error Handling
 
@@ -441,6 +477,8 @@ The test suite covers:
 * Generation idempotency
 * Telegram API end-to-end behavior
 
+Current Schema 10.3 validation baseline: **11** CTest tests discovered, **10** passed, **1** E2E test skipped without real bot credentials, and **0** failed.
+
 ## End-to-End Testing
 
 The Telegram E2E test requires a real Telegram bot token and a chat ID.
@@ -471,11 +509,14 @@ Do not commit bot tokens or other credentials to the repository.
 
 ## Examples
 
-The repository contains an example application under:
+The repository contains two example applications:
 
 ```text
 Examples/EchoBot/
+Examples/KeyboardBot/
 ```
+
+`EchoBot` demonstrates a minimal message-handling bot. `KeyboardBot` demonstrates inline keyboards, reply keyboards, `CallbackQuery` handling, `AnswerCallbackQuery`, `API()`, and long polling with `Run()`.
 
 Build it with:
 
@@ -492,7 +533,8 @@ cmake --build build -j
 .
 ├── CMakeLists.txt
 ├── Examples/
-│   └── EchoBot/
+│   ├── EchoBot/
+│   └── KeyboardBot/
 ├── Include/
 │   └── TelegramBotAPI/
 │       ├── JSON/

@@ -174,6 +174,15 @@ int main() {
 TelegramBotAPI::Type::User
 ```
 
+如果使用更高层的 `TelegramBotAPI` Runtime，可以通过 `API()` 访问底层 `TelegramClient`：
+
+```cpp
+TelegramBotAPI::TelegramBotAPI Bot("YOUR_BOT_TOKEN");
+const auto Me = Bot.API().GetMe();
+```
+
+`API()` 返回底层 `TelegramClient` 的引用。
+
 ### 发送消息
 
 `ChatID` 支持数字类型的 Chat ID，也支持类似 `@channelusername` 的字符串用户名。
@@ -314,6 +323,22 @@ TelegramBotAPI::TelegramClient Client(
 
 代码生成器会将 Telegram Bot API 的全部方法暴露到 `TelegramClient`。
 
+对于带参数的方法，对应的参数结构体会直接生成在该 Method 的头文件中：
+
+```cpp
+#include <TelegramBotAPI/Methods/sendMessage.HPP>
+
+TelegramBotAPI::Methods::sendMessageParameters Parameters;
+Parameters.ChatID = 123456789LL;
+Parameters.Text = "Hello";
+
+const auto Message = Client.SendMessage(Parameters);
+```
+
+Method 类同时保留兼容性别名 `using Parameters = sendMessageParameters;`，因此 `TelegramBotAPI::Methods::sendMessage::Parameters` 仍然有效。当前不再生成独立的 `MethodParameters/` 头文件目录；每个方法的参数结构体和 Method 类会一起生成到 `Include/TelegramBotAPI/Methods/<method>.HPP`。
+
+对于没有必填参数的方法，会生成无参数便捷重载；对于存在必填参数的方法，也会生成只接收必填参数的便捷重载。
+
 例如：
 
 ```cpp
@@ -362,6 +387,17 @@ JSON 相关组件位于：
 ```text
 Include/TelegramBotAPI/JSON/
 ```
+
+## Runtime 与 Long Polling
+
+`TelegramBotAPI::TelegramBotAPI` 提供更高层的 Long Polling Runtime：
+
+```cpp
+TelegramBotAPI::TelegramBotAPI Bot("YOUR_BOT_TOKEN");
+Bot.Run();
+```
+
+可以调用 `Bot.Stop()` 停止轮询。Runtime 会在每个 Update 处理后推进 Offset；单个 Update 的处理器抛出异常时，不会因此终止整个 Long Polling 循环。`getUpdates` 的网络/API 错误仍会向外抛出。
 
 ## 错误处理
 
@@ -464,6 +500,8 @@ ctest --test-dir build --output-on-failure
 * 代码生成幂等性
 * Telegram API 端到端测试
 
+当前 Schema 10.3 的验证基线：**11** 个 CTest 测试，**10** 个通过，未配置真实 Bot 凭据时 **1** 个 E2E 测试跳过，**0** 个失败。
+
 ## 端到端测试
 
 Telegram E2E 测试需要一个真实的 Telegram Bot Token 和 Chat ID。
@@ -496,11 +534,14 @@ E2E 测试会执行真实的 Telegram API 操作，包括：
 
 ## 示例
 
-项目包含一个 Echo Bot 示例：
+项目包含两个示例：
 
 ```text
 Examples/EchoBot/
+Examples/KeyboardBot/
 ```
+
+`EchoBot` 展示最小化的消息处理 Bot。`KeyboardBot` 展示 Inline Keyboard、Reply Keyboard、`CallbackQuery`、`AnswerCallbackQuery`、`API()` 以及 `Run()` Long Polling。
 
 启用示例并构建：
 
@@ -517,7 +558,8 @@ cmake --build build -j
 .
 ├── CMakeLists.txt
 ├── Examples/
-│   └── EchoBot/
+│   ├── EchoBot/
+│   └── KeyboardBot/
 ├── Include/
 │   └── TelegramBotAPI/
 │       ├── JSON/
