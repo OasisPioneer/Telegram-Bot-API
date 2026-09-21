@@ -1,0 +1,9 @@
+[project]
+name = "telegram-bot-api"
+version = "0.1.0"
+description = "Schema-driven Python generator for a modern C++ Telegram Bot API library"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pyyaml>=6.0.3",
+]

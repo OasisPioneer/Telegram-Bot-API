@@ -240,3 +240,4 @@ namespace TelegramBotAPI {
         return HTTPClient->PerformHTTPS(Request);
     }
 } // namespace TelegramBotAPI
+#include "TelegramBotAPI/TelegramClientMethods.TPP"

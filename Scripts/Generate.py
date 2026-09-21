@@ -18,6 +18,7 @@ from SchemaToModel import convert_schema
 from SerializerGenerator import SerializerGenerator
 from TelegramSchemaNormalizer import normalize_and_validate
 from TypeGenerator import TypeGenerator
+from TelegramClientGenerator import TelegramClientGenerator
 from TypeGraph import TypeGraph
 from UnionResolution import resolve_model_unions, validate_union_resolutions
 
@@ -154,6 +155,7 @@ def generate(project_root: Path, schema_path: Path) -> dict:
     context = CppContext(model, graph)
     type_generator = TypeGenerator(model, context)
     method_generator = MethodGenerator(model, context)
+    client_generator = TelegramClientGenerator(model, context)
 
     clean_previous_generated_files(project_root)
 
@@ -200,6 +202,25 @@ def generate(project_root: Path, schema_path: Path) -> dict:
         path = methods_dir / f"{method.name}.HPP"
         write_text(path, method_generator.generate(method))
         generated.append(path.relative_to(project_root).as_posix())
+
+    # TelegramClient.
+    client_path = include_root / "TelegramClient.HPP"
+    client_methods_path = include_root / "TelegramClientMethods.TPP"
+
+    write_text(
+        client_path,
+        client_generator.generate_header()
+    )
+
+    write_text(
+        client_methods_path,
+        client_generator.generate_methods_tpp()
+    )
+
+    generated.extend([
+        client_path.relative_to(project_root).as_posix(),
+        client_methods_path.relative_to(project_root).as_posix(),
+    ])
 
     manifest = {
         "generator": "TelegramBotAPIGenerator",

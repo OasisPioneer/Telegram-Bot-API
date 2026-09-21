@@ -1,10 +1,13 @@
-# CLion project files
+# CLion
 .idea/
 
-# CMake build directory
+# CMake build directories
+build/
 Build/
 
+# Generated manifest
 .telegram_codegen_manifest.json
-# Python cache
+
+# Python
 __pycache__/
 *.py[cod]
