@@ -10,75 +10,90 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Deletes a story previously posted by the bot on behalf of a managed business account. Requires the can_manage_stories business bot right. Returns True on success.
+    // Deletes a story previously posted by the bot on behalf of a managed business account. Requires the can_manage_stories business bot right. Returns True on success.
+
+struct deleteStoryParameters {
+    // Unique identifier of the business connection
+    std::string BusinessConnectionID;
+
+    // Unique identifier of the story to delete
+    long long StoryID;
+
+    deleteStoryParameters(const std::string &BusinessConnectionIDValue, const long long &StoryIDValue)
+        : BusinessConnectionID(BusinessConnectionIDValue), StoryID(StoryIDValue) {}
+
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        Object["business_connection_id"] = JSON::ToJson(BusinessConnectionID);
+
+        Object["story_id"] = JSON::ToJson(StoryID);
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return JSON::RequiresMultipart(BusinessConnectionID) || JSON::RequiresMultipart(StoryID);
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        JSON::AddMultipartField(
+            Form, "business_connection_id",
+            BusinessConnectionID);
+
+        JSON::AddMultipartField(
+            Form, "story_id",
+            StoryID);
+
+        return Form;
+    }
+
+};
 
 class deleteStory {
-    public:
-        struct Parameters {
-            // Unique identifier of the business connection
-            std::string BusinessConnectionID;
+public:
+    using Parameters = deleteStoryParameters;
+    using ReturnType = bool;
 
-            // Unique identifier of the story to delete
-            long long StoryID;
+    static constexpr const char *Name() noexcept {
+        return "deleteStory";
+    }
 
-            Parameters(const std::string &BusinessConnectionIDValue, const long long &StoryIDValue)
-                : BusinessConnectionID(BusinessConnectionIDValue), StoryID(StoryIDValue) {}
+    explicit deleteStory(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-            JSON::Object ToJson() const {
-                JSON::Object Object;
-
-                Object["business_connection_id"] = JSON::ToJson(BusinessConnectionID);
-
-                Object["story_id"] = JSON::ToJson(StoryID);
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return JSON::RequiresMultipart(BusinessConnectionID) || JSON::RequiresMultipart(StoryID);
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                JSON::AddMultipartField(
-                    Form, "business_connection_id",
-                    BusinessConnectionID);
-
-                JSON::AddMultipartField(
-                    Form, "story_id",
-                    StoryID);
-
-                return Form;
-            }
-
-        };
-
-        explicit deleteStory(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        bool DeleteStory(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<bool>("deleteStory",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<bool>("deleteStory",
-                                      ParametersValue.ToJson());
-        }
-
-        bool DeleteStory(std::string BusinessConnectionID, long long StoryID) {
-            Parameters ParametersValue(
-                BusinessConnectionID,
-                StoryID
+    bool DeleteStory(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<bool>(
+                "deleteStory",
+                ParametersValue.ToMultipart()
             );
-
-            return DeleteStory(ParametersValue);
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<bool>(
+            "deleteStory",
+            ParametersValue.ToJson()
+        );
+    }
+
+    bool DeleteStory(std::string BusinessConnectionID, long long StoryID) {
+        Parameters ParametersValue(
+        BusinessConnectionID,
+        StoryID
+        );
+
+        return DeleteStory(ParametersValue);
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

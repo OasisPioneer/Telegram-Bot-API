@@ -18,32 +18,35 @@ def contains_input_file(type_ref: TypeRef) -> bool:
         return type_ref.name == "InputFile"
 
     if type_ref.is_array():
-        return type_ref.element is not None and contains_input_file(
-            type_ref.element
+        return (
+            type_ref.element is not None
+            and contains_input_file(type_ref.element)
         )
 
     if type_ref.is_union():
-        return any(contains_input_file(item) for item in type_ref.alternatives)
+        return any(
+            contains_input_file(item)
+            for item in type_ref.alternatives
+        )
 
     return False
 
 
 class MethodGenerator:
     """
-    Generate the public method façade used by TelegramClient.
+    Generate self-contained method headers.
 
-    Transport policy is deliberately kept small:
-
-    * Parameters::ToJson() builds the normal JSON request.
-    * Parameters::RequiresMultipart() delegates to JSON::RequiresMultipart().
-    * Parameters::ToMultipart() delegates to JSON::AddMultipartField().
-    * Send/Get/etc. chooses Call() or CallMultipart().
-
-    InputFile handling therefore lives in the stable JSON request-runtime
-    helper, not in 185 copies of generated method-specific upload code.
+    Each Methods/<method>.HPP contains both the request parameter structure
+    and the method façade. TelegramClient.HPP only forward-declares the
+    generated parameter structures and method classes, while
+    TelegramClientMethods.TPP includes the complete method headers.
     """
 
-    def __init__(self, model: TelegramModel, context: CppContext) -> None:
+    def __init__(
+        self,
+        model: TelegramModel,
+        context: CppContext,
+    ) -> None:
         self.model = model
         self.context = context
 
@@ -51,18 +54,26 @@ class MethodGenerator:
         includes = self._collect_includes(method)
         return self._render_header(method, includes)
 
-    def _collect_includes(self, method: TelegramMethod) -> set[str]:
+    # ------------------------------------------------------------------
+    # Includes
+    # ------------------------------------------------------------------
+
+    def _collect_includes(
+        self,
+        method: TelegramMethod,
+    ) -> set[str]:
         includes = {
-            '"TelegramBotAPI/TelegramClient.HPP"',
-            '"TelegramBotAPI/JSON/Serializer.HPP"',
             '"TelegramBotAPI/JSON/Request.HPP"',
+            '"TelegramBotAPI/JSON/Serializer.HPP"',
+            '"TelegramBotAPI/TelegramClient.HPP"',
             "<boost/json.hpp>",
             "<optional>",
             "<string>",
         }
 
         result = self.context.type_to_cpp(
-            method.return_type, owner=method.name
+            method.return_type,
+            owner=method.name,
         )
         includes.update(result.includes)
 
@@ -76,8 +87,17 @@ class MethodGenerator:
 
         return includes
 
-    def _render_header(self, method: TelegramMethod, includes: set[str]) -> str:
+    # ------------------------------------------------------------------
+    # Method header
+    # ------------------------------------------------------------------
+
+    def _render_header(
+        self,
+        method: TelegramMethod,
+        includes: set[str],
+    ) -> str:
         guard = f"TELEGRAMBOTAPI_METHOD_{method.name.upper()}_HPP"
+        parameter_name = f"{method.name}Parameters"
 
         lines = [
             f"#ifndef {guard}",
@@ -85,7 +105,10 @@ class MethodGenerator:
             "",
         ]
 
-        lines.extend(f"#include {item}" for item in sorted(includes))
+        lines.extend(
+            f"#include {item}"
+            for item in sorted(includes)
+        )
         lines.append("")
 
         lines.extend(
@@ -100,7 +123,15 @@ class MethodGenerator:
             lines.append(description)
             lines.append("")
 
+        lines.extend(
+            self._render_parameters_struct(
+                method,
+                parameter_name,
+            )
+        )
+        lines.append("")
         lines.extend(self._render_class(method))
+
         lines.extend(
             [
                 "",
@@ -113,23 +144,29 @@ class MethodGenerator:
 
         return "\n".join(lines)
 
-    def _render_class(self, method: TelegramMethod) -> list[str]:
-        result = self.context.type_to_cpp(
-            method.return_type, owner=method.name
-        ).type
-        public_name = public_method_name(method.name)
-
+    def _render_parameters_struct(
+        self,
+        method: TelegramMethod,
+        parameter_name: str,
+    ) -> list[str]:
         lines = [
-            f"class {method.name} {{",
-            "    public:",
-            "        struct Parameters {",
+            f"struct {parameter_name} {{",
         ]
 
-        if method.parameters:
-            for parameter in method.parameters:
-                lines.extend(self._render_parameter(parameter, method.name))
+        for parameter in method.parameters:
+            lines.extend(
+                self._render_parameter(
+                    parameter,
+                    method.name,
+                )
+            )
 
-        required = [p for p in method.parameters if p.required]
+        required = [
+            parameter
+            for parameter in method.parameters
+            if parameter.required
+        ]
+
         if required:
             lines.extend(
                 self._render_parameters_constructor(
@@ -142,61 +179,114 @@ class MethodGenerator:
         lines.extend(self._render_requires_multipart(method))
         lines.extend(self._render_to_multipart(method))
 
-        lines.extend(
-            [
-                "        };",
-                "",
-                f"        explicit {method.name}(TelegramClient &ClientValue)",
-                "            : Client(ClientValue) {}",
-                "",
-                f"        {result} {public_name}(const Parameters &ParametersValue) {{",
-                "            if (ParametersValue.RequiresMultipart()) {",
-                f'                return Client.CallMultipart<{result}>("{method.name}",',
-                "                                                   ParametersValue.ToMultipart());",
-                "            }",
-                "",
-                f'            return Client.Call<{result}>("{method.name}",',
-                "                                      ParametersValue.ToJson());",
-                "        }",
-                "",
-            ]
-        )
+        lines.append("};")
+        return lines
 
-        # Convenience overload for methods with required parameters.  This is
-        # intentionally limited to required arguments so optional parameters
-        # remain represented by Parameters and do not create a huge overload set.
-        required = [p for p in method.parameters if p.required]
+    # ------------------------------------------------------------------
+    # Method façade
+    # ------------------------------------------------------------------
+
+    def _render_class(
+        self,
+        method: TelegramMethod,
+    ) -> list[str]:
+        result = self.context.type_to_cpp(
+            method.return_type,
+            owner=method.name,
+        ).type
+        public_name = public_method_name(method.name)
+        parameter_name = f"{method.name}Parameters"
+
+        lines = [
+            f"class {method.name} {{",
+            "public:",
+            f"    using Parameters = {parameter_name};",
+            f"    using ReturnType = {result};",
+            "",
+            "    static constexpr const char *Name() noexcept {",
+            f'        return "{method.name}";',
+            "    }",
+            "",
+            f"    explicit {method.name}(",
+            "        TelegramClient &ClientValue",
+            "    )",
+            "        : Client(ClientValue) {}",
+            "",
+            f"    {result} {public_name}(",
+            "        const Parameters &ParametersValue",
+            "    ) {",
+            "        if (ParametersValue.RequiresMultipart()) {",
+            f"            return Client.CallMultipart<{result}>(",
+            f'                "{method.name}",',
+            "                ParametersValue.ToMultipart()",
+            "            );",
+            "        }",
+            "",
+            f"        return Client.Call<{result}>(",
+            f'            "{method.name}",',
+            "            ParametersValue.ToJson()",
+            "        );",
+            "    }",
+            "",
+        ]
+
+        required = [
+            parameter
+            for parameter in method.parameters
+            if parameter.required
+        ]
+
         if required:
             lines.extend(
-                self._render_convenience_overload(method, required, result, public_name)
+                self._render_convenience_overload(
+                    method,
+                    required,
+                    result,
+                    public_name,
+                )
             )
 
         lines.extend(
             [
-                "    private:",
-                "        TelegramClient &Client;",
+                "private:",
+                "    TelegramClient &Client;",
                 "};",
             ]
         )
+
         return lines
 
-    def _render_parameter(self, parameter: Parameter, owner: str) -> list[str]:
+    # ------------------------------------------------------------------
+    # Parameter fields
+    # ------------------------------------------------------------------
+
+    def _render_parameter(
+        self,
+        parameter: Parameter,
+        owner: str,
+    ) -> list[str]:
         cpp_type = self.context.field_type_to_cpp(
-            parameter.type, parameter.required, owner=owner
+            parameter.type,
+            parameter.required,
+            owner=owner,
         )
+
         lines: list[str] = []
 
         description = self._render_description(
-            parameter.description, indent="            "
+            parameter.description,
+            indent="    ",
         )
         if description:
             lines.append(description)
 
         initializer = "" if parameter.required else "{}"
         lines.append(
-            f"            {cpp_type.type} {parameter.cpp_name}{initializer};"
+            f"    {cpp_type.type} "
+            f"{parameter.cpp_name}{initializer};"
         )
         lines.append("")
+
         return lines
 
     def _render_parameters_constructor(
@@ -204,8 +294,8 @@ class MethodGenerator:
         method: TelegramMethod,
         required: list[Parameter],
     ) -> list[str]:
-        arguments = []
-        initializers = []
+        arguments: list[str] = []
+        initializers: list[str] = []
 
         for parameter in required:
             cpp_type = self.context.field_type_to_cpp(
@@ -213,59 +303,78 @@ class MethodGenerator:
                 True,
                 owner=method.name,
             ).type
+
             arguments.append(
-                f"const {cpp_type} &{parameter.cpp_name}Value"
+                f"const {cpp_type} &"
+                f"{parameter.cpp_name}Value"
             )
             initializers.append(
-                f"{parameter.cpp_name}({parameter.cpp_name}Value)"
+                f"{parameter.cpp_name}"
+                f"({parameter.cpp_name}Value)"
             )
 
         return [
-            f"            Parameters({', '.join(arguments)})",
-            f"                : {', '.join(initializers)} {{}}",
+            f"    {method.name}Parameters({', '.join(arguments)})",
+            f"        : {', '.join(initializers)} {{}}",
             "",
         ]
 
-    def _render_to_json(self, method: TelegramMethod) -> list[str]:
+    # ------------------------------------------------------------------
+    # JSON serialization
+    # ------------------------------------------------------------------
+
+    def _render_to_json(
+        self,
+        method: TelegramMethod,
+    ) -> list[str]:
         lines = [
-            "            JSON::Object ToJson() const {",
-            "                JSON::Object Object;",
+            "    JSON::Object ToJson() const {",
+            "        JSON::Object Object;",
             "",
         ]
 
         for parameter in method.parameters:
-            expression = self._request_expression(parameter)
             if parameter.required:
+                expression = self._request_expression(parameter)
                 lines.extend(
                     [
-                        "                Object[\""
-                        + parameter.name
-                        + "\"] = "
-                        + expression
-                        + ";",
+                        (
+                            f'        Object["{parameter.name}"] = '
+                            f"{expression};"
+                        ),
+                        "",
                     ]
                 )
-            else:
-                lines.extend(
-                    [
-                        f"                if ({parameter.cpp_name}.has_value()) {{",
-                        "                    Object[\""
-                        + parameter.name
-                        + "\"] = "
-                        + self._request_expression(parameter, f"{parameter.cpp_name}.value()")
-                        + ";",
-                        "                }",
-                    ]
-                )
-            lines.append("")
+                continue
+
+            expression = self._request_expression(
+                parameter,
+                f"{parameter.cpp_name}.value()",
+            )
+
+            lines.extend(
+                [
+                    (
+                        f"        if "
+                        f"({parameter.cpp_name}.has_value()) {{"
+                    ),
+                    (
+                        f'            Object["{parameter.name}"] = '
+                        f"{expression};"
+                    ),
+                    "        }",
+                    "",
+                ]
+            )
 
         lines.extend(
             [
-                "                return Object;",
-                "            }",
+                "        return Object;",
+                "    }",
                 "",
             ]
         )
+
         return lines
 
     def _request_expression(
@@ -274,38 +383,59 @@ class MethodGenerator:
         value_expression: str | None = None,
     ) -> str:
         value = value_expression or parameter.cpp_name
+
         if contains_input_file(parameter.type):
             return (
-                f'JSON::EncodeRequestValue({value}, "{parameter.name}")'
+                f'JSON::EncodeRequestValue('
+                f'{value}, "{parameter.name}")'
             )
+
         return f"JSON::ToJson({value})"
 
-    def _render_requires_multipart(self, method: TelegramMethod) -> list[str]:
-        expressions = []
+    # ------------------------------------------------------------------
+    # Multipart
+    # ------------------------------------------------------------------
+
+    def _render_requires_multipart(
+        self,
+        method: TelegramMethod,
+    ) -> list[str]:
+        expressions: list[str] = []
+
         for parameter in method.parameters:
             if parameter.required:
                 expressions.append(
-                    f"JSON::RequiresMultipart({parameter.cpp_name})"
+                    f"JSON::RequiresMultipart("
+                    f"{parameter.cpp_name})"
                 )
             else:
                 expressions.append(
                     f"({parameter.cpp_name}.has_value() && "
-                    f"JSON::RequiresMultipart({parameter.cpp_name}.value()))"
+                    f"JSON::RequiresMultipart("
+                    f"{parameter.cpp_name}.value()))"
                 )
 
-        expression = " || ".join(expressions) if expressions else "false"
+        expression = (
+            " || ".join(expressions)
+            if expressions
+            else "false"
+        )
+
         return [
-            "            bool RequiresMultipart() const {",
-            f"                return {expression};",
-            "            }",
+            "    bool RequiresMultipart() const {",
+            f"        return {expression};",
+            "    }",
             "",
         ]
 
-    def _render_to_multipart(self, method: TelegramMethod) -> list[str]:
+    def _render_to_multipart(
+        self,
+        method: TelegramMethod,
+    ) -> list[str]:
         lines = [
-            "            ::TelegramBotAPI::Network::Multipart::MultipartForm",
-            "            ToMultipart() const {",
-            "                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;",
+            "    ::TelegramBotAPI::Network::Multipart::MultipartForm",
+            "    ToMultipart() const {",
+            "        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;",
             "",
         ]
 
@@ -313,31 +443,43 @@ class MethodGenerator:
             if parameter.required:
                 lines.extend(
                     [
-                        "                JSON::AddMultipartField(",
-                        f'                    Form, "{parameter.name}",',
-                        f"                    {parameter.cpp_name});",
+                        "        JSON::AddMultipartField(",
+                        f'            Form, "{parameter.name}",',
+                        f"            {parameter.cpp_name});",
+                        "",
                     ]
                 )
             else:
                 lines.extend(
                     [
-                        f"                if ({parameter.cpp_name}.has_value()) {{",
-                        "                    JSON::AddMultipartField(",
-                        f'                        Form, "{parameter.name}",',
-                        f"                        {parameter.cpp_name}.value());",
-                        "                }",
+                        (
+                            f"        if "
+                            f"({parameter.cpp_name}.has_value()) {{"
+                        ),
+                        "            JSON::AddMultipartField(",
+                        f'                Form, "{parameter.name}",',
+                        (
+                            f"                "
+                            f"{parameter.cpp_name}.value());"
+                        ),
+                        "        }",
+                        "",
                     ]
                 )
-            lines.append("")
 
         lines.extend(
             [
-                "                return Form;",
-                "            }",
+                "        return Form;",
+                "    }",
                 "",
             ]
         )
+
         return lines
+
+    # ------------------------------------------------------------------
+    # Required-parameter convenience overload
+    # ------------------------------------------------------------------
 
     def _render_convenience_overload(
         self,
@@ -346,37 +488,51 @@ class MethodGenerator:
         result: str,
         public_name: str,
     ) -> list[str]:
-        signature = ", ".join(
-            f"{self.context.field_type_to_cpp(p.type, True, owner=method.name).type} {p.cpp_name}"
-            for p in required
+        parameter_types: list[str] = []
+
+        for parameter in required:
+            cpp_type = self.context.field_type_to_cpp(
+                parameter.type,
+                True,
+                owner=method.name,
+            ).type
+
+            parameter_types.append(
+                f"{cpp_type} {parameter.cpp_name}"
+            )
+
+        signature = ", ".join(parameter_types)
+
+        arguments = ",\n".join(
+            f"        {parameter.cpp_name}"
+            for parameter in required
         )
 
-        lines = [
-            f"        {result} {public_name}({signature}) {{",
-            "            Parameters ParametersValue(",
-            "                " + ",\n                ".join(
-                parameter.cpp_name for parameter in required
-            ),
-            "            );",
+        return [
+            f"    {result} {public_name}({signature}) {{",
+            "        Parameters ParametersValue(",
+            arguments,
+            "        );",
+            "",
+            f"        return {public_name}(ParametersValue);",
+            "    }",
+            "",
         ]
 
-        lines.extend(
-            [
-                "",
-                f"            return {public_name}(ParametersValue);",
-                "        }",
-                "",
-            ]
-        )
-        return lines
-
     @staticmethod
-    def _render_description(description: str, indent: str = "        ") -> str:
+    def _render_description(
+        description: str,
+        indent: str = "    ",
+    ) -> str:
         if not description:
             return ""
 
         return "\n".join(
-            f"{indent}// {line.strip()}" if line.strip() else f"{indent}//"
+            (
+                f"{indent}// {line.strip()}"
+                if line.strip()
+                else f"{indent}//"
+            )
             for line in description.splitlines()
         )
 

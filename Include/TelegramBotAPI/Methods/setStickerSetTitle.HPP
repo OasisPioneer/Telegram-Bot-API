@@ -10,75 +10,90 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Use this method to set the title of a created sticker set. Returns True on success.
+    // Use this method to set the title of a created sticker set. Returns True on success.
+
+struct setStickerSetTitleParameters {
+    // Sticker set name
+    std::string Name;
+
+    // Sticker set title, 1-64 characters
+    std::string Title;
+
+    setStickerSetTitleParameters(const std::string &NameValue, const std::string &TitleValue)
+        : Name(NameValue), Title(TitleValue) {}
+
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        Object["name"] = JSON::ToJson(Name);
+
+        Object["title"] = JSON::ToJson(Title);
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return JSON::RequiresMultipart(Name) || JSON::RequiresMultipart(Title);
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        JSON::AddMultipartField(
+            Form, "name",
+            Name);
+
+        JSON::AddMultipartField(
+            Form, "title",
+            Title);
+
+        return Form;
+    }
+
+};
 
 class setStickerSetTitle {
-    public:
-        struct Parameters {
-            // Sticker set name
-            std::string Name;
+public:
+    using Parameters = setStickerSetTitleParameters;
+    using ReturnType = bool;
 
-            // Sticker set title, 1-64 characters
-            std::string Title;
+    static constexpr const char *Name() noexcept {
+        return "setStickerSetTitle";
+    }
 
-            Parameters(const std::string &NameValue, const std::string &TitleValue)
-                : Name(NameValue), Title(TitleValue) {}
+    explicit setStickerSetTitle(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-            JSON::Object ToJson() const {
-                JSON::Object Object;
-
-                Object["name"] = JSON::ToJson(Name);
-
-                Object["title"] = JSON::ToJson(Title);
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return JSON::RequiresMultipart(Name) || JSON::RequiresMultipart(Title);
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                JSON::AddMultipartField(
-                    Form, "name",
-                    Name);
-
-                JSON::AddMultipartField(
-                    Form, "title",
-                    Title);
-
-                return Form;
-            }
-
-        };
-
-        explicit setStickerSetTitle(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        bool SetStickerSetTitle(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<bool>("setStickerSetTitle",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<bool>("setStickerSetTitle",
-                                      ParametersValue.ToJson());
-        }
-
-        bool SetStickerSetTitle(std::string Name, std::string Title) {
-            Parameters ParametersValue(
-                Name,
-                Title
+    bool SetStickerSetTitle(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<bool>(
+                "setStickerSetTitle",
+                ParametersValue.ToMultipart()
             );
-
-            return SetStickerSetTitle(ParametersValue);
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<bool>(
+            "setStickerSetTitle",
+            ParametersValue.ToJson()
+        );
+    }
+
+    bool SetStickerSetTitle(std::string Name, std::string Title) {
+        Parameters ParametersValue(
+        Name,
+        Title
+        );
+
+        return SetStickerSetTitle(ParametersValue);
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

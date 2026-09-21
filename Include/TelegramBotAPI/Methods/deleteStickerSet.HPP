@@ -10,66 +10,81 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Use this method to delete a sticker set that was created by the bot. Returns True on success.
-        // The following methods and objects allow your bot to handle and send rich messages.
+    // Use this method to delete a sticker set that was created by the bot. Returns True on success.
+    // The following methods and objects allow your bot to handle and send rich messages.
+
+struct deleteStickerSetParameters {
+    // Sticker set name
+    std::string Name;
+
+    deleteStickerSetParameters(const std::string &NameValue)
+        : Name(NameValue) {}
+
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        Object["name"] = JSON::ToJson(Name);
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return JSON::RequiresMultipart(Name);
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        JSON::AddMultipartField(
+            Form, "name",
+            Name);
+
+        return Form;
+    }
+
+};
 
 class deleteStickerSet {
-    public:
-        struct Parameters {
-            // Sticker set name
-            std::string Name;
+public:
+    using Parameters = deleteStickerSetParameters;
+    using ReturnType = bool;
 
-            Parameters(const std::string &NameValue)
-                : Name(NameValue) {}
+    static constexpr const char *Name() noexcept {
+        return "deleteStickerSet";
+    }
 
-            JSON::Object ToJson() const {
-                JSON::Object Object;
+    explicit deleteStickerSet(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-                Object["name"] = JSON::ToJson(Name);
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return JSON::RequiresMultipart(Name);
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                JSON::AddMultipartField(
-                    Form, "name",
-                    Name);
-
-                return Form;
-            }
-
-        };
-
-        explicit deleteStickerSet(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        bool DeleteStickerSet(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<bool>("deleteStickerSet",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<bool>("deleteStickerSet",
-                                      ParametersValue.ToJson());
-        }
-
-        bool DeleteStickerSet(std::string Name) {
-            Parameters ParametersValue(
-                Name
+    bool DeleteStickerSet(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<bool>(
+                "deleteStickerSet",
+                ParametersValue.ToMultipart()
             );
-
-            return DeleteStickerSet(ParametersValue);
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<bool>(
+            "deleteStickerSet",
+            ParametersValue.ToJson()
+        );
+    }
+
+    bool DeleteStickerSet(std::string Name) {
+        Parameters ParametersValue(
+        Name
+        );
+
+        return DeleteStickerSet(ParametersValue);
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

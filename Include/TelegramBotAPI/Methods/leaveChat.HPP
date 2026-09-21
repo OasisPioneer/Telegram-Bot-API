@@ -11,65 +11,80 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Use this method for your bot to leave a group, supergroup or channel. Returns True on success.
+    // Use this method for your bot to leave a group, supergroup or channel. Returns True on success.
+
+struct leaveChatParameters {
+    // Unique identifier for the target chat or username of the target supergroup or channel in the format @username. Channel direct messages chats aren't supported; leave the corresponding channel instead.
+    std::variant<long long, std::string> ChatID;
+
+    leaveChatParameters(const std::variant<long long, std::string> &ChatIDValue)
+        : ChatID(ChatIDValue) {}
+
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        Object["chat_id"] = JSON::ToJson(ChatID);
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return JSON::RequiresMultipart(ChatID);
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        JSON::AddMultipartField(
+            Form, "chat_id",
+            ChatID);
+
+        return Form;
+    }
+
+};
 
 class leaveChat {
-    public:
-        struct Parameters {
-            // Unique identifier for the target chat or username of the target supergroup or channel in the format @username. Channel direct messages chats aren't supported; leave the corresponding channel instead.
-            std::variant<long long, std::string> ChatID;
+public:
+    using Parameters = leaveChatParameters;
+    using ReturnType = bool;
 
-            Parameters(const std::variant<long long, std::string> &ChatIDValue)
-                : ChatID(ChatIDValue) {}
+    static constexpr const char *Name() noexcept {
+        return "leaveChat";
+    }
 
-            JSON::Object ToJson() const {
-                JSON::Object Object;
+    explicit leaveChat(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-                Object["chat_id"] = JSON::ToJson(ChatID);
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return JSON::RequiresMultipart(ChatID);
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                JSON::AddMultipartField(
-                    Form, "chat_id",
-                    ChatID);
-
-                return Form;
-            }
-
-        };
-
-        explicit leaveChat(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        bool LeaveChat(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<bool>("leaveChat",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<bool>("leaveChat",
-                                      ParametersValue.ToJson());
-        }
-
-        bool LeaveChat(std::variant<long long, std::string> ChatID) {
-            Parameters ParametersValue(
-                ChatID
+    bool LeaveChat(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<bool>(
+                "leaveChat",
+                ParametersValue.ToMultipart()
             );
-
-            return LeaveChat(ParametersValue);
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<bool>(
+            "leaveChat",
+            ParametersValue.ToJson()
+        );
+    }
+
+    bool LeaveChat(std::variant<long long, std::string> ChatID) {
+        Parameters ParametersValue(
+        ChatID
+        );
+
+        return LeaveChat(ParametersValue);
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

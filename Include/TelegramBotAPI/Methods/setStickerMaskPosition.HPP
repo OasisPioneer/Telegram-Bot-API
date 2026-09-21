@@ -11,78 +11,93 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Use this method to change the mask position of a mask sticker. The sticker must belong to a sticker set that was created by the bot. Returns True on success.
+    // Use this method to change the mask position of a mask sticker. The sticker must belong to a sticker set that was created by the bot. Returns True on success.
+
+struct setStickerMaskPositionParameters {
+    // A JSON-serialized object with the position where the mask should be placed on faces. Omit the parameter to remove the mask position.
+    std::optional<::TelegramBotAPI::Type::MaskPosition> MaskPosition{};
+
+    // File identifier of the sticker
+    std::string Sticker;
+
+    setStickerMaskPositionParameters(const std::string &StickerValue)
+        : Sticker(StickerValue) {}
+
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        if (MaskPosition.has_value()) {
+            Object["mask_position"] = JSON::ToJson(MaskPosition.value());
+        }
+
+        Object["sticker"] = JSON::ToJson(Sticker);
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return (MaskPosition.has_value() && JSON::RequiresMultipart(MaskPosition.value())) || JSON::RequiresMultipart(Sticker);
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        if (MaskPosition.has_value()) {
+            JSON::AddMultipartField(
+                Form, "mask_position",
+                MaskPosition.value());
+        }
+
+        JSON::AddMultipartField(
+            Form, "sticker",
+            Sticker);
+
+        return Form;
+    }
+
+};
 
 class setStickerMaskPosition {
-    public:
-        struct Parameters {
-            // A JSON-serialized object with the position where the mask should be placed on faces. Omit the parameter to remove the mask position.
-            std::optional<::TelegramBotAPI::Type::MaskPosition> MaskPosition{};
+public:
+    using Parameters = setStickerMaskPositionParameters;
+    using ReturnType = bool;
 
-            // File identifier of the sticker
-            std::string Sticker;
+    static constexpr const char *Name() noexcept {
+        return "setStickerMaskPosition";
+    }
 
-            Parameters(const std::string &StickerValue)
-                : Sticker(StickerValue) {}
+    explicit setStickerMaskPosition(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-            JSON::Object ToJson() const {
-                JSON::Object Object;
-
-                if (MaskPosition.has_value()) {
-                    Object["mask_position"] = JSON::ToJson(MaskPosition.value());
-                }
-
-                Object["sticker"] = JSON::ToJson(Sticker);
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return (MaskPosition.has_value() && JSON::RequiresMultipart(MaskPosition.value())) || JSON::RequiresMultipart(Sticker);
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                if (MaskPosition.has_value()) {
-                    JSON::AddMultipartField(
-                        Form, "mask_position",
-                        MaskPosition.value());
-                }
-
-                JSON::AddMultipartField(
-                    Form, "sticker",
-                    Sticker);
-
-                return Form;
-            }
-
-        };
-
-        explicit setStickerMaskPosition(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        bool SetStickerMaskPosition(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<bool>("setStickerMaskPosition",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<bool>("setStickerMaskPosition",
-                                      ParametersValue.ToJson());
-        }
-
-        bool SetStickerMaskPosition(std::string Sticker) {
-            Parameters ParametersValue(
-                Sticker
+    bool SetStickerMaskPosition(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<bool>(
+                "setStickerMaskPosition",
+                ParametersValue.ToMultipart()
             );
-
-            return SetStickerMaskPosition(ParametersValue);
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<bool>(
+            "setStickerMaskPosition",
+            ParametersValue.ToJson()
+        );
+    }
+
+    bool SetStickerMaskPosition(std::string Sticker) {
+        Parameters ParametersValue(
+        Sticker
+        );
+
+        return SetStickerMaskPosition(ParametersValue);
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

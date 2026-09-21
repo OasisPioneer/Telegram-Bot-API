@@ -10,75 +10,90 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Refunds a successful payment in Telegram Stars. Returns True on success.
+    // Refunds a successful payment in Telegram Stars. Returns True on success.
+
+struct refundStarPaymentParameters {
+    // Telegram payment identifier
+    std::string TelegramPaymentChargeID;
+
+    // Identifier of the user whose payment will be refunded
+    long long UserID;
+
+    refundStarPaymentParameters(const std::string &TelegramPaymentChargeIDValue, const long long &UserIDValue)
+        : TelegramPaymentChargeID(TelegramPaymentChargeIDValue), UserID(UserIDValue) {}
+
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        Object["telegram_payment_charge_id"] = JSON::ToJson(TelegramPaymentChargeID);
+
+        Object["user_id"] = JSON::ToJson(UserID);
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return JSON::RequiresMultipart(TelegramPaymentChargeID) || JSON::RequiresMultipart(UserID);
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        JSON::AddMultipartField(
+            Form, "telegram_payment_charge_id",
+            TelegramPaymentChargeID);
+
+        JSON::AddMultipartField(
+            Form, "user_id",
+            UserID);
+
+        return Form;
+    }
+
+};
 
 class refundStarPayment {
-    public:
-        struct Parameters {
-            // Telegram payment identifier
-            std::string TelegramPaymentChargeID;
+public:
+    using Parameters = refundStarPaymentParameters;
+    using ReturnType = bool;
 
-            // Identifier of the user whose payment will be refunded
-            long long UserID;
+    static constexpr const char *Name() noexcept {
+        return "refundStarPayment";
+    }
 
-            Parameters(const std::string &TelegramPaymentChargeIDValue, const long long &UserIDValue)
-                : TelegramPaymentChargeID(TelegramPaymentChargeIDValue), UserID(UserIDValue) {}
+    explicit refundStarPayment(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-            JSON::Object ToJson() const {
-                JSON::Object Object;
-
-                Object["telegram_payment_charge_id"] = JSON::ToJson(TelegramPaymentChargeID);
-
-                Object["user_id"] = JSON::ToJson(UserID);
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return JSON::RequiresMultipart(TelegramPaymentChargeID) || JSON::RequiresMultipart(UserID);
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                JSON::AddMultipartField(
-                    Form, "telegram_payment_charge_id",
-                    TelegramPaymentChargeID);
-
-                JSON::AddMultipartField(
-                    Form, "user_id",
-                    UserID);
-
-                return Form;
-            }
-
-        };
-
-        explicit refundStarPayment(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        bool RefundStarPayment(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<bool>("refundStarPayment",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<bool>("refundStarPayment",
-                                      ParametersValue.ToJson());
-        }
-
-        bool RefundStarPayment(std::string TelegramPaymentChargeID, long long UserID) {
-            Parameters ParametersValue(
-                TelegramPaymentChargeID,
-                UserID
+    bool RefundStarPayment(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<bool>(
+                "refundStarPayment",
+                ParametersValue.ToMultipart()
             );
-
-            return RefundStarPayment(ParametersValue);
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<bool>(
+            "refundStarPayment",
+            ParametersValue.ToJson()
+        );
+    }
+
+    bool RefundStarPayment(std::string TelegramPaymentChargeID, long long UserID) {
+        Parameters ParametersValue(
+        TelegramPaymentChargeID,
+        UserID
+        );
+
+        return RefundStarPayment(ParametersValue);
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

@@ -12,88 +12,103 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Use this method to edit a subscription invite link created by the bot. The bot must have the can_invite_users administrator rights. Returns the edited invite link as a ChatInviteLink object.
+    // Use this method to edit a subscription invite link created by the bot. The bot must have the can_invite_users administrator rights. Returns the edited invite link as a ChatInviteLink object.
+
+struct editChatSubscriptionInviteLinkParameters {
+    // Unique identifier for the target chat or username of the target channel in the format @username
+    std::variant<long long, std::string> ChatID;
+
+    // The invite link to edit
+    std::string InviteLink;
+
+    // Invite link name; 0-32 characters
+    std::optional<std::string> Name{};
+
+    editChatSubscriptionInviteLinkParameters(const std::variant<long long, std::string> &ChatIDValue, const std::string &InviteLinkValue)
+        : ChatID(ChatIDValue), InviteLink(InviteLinkValue) {}
+
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        Object["chat_id"] = JSON::ToJson(ChatID);
+
+        Object["invite_link"] = JSON::ToJson(InviteLink);
+
+        if (Name.has_value()) {
+            Object["name"] = JSON::ToJson(Name.value());
+        }
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return JSON::RequiresMultipart(ChatID) || JSON::RequiresMultipart(InviteLink) || (Name.has_value() && JSON::RequiresMultipart(Name.value()));
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        JSON::AddMultipartField(
+            Form, "chat_id",
+            ChatID);
+
+        JSON::AddMultipartField(
+            Form, "invite_link",
+            InviteLink);
+
+        if (Name.has_value()) {
+            JSON::AddMultipartField(
+                Form, "name",
+                Name.value());
+        }
+
+        return Form;
+    }
+
+};
 
 class editChatSubscriptionInviteLink {
-    public:
-        struct Parameters {
-            // Unique identifier for the target chat or username of the target channel in the format @username
-            std::variant<long long, std::string> ChatID;
+public:
+    using Parameters = editChatSubscriptionInviteLinkParameters;
+    using ReturnType = ::TelegramBotAPI::Type::ChatInviteLink;
 
-            // The invite link to edit
-            std::string InviteLink;
+    static constexpr const char *Name() noexcept {
+        return "editChatSubscriptionInviteLink";
+    }
 
-            // Invite link name; 0-32 characters
-            std::optional<std::string> Name{};
+    explicit editChatSubscriptionInviteLink(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-            Parameters(const std::variant<long long, std::string> &ChatIDValue, const std::string &InviteLinkValue)
-                : ChatID(ChatIDValue), InviteLink(InviteLinkValue) {}
-
-            JSON::Object ToJson() const {
-                JSON::Object Object;
-
-                Object["chat_id"] = JSON::ToJson(ChatID);
-
-                Object["invite_link"] = JSON::ToJson(InviteLink);
-
-                if (Name.has_value()) {
-                    Object["name"] = JSON::ToJson(Name.value());
-                }
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return JSON::RequiresMultipart(ChatID) || JSON::RequiresMultipart(InviteLink) || (Name.has_value() && JSON::RequiresMultipart(Name.value()));
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                JSON::AddMultipartField(
-                    Form, "chat_id",
-                    ChatID);
-
-                JSON::AddMultipartField(
-                    Form, "invite_link",
-                    InviteLink);
-
-                if (Name.has_value()) {
-                    JSON::AddMultipartField(
-                        Form, "name",
-                        Name.value());
-                }
-
-                return Form;
-            }
-
-        };
-
-        explicit editChatSubscriptionInviteLink(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        ::TelegramBotAPI::Type::ChatInviteLink EditChatSubscriptionInviteLink(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<::TelegramBotAPI::Type::ChatInviteLink>("editChatSubscriptionInviteLink",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<::TelegramBotAPI::Type::ChatInviteLink>("editChatSubscriptionInviteLink",
-                                      ParametersValue.ToJson());
-        }
-
-        ::TelegramBotAPI::Type::ChatInviteLink EditChatSubscriptionInviteLink(std::variant<long long, std::string> ChatID, std::string InviteLink) {
-            Parameters ParametersValue(
-                ChatID,
-                InviteLink
+    ::TelegramBotAPI::Type::ChatInviteLink EditChatSubscriptionInviteLink(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<::TelegramBotAPI::Type::ChatInviteLink>(
+                "editChatSubscriptionInviteLink",
+                ParametersValue.ToMultipart()
             );
-
-            return EditChatSubscriptionInviteLink(ParametersValue);
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<::TelegramBotAPI::Type::ChatInviteLink>(
+            "editChatSubscriptionInviteLink",
+            ParametersValue.ToJson()
+        );
+    }
+
+    ::TelegramBotAPI::Type::ChatInviteLink EditChatSubscriptionInviteLink(std::variant<long long, std::string> ChatID, std::string InviteLink) {
+        Parameters ParametersValue(
+        ChatID,
+        InviteLink
+        );
+
+        return EditChatSubscriptionInviteLink(ParametersValue);
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

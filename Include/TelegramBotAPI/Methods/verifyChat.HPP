@@ -11,78 +11,93 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Verifies a chat on behalf of the organization which is represented by the bot. Returns True on success.
+    // Verifies a chat on behalf of the organization which is represented by the bot. Returns True on success.
+
+struct verifyChatParameters {
+    // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username. Channel direct messages chats can't be verified.
+    std::variant<long long, std::string> ChatID;
+
+    // Custom description for the verification; 0-70 characters. Must be empty if the organization isn't allowed to provide a custom verification description.
+    std::optional<std::string> CustomDescription{};
+
+    verifyChatParameters(const std::variant<long long, std::string> &ChatIDValue)
+        : ChatID(ChatIDValue) {}
+
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        Object["chat_id"] = JSON::ToJson(ChatID);
+
+        if (CustomDescription.has_value()) {
+            Object["custom_description"] = JSON::ToJson(CustomDescription.value());
+        }
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return JSON::RequiresMultipart(ChatID) || (CustomDescription.has_value() && JSON::RequiresMultipart(CustomDescription.value()));
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        JSON::AddMultipartField(
+            Form, "chat_id",
+            ChatID);
+
+        if (CustomDescription.has_value()) {
+            JSON::AddMultipartField(
+                Form, "custom_description",
+                CustomDescription.value());
+        }
+
+        return Form;
+    }
+
+};
 
 class verifyChat {
-    public:
-        struct Parameters {
-            // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username. Channel direct messages chats can't be verified.
-            std::variant<long long, std::string> ChatID;
+public:
+    using Parameters = verifyChatParameters;
+    using ReturnType = bool;
 
-            // Custom description for the verification; 0-70 characters. Must be empty if the organization isn't allowed to provide a custom verification description.
-            std::optional<std::string> CustomDescription{};
+    static constexpr const char *Name() noexcept {
+        return "verifyChat";
+    }
 
-            Parameters(const std::variant<long long, std::string> &ChatIDValue)
-                : ChatID(ChatIDValue) {}
+    explicit verifyChat(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-            JSON::Object ToJson() const {
-                JSON::Object Object;
-
-                Object["chat_id"] = JSON::ToJson(ChatID);
-
-                if (CustomDescription.has_value()) {
-                    Object["custom_description"] = JSON::ToJson(CustomDescription.value());
-                }
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return JSON::RequiresMultipart(ChatID) || (CustomDescription.has_value() && JSON::RequiresMultipart(CustomDescription.value()));
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                JSON::AddMultipartField(
-                    Form, "chat_id",
-                    ChatID);
-
-                if (CustomDescription.has_value()) {
-                    JSON::AddMultipartField(
-                        Form, "custom_description",
-                        CustomDescription.value());
-                }
-
-                return Form;
-            }
-
-        };
-
-        explicit verifyChat(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        bool VerifyChat(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<bool>("verifyChat",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<bool>("verifyChat",
-                                      ParametersValue.ToJson());
-        }
-
-        bool VerifyChat(std::variant<long long, std::string> ChatID) {
-            Parameters ParametersValue(
-                ChatID
+    bool VerifyChat(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<bool>(
+                "verifyChat",
+                ParametersValue.ToMultipart()
             );
-
-            return VerifyChat(ParametersValue);
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<bool>(
+            "verifyChat",
+            ParametersValue.ToJson()
+        );
+    }
+
+    bool VerifyChat(std::variant<long long, std::string> ChatID) {
+        Parameters ParametersValue(
+        ChatID
+        );
+
+        return VerifyChat(ParametersValue);
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

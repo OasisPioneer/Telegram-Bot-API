@@ -44,10 +44,16 @@ def main() -> int:
     message_header = TYPE_ROOT / "Message.HPP"
     deserializer_header = JSON_ROOT / "Deserializer.HPP"
     serializer_header = JSON_ROOT / "Serializer.HPP"
+    send_message_header = (
+        INCLUDE_ROOT / "Methods" / "sendMessage.HPP"
+    )
+    client_header = INCLUDE_ROOT / "TelegramClient.HPP"
 
     message = read_required(message_header)
     deserializer = read_required(deserializer_header)
     serializer = read_required(serializer_header)
+    send_message = read_required(send_message_header)
+    client = read_required(client_header)
 
     # ------------------------------------------------------------------
     # 1. Message.HPP — recursive object field
@@ -151,6 +157,40 @@ def main() -> int:
         serializer,
         "PinnedMessage",
         "Serializer contains PinnedMessage handling",
+    )
+
+    # ------------------------------------------------------------------
+    # 6. Generated method API
+    # ------------------------------------------------------------------
+
+    assert_contains(
+        send_message,
+        "struct sendMessageParameters",
+        "sendMessage parameters are generated in the method header",
+    )
+
+    assert_contains(
+        send_message,
+        "using Parameters = sendMessageParameters;",
+        "Method façade aliases the standalone parameter type",
+    )
+
+    assert_not_contains(
+        send_message,
+        "struct Parameters {",
+        "Method façade must not contain an embedded Parameters struct",
+    )
+
+    assert_contains(
+        client,
+        "const Methods::sendMessageParameters &Parameters",
+        "TelegramClient exposes the standalone parameter overload",
+    )
+
+    assert_not_contains(
+        client,
+        "MethodCall(",
+        "TelegramClient must not expose the obsolete MethodCall template",
     )
 
     print("Message.HPP                  : PASS")

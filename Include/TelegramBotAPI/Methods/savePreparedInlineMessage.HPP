@@ -32,127 +32,142 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Stores a message that can be sent by a user of a Mini App. Returns a PreparedInlineMessage object.
+    // Stores a message that can be sent by a user of a Mini App. Returns a PreparedInlineMessage object.
+
+struct savePreparedInlineMessageParameters {
+    // Pass True if the message can be sent to private chats with bots
+    std::optional<bool> AllowBotChats{};
+
+    // Pass True if the message can be sent to channel chats
+    std::optional<bool> AllowChannelChats{};
+
+    // Pass True if the message can be sent to group and supergroup chats
+    std::optional<bool> AllowGroupChats{};
+
+    // Pass True if the message can be sent to private chats with users
+    std::optional<bool> AllowUserChats{};
+
+    // A JSON-serialized object describing the message to be sent
+    std::variant<::TelegramBotAPI::Type::InlineQueryResultCachedAudio, ::TelegramBotAPI::Type::InlineQueryResultCachedDocument, ::TelegramBotAPI::Type::InlineQueryResultCachedGif, ::TelegramBotAPI::Type::InlineQueryResultCachedMpeg4Gif, ::TelegramBotAPI::Type::InlineQueryResultCachedPhoto, ::TelegramBotAPI::Type::InlineQueryResultCachedSticker, ::TelegramBotAPI::Type::InlineQueryResultCachedVideo, ::TelegramBotAPI::Type::InlineQueryResultCachedVoice, ::TelegramBotAPI::Type::InlineQueryResultArticle, ::TelegramBotAPI::Type::InlineQueryResultAudio, ::TelegramBotAPI::Type::InlineQueryResultContact, ::TelegramBotAPI::Type::InlineQueryResultGame, ::TelegramBotAPI::Type::InlineQueryResultDocument, ::TelegramBotAPI::Type::InlineQueryResultGif, ::TelegramBotAPI::Type::InlineQueryResultLocation, ::TelegramBotAPI::Type::InlineQueryResultMpeg4Gif, ::TelegramBotAPI::Type::InlineQueryResultPhoto, ::TelegramBotAPI::Type::InlineQueryResultVenue, ::TelegramBotAPI::Type::InlineQueryResultVideo, ::TelegramBotAPI::Type::InlineQueryResultVoice> Result;
+
+    // Unique identifier of the target user that can use the prepared message
+    long long UserID;
+
+    savePreparedInlineMessageParameters(const std::variant<::TelegramBotAPI::Type::InlineQueryResultCachedAudio, ::TelegramBotAPI::Type::InlineQueryResultCachedDocument, ::TelegramBotAPI::Type::InlineQueryResultCachedGif, ::TelegramBotAPI::Type::InlineQueryResultCachedMpeg4Gif, ::TelegramBotAPI::Type::InlineQueryResultCachedPhoto, ::TelegramBotAPI::Type::InlineQueryResultCachedSticker, ::TelegramBotAPI::Type::InlineQueryResultCachedVideo, ::TelegramBotAPI::Type::InlineQueryResultCachedVoice, ::TelegramBotAPI::Type::InlineQueryResultArticle, ::TelegramBotAPI::Type::InlineQueryResultAudio, ::TelegramBotAPI::Type::InlineQueryResultContact, ::TelegramBotAPI::Type::InlineQueryResultGame, ::TelegramBotAPI::Type::InlineQueryResultDocument, ::TelegramBotAPI::Type::InlineQueryResultGif, ::TelegramBotAPI::Type::InlineQueryResultLocation, ::TelegramBotAPI::Type::InlineQueryResultMpeg4Gif, ::TelegramBotAPI::Type::InlineQueryResultPhoto, ::TelegramBotAPI::Type::InlineQueryResultVenue, ::TelegramBotAPI::Type::InlineQueryResultVideo, ::TelegramBotAPI::Type::InlineQueryResultVoice> &ResultValue, const long long &UserIDValue)
+        : Result(ResultValue), UserID(UserIDValue) {}
+
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        if (AllowBotChats.has_value()) {
+            Object["allow_bot_chats"] = JSON::ToJson(AllowBotChats.value());
+        }
+
+        if (AllowChannelChats.has_value()) {
+            Object["allow_channel_chats"] = JSON::ToJson(AllowChannelChats.value());
+        }
+
+        if (AllowGroupChats.has_value()) {
+            Object["allow_group_chats"] = JSON::ToJson(AllowGroupChats.value());
+        }
+
+        if (AllowUserChats.has_value()) {
+            Object["allow_user_chats"] = JSON::ToJson(AllowUserChats.value());
+        }
+
+        Object["result"] = JSON::ToJson(Result);
+
+        Object["user_id"] = JSON::ToJson(UserID);
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return (AllowBotChats.has_value() && JSON::RequiresMultipart(AllowBotChats.value())) || (AllowChannelChats.has_value() && JSON::RequiresMultipart(AllowChannelChats.value())) || (AllowGroupChats.has_value() && JSON::RequiresMultipart(AllowGroupChats.value())) || (AllowUserChats.has_value() && JSON::RequiresMultipart(AllowUserChats.value())) || JSON::RequiresMultipart(Result) || JSON::RequiresMultipart(UserID);
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        if (AllowBotChats.has_value()) {
+            JSON::AddMultipartField(
+                Form, "allow_bot_chats",
+                AllowBotChats.value());
+        }
+
+        if (AllowChannelChats.has_value()) {
+            JSON::AddMultipartField(
+                Form, "allow_channel_chats",
+                AllowChannelChats.value());
+        }
+
+        if (AllowGroupChats.has_value()) {
+            JSON::AddMultipartField(
+                Form, "allow_group_chats",
+                AllowGroupChats.value());
+        }
+
+        if (AllowUserChats.has_value()) {
+            JSON::AddMultipartField(
+                Form, "allow_user_chats",
+                AllowUserChats.value());
+        }
+
+        JSON::AddMultipartField(
+            Form, "result",
+            Result);
+
+        JSON::AddMultipartField(
+            Form, "user_id",
+            UserID);
+
+        return Form;
+    }
+
+};
 
 class savePreparedInlineMessage {
-    public:
-        struct Parameters {
-            // Pass True if the message can be sent to private chats with bots
-            std::optional<bool> AllowBotChats{};
+public:
+    using Parameters = savePreparedInlineMessageParameters;
+    using ReturnType = ::TelegramBotAPI::Type::PreparedInlineMessage;
 
-            // Pass True if the message can be sent to channel chats
-            std::optional<bool> AllowChannelChats{};
+    static constexpr const char *Name() noexcept {
+        return "savePreparedInlineMessage";
+    }
 
-            // Pass True if the message can be sent to group and supergroup chats
-            std::optional<bool> AllowGroupChats{};
+    explicit savePreparedInlineMessage(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-            // Pass True if the message can be sent to private chats with users
-            std::optional<bool> AllowUserChats{};
-
-            // A JSON-serialized object describing the message to be sent
-            std::variant<::TelegramBotAPI::Type::InlineQueryResultCachedAudio, ::TelegramBotAPI::Type::InlineQueryResultCachedDocument, ::TelegramBotAPI::Type::InlineQueryResultCachedGif, ::TelegramBotAPI::Type::InlineQueryResultCachedMpeg4Gif, ::TelegramBotAPI::Type::InlineQueryResultCachedPhoto, ::TelegramBotAPI::Type::InlineQueryResultCachedSticker, ::TelegramBotAPI::Type::InlineQueryResultCachedVideo, ::TelegramBotAPI::Type::InlineQueryResultCachedVoice, ::TelegramBotAPI::Type::InlineQueryResultArticle, ::TelegramBotAPI::Type::InlineQueryResultAudio, ::TelegramBotAPI::Type::InlineQueryResultContact, ::TelegramBotAPI::Type::InlineQueryResultGame, ::TelegramBotAPI::Type::InlineQueryResultDocument, ::TelegramBotAPI::Type::InlineQueryResultGif, ::TelegramBotAPI::Type::InlineQueryResultLocation, ::TelegramBotAPI::Type::InlineQueryResultMpeg4Gif, ::TelegramBotAPI::Type::InlineQueryResultPhoto, ::TelegramBotAPI::Type::InlineQueryResultVenue, ::TelegramBotAPI::Type::InlineQueryResultVideo, ::TelegramBotAPI::Type::InlineQueryResultVoice> Result;
-
-            // Unique identifier of the target user that can use the prepared message
-            long long UserID;
-
-            Parameters(const std::variant<::TelegramBotAPI::Type::InlineQueryResultCachedAudio, ::TelegramBotAPI::Type::InlineQueryResultCachedDocument, ::TelegramBotAPI::Type::InlineQueryResultCachedGif, ::TelegramBotAPI::Type::InlineQueryResultCachedMpeg4Gif, ::TelegramBotAPI::Type::InlineQueryResultCachedPhoto, ::TelegramBotAPI::Type::InlineQueryResultCachedSticker, ::TelegramBotAPI::Type::InlineQueryResultCachedVideo, ::TelegramBotAPI::Type::InlineQueryResultCachedVoice, ::TelegramBotAPI::Type::InlineQueryResultArticle, ::TelegramBotAPI::Type::InlineQueryResultAudio, ::TelegramBotAPI::Type::InlineQueryResultContact, ::TelegramBotAPI::Type::InlineQueryResultGame, ::TelegramBotAPI::Type::InlineQueryResultDocument, ::TelegramBotAPI::Type::InlineQueryResultGif, ::TelegramBotAPI::Type::InlineQueryResultLocation, ::TelegramBotAPI::Type::InlineQueryResultMpeg4Gif, ::TelegramBotAPI::Type::InlineQueryResultPhoto, ::TelegramBotAPI::Type::InlineQueryResultVenue, ::TelegramBotAPI::Type::InlineQueryResultVideo, ::TelegramBotAPI::Type::InlineQueryResultVoice> &ResultValue, const long long &UserIDValue)
-                : Result(ResultValue), UserID(UserIDValue) {}
-
-            JSON::Object ToJson() const {
-                JSON::Object Object;
-
-                if (AllowBotChats.has_value()) {
-                    Object["allow_bot_chats"] = JSON::ToJson(AllowBotChats.value());
-                }
-
-                if (AllowChannelChats.has_value()) {
-                    Object["allow_channel_chats"] = JSON::ToJson(AllowChannelChats.value());
-                }
-
-                if (AllowGroupChats.has_value()) {
-                    Object["allow_group_chats"] = JSON::ToJson(AllowGroupChats.value());
-                }
-
-                if (AllowUserChats.has_value()) {
-                    Object["allow_user_chats"] = JSON::ToJson(AllowUserChats.value());
-                }
-
-                Object["result"] = JSON::ToJson(Result);
-
-                Object["user_id"] = JSON::ToJson(UserID);
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return (AllowBotChats.has_value() && JSON::RequiresMultipart(AllowBotChats.value())) || (AllowChannelChats.has_value() && JSON::RequiresMultipart(AllowChannelChats.value())) || (AllowGroupChats.has_value() && JSON::RequiresMultipart(AllowGroupChats.value())) || (AllowUserChats.has_value() && JSON::RequiresMultipart(AllowUserChats.value())) || JSON::RequiresMultipart(Result) || JSON::RequiresMultipart(UserID);
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                if (AllowBotChats.has_value()) {
-                    JSON::AddMultipartField(
-                        Form, "allow_bot_chats",
-                        AllowBotChats.value());
-                }
-
-                if (AllowChannelChats.has_value()) {
-                    JSON::AddMultipartField(
-                        Form, "allow_channel_chats",
-                        AllowChannelChats.value());
-                }
-
-                if (AllowGroupChats.has_value()) {
-                    JSON::AddMultipartField(
-                        Form, "allow_group_chats",
-                        AllowGroupChats.value());
-                }
-
-                if (AllowUserChats.has_value()) {
-                    JSON::AddMultipartField(
-                        Form, "allow_user_chats",
-                        AllowUserChats.value());
-                }
-
-                JSON::AddMultipartField(
-                    Form, "result",
-                    Result);
-
-                JSON::AddMultipartField(
-                    Form, "user_id",
-                    UserID);
-
-                return Form;
-            }
-
-        };
-
-        explicit savePreparedInlineMessage(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        ::TelegramBotAPI::Type::PreparedInlineMessage SavePreparedInlineMessage(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<::TelegramBotAPI::Type::PreparedInlineMessage>("savePreparedInlineMessage",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<::TelegramBotAPI::Type::PreparedInlineMessage>("savePreparedInlineMessage",
-                                      ParametersValue.ToJson());
-        }
-
-        ::TelegramBotAPI::Type::PreparedInlineMessage SavePreparedInlineMessage(std::variant<::TelegramBotAPI::Type::InlineQueryResultCachedAudio, ::TelegramBotAPI::Type::InlineQueryResultCachedDocument, ::TelegramBotAPI::Type::InlineQueryResultCachedGif, ::TelegramBotAPI::Type::InlineQueryResultCachedMpeg4Gif, ::TelegramBotAPI::Type::InlineQueryResultCachedPhoto, ::TelegramBotAPI::Type::InlineQueryResultCachedSticker, ::TelegramBotAPI::Type::InlineQueryResultCachedVideo, ::TelegramBotAPI::Type::InlineQueryResultCachedVoice, ::TelegramBotAPI::Type::InlineQueryResultArticle, ::TelegramBotAPI::Type::InlineQueryResultAudio, ::TelegramBotAPI::Type::InlineQueryResultContact, ::TelegramBotAPI::Type::InlineQueryResultGame, ::TelegramBotAPI::Type::InlineQueryResultDocument, ::TelegramBotAPI::Type::InlineQueryResultGif, ::TelegramBotAPI::Type::InlineQueryResultLocation, ::TelegramBotAPI::Type::InlineQueryResultMpeg4Gif, ::TelegramBotAPI::Type::InlineQueryResultPhoto, ::TelegramBotAPI::Type::InlineQueryResultVenue, ::TelegramBotAPI::Type::InlineQueryResultVideo, ::TelegramBotAPI::Type::InlineQueryResultVoice> Result, long long UserID) {
-            Parameters ParametersValue(
-                Result,
-                UserID
+    ::TelegramBotAPI::Type::PreparedInlineMessage SavePreparedInlineMessage(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<::TelegramBotAPI::Type::PreparedInlineMessage>(
+                "savePreparedInlineMessage",
+                ParametersValue.ToMultipart()
             );
-
-            return SavePreparedInlineMessage(ParametersValue);
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<::TelegramBotAPI::Type::PreparedInlineMessage>(
+            "savePreparedInlineMessage",
+            ParametersValue.ToJson()
+        );
+    }
+
+    ::TelegramBotAPI::Type::PreparedInlineMessage SavePreparedInlineMessage(std::variant<::TelegramBotAPI::Type::InlineQueryResultCachedAudio, ::TelegramBotAPI::Type::InlineQueryResultCachedDocument, ::TelegramBotAPI::Type::InlineQueryResultCachedGif, ::TelegramBotAPI::Type::InlineQueryResultCachedMpeg4Gif, ::TelegramBotAPI::Type::InlineQueryResultCachedPhoto, ::TelegramBotAPI::Type::InlineQueryResultCachedSticker, ::TelegramBotAPI::Type::InlineQueryResultCachedVideo, ::TelegramBotAPI::Type::InlineQueryResultCachedVoice, ::TelegramBotAPI::Type::InlineQueryResultArticle, ::TelegramBotAPI::Type::InlineQueryResultAudio, ::TelegramBotAPI::Type::InlineQueryResultContact, ::TelegramBotAPI::Type::InlineQueryResultGame, ::TelegramBotAPI::Type::InlineQueryResultDocument, ::TelegramBotAPI::Type::InlineQueryResultGif, ::TelegramBotAPI::Type::InlineQueryResultLocation, ::TelegramBotAPI::Type::InlineQueryResultMpeg4Gif, ::TelegramBotAPI::Type::InlineQueryResultPhoto, ::TelegramBotAPI::Type::InlineQueryResultVenue, ::TelegramBotAPI::Type::InlineQueryResultVideo, ::TelegramBotAPI::Type::InlineQueryResultVoice> Result, long long UserID) {
+        Parameters ParametersValue(
+        Result,
+        UserID
+        );
+
+        return SavePreparedInlineMessage(ParametersValue);
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

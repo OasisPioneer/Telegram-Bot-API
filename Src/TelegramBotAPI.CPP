@@ -24,6 +24,14 @@ namespace TelegramBotAPI {
                                    Network::IHTTPClient &HTTPClient)
         : Client(BotToken, APIURL, HTTPClient) {}
 
+    TelegramClient &TelegramBotAPI::API() noexcept {
+        return Client;
+    }
+
+    const TelegramClient &TelegramBotAPI::API() const noexcept {
+        return Client;
+    }
+
     void TelegramBotAPI::OnMessage(MessageHandler Handler) {
         MessageHandlerFunction = std::move(Handler);
     }
@@ -125,7 +133,13 @@ namespace TelegramBotAPI {
                 break;
             }
 
-            ProcessUpdate(Update);
+            try {
+                ProcessUpdate(Update);
+            } catch (...) {
+                // Individual update handler failures must not terminate
+                // the long-polling loop. The update is still acknowledged
+                // by advancing the offset below.
+            }
 
             Offset = Update.UpdateID + 1;
         }

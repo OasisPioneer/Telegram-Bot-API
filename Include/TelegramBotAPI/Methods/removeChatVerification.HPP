@@ -11,65 +11,80 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Removes verification from a chat that is currently verified on behalf of the organization represented by the bot. Returns True on success.
+    // Removes verification from a chat that is currently verified on behalf of the organization represented by the bot. Returns True on success.
+
+struct removeChatVerificationParameters {
+    // Unique identifier for the target chat or username of the target bot or channel in the format @username
+    std::variant<long long, std::string> ChatID;
+
+    removeChatVerificationParameters(const std::variant<long long, std::string> &ChatIDValue)
+        : ChatID(ChatIDValue) {}
+
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        Object["chat_id"] = JSON::ToJson(ChatID);
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return JSON::RequiresMultipart(ChatID);
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        JSON::AddMultipartField(
+            Form, "chat_id",
+            ChatID);
+
+        return Form;
+    }
+
+};
 
 class removeChatVerification {
-    public:
-        struct Parameters {
-            // Unique identifier for the target chat or username of the target bot or channel in the format @username
-            std::variant<long long, std::string> ChatID;
+public:
+    using Parameters = removeChatVerificationParameters;
+    using ReturnType = bool;
 
-            Parameters(const std::variant<long long, std::string> &ChatIDValue)
-                : ChatID(ChatIDValue) {}
+    static constexpr const char *Name() noexcept {
+        return "removeChatVerification";
+    }
 
-            JSON::Object ToJson() const {
-                JSON::Object Object;
+    explicit removeChatVerification(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-                Object["chat_id"] = JSON::ToJson(ChatID);
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return JSON::RequiresMultipart(ChatID);
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                JSON::AddMultipartField(
-                    Form, "chat_id",
-                    ChatID);
-
-                return Form;
-            }
-
-        };
-
-        explicit removeChatVerification(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        bool RemoveChatVerification(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<bool>("removeChatVerification",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<bool>("removeChatVerification",
-                                      ParametersValue.ToJson());
-        }
-
-        bool RemoveChatVerification(std::variant<long long, std::string> ChatID) {
-            Parameters ParametersValue(
-                ChatID
+    bool RemoveChatVerification(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<bool>(
+                "removeChatVerification",
+                ParametersValue.ToMultipart()
             );
-
-            return RemoveChatVerification(ParametersValue);
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<bool>(
+            "removeChatVerification",
+            ParametersValue.ToJson()
+        );
+    }
+
+    bool RemoveChatVerification(std::variant<long long, std::string> ChatID) {
+        Parameters ParametersValue(
+        ChatID
+        );
+
+        return RemoveChatVerification(ParametersValue);
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

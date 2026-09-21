@@ -11,65 +11,80 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Use this method to get the number of members in a chat. Returns Integer on success.
+    // Use this method to get the number of members in a chat. Returns Integer on success.
+
+struct getChatMemberCountParameters {
+    // Unique identifier for the target chat or username of the target supergroup or channel in the format @username
+    std::variant<long long, std::string> ChatID;
+
+    getChatMemberCountParameters(const std::variant<long long, std::string> &ChatIDValue)
+        : ChatID(ChatIDValue) {}
+
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        Object["chat_id"] = JSON::ToJson(ChatID);
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return JSON::RequiresMultipart(ChatID);
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        JSON::AddMultipartField(
+            Form, "chat_id",
+            ChatID);
+
+        return Form;
+    }
+
+};
 
 class getChatMemberCount {
-    public:
-        struct Parameters {
-            // Unique identifier for the target chat or username of the target supergroup or channel in the format @username
-            std::variant<long long, std::string> ChatID;
+public:
+    using Parameters = getChatMemberCountParameters;
+    using ReturnType = long long;
 
-            Parameters(const std::variant<long long, std::string> &ChatIDValue)
-                : ChatID(ChatIDValue) {}
+    static constexpr const char *Name() noexcept {
+        return "getChatMemberCount";
+    }
 
-            JSON::Object ToJson() const {
-                JSON::Object Object;
+    explicit getChatMemberCount(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-                Object["chat_id"] = JSON::ToJson(ChatID);
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return JSON::RequiresMultipart(ChatID);
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                JSON::AddMultipartField(
-                    Form, "chat_id",
-                    ChatID);
-
-                return Form;
-            }
-
-        };
-
-        explicit getChatMemberCount(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        long long GetChatMemberCount(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<long long>("getChatMemberCount",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<long long>("getChatMemberCount",
-                                      ParametersValue.ToJson());
-        }
-
-        long long GetChatMemberCount(std::variant<long long, std::string> ChatID) {
-            Parameters ParametersValue(
-                ChatID
+    long long GetChatMemberCount(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<long long>(
+                "getChatMemberCount",
+                ParametersValue.ToMultipart()
             );
-
-            return GetChatMemberCount(ParametersValue);
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<long long>(
+            "getChatMemberCount",
+            ParametersValue.ToJson()
+        );
+    }
+
+    long long GetChatMemberCount(std::variant<long long, std::string> ChatID) {
+        Parameters ParametersValue(
+        ChatID
+        );
+
+        return GetChatMemberCount(ParametersValue);
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

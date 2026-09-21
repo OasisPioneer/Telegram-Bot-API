@@ -11,85 +11,100 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Changes the privacy settings pertaining to incoming gifts in a managed business account. Requires the can_change_gift_settings business bot right. Returns True on success.
+    // Changes the privacy settings pertaining to incoming gifts in a managed business account. Requires the can_change_gift_settings business bot right. Returns True on success.
+
+struct setBusinessAccountGiftSettingsParameters {
+    // Types of gifts accepted by the business account
+    ::TelegramBotAPI::Type::AcceptedGiftTypes AcceptedGiftTypes;
+
+    // Unique identifier of the business connection
+    std::string BusinessConnectionID;
+
+    // Pass True if a button for sending a gift to the user or by the business account must always be shown in the input field
+    bool ShowGiftButton;
+
+    setBusinessAccountGiftSettingsParameters(const ::TelegramBotAPI::Type::AcceptedGiftTypes &AcceptedGiftTypesValue, const std::string &BusinessConnectionIDValue, const bool &ShowGiftButtonValue)
+        : AcceptedGiftTypes(AcceptedGiftTypesValue), BusinessConnectionID(BusinessConnectionIDValue), ShowGiftButton(ShowGiftButtonValue) {}
+
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        Object["accepted_gift_types"] = JSON::ToJson(AcceptedGiftTypes);
+
+        Object["business_connection_id"] = JSON::ToJson(BusinessConnectionID);
+
+        Object["show_gift_button"] = JSON::ToJson(ShowGiftButton);
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return JSON::RequiresMultipart(AcceptedGiftTypes) || JSON::RequiresMultipart(BusinessConnectionID) || JSON::RequiresMultipart(ShowGiftButton);
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        JSON::AddMultipartField(
+            Form, "accepted_gift_types",
+            AcceptedGiftTypes);
+
+        JSON::AddMultipartField(
+            Form, "business_connection_id",
+            BusinessConnectionID);
+
+        JSON::AddMultipartField(
+            Form, "show_gift_button",
+            ShowGiftButton);
+
+        return Form;
+    }
+
+};
 
 class setBusinessAccountGiftSettings {
-    public:
-        struct Parameters {
-            // Types of gifts accepted by the business account
-            ::TelegramBotAPI::Type::AcceptedGiftTypes AcceptedGiftTypes;
+public:
+    using Parameters = setBusinessAccountGiftSettingsParameters;
+    using ReturnType = bool;
 
-            // Unique identifier of the business connection
-            std::string BusinessConnectionID;
+    static constexpr const char *Name() noexcept {
+        return "setBusinessAccountGiftSettings";
+    }
 
-            // Pass True if a button for sending a gift to the user or by the business account must always be shown in the input field
-            bool ShowGiftButton;
+    explicit setBusinessAccountGiftSettings(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-            Parameters(const ::TelegramBotAPI::Type::AcceptedGiftTypes &AcceptedGiftTypesValue, const std::string &BusinessConnectionIDValue, const bool &ShowGiftButtonValue)
-                : AcceptedGiftTypes(AcceptedGiftTypesValue), BusinessConnectionID(BusinessConnectionIDValue), ShowGiftButton(ShowGiftButtonValue) {}
-
-            JSON::Object ToJson() const {
-                JSON::Object Object;
-
-                Object["accepted_gift_types"] = JSON::ToJson(AcceptedGiftTypes);
-
-                Object["business_connection_id"] = JSON::ToJson(BusinessConnectionID);
-
-                Object["show_gift_button"] = JSON::ToJson(ShowGiftButton);
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return JSON::RequiresMultipart(AcceptedGiftTypes) || JSON::RequiresMultipart(BusinessConnectionID) || JSON::RequiresMultipart(ShowGiftButton);
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                JSON::AddMultipartField(
-                    Form, "accepted_gift_types",
-                    AcceptedGiftTypes);
-
-                JSON::AddMultipartField(
-                    Form, "business_connection_id",
-                    BusinessConnectionID);
-
-                JSON::AddMultipartField(
-                    Form, "show_gift_button",
-                    ShowGiftButton);
-
-                return Form;
-            }
-
-        };
-
-        explicit setBusinessAccountGiftSettings(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        bool SetBusinessAccountGiftSettings(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<bool>("setBusinessAccountGiftSettings",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<bool>("setBusinessAccountGiftSettings",
-                                      ParametersValue.ToJson());
-        }
-
-        bool SetBusinessAccountGiftSettings(::TelegramBotAPI::Type::AcceptedGiftTypes AcceptedGiftTypes, std::string BusinessConnectionID, bool ShowGiftButton) {
-            Parameters ParametersValue(
-                AcceptedGiftTypes,
-                BusinessConnectionID,
-                ShowGiftButton
+    bool SetBusinessAccountGiftSettings(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<bool>(
+                "setBusinessAccountGiftSettings",
+                ParametersValue.ToMultipart()
             );
-
-            return SetBusinessAccountGiftSettings(ParametersValue);
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<bool>(
+            "setBusinessAccountGiftSettings",
+            ParametersValue.ToJson()
+        );
+    }
+
+    bool SetBusinessAccountGiftSettings(::TelegramBotAPI::Type::AcceptedGiftTypes AcceptedGiftTypes, std::string BusinessConnectionID, bool ShowGiftButton) {
+        Parameters ParametersValue(
+        AcceptedGiftTypes,
+        BusinessConnectionID,
+        ShowGiftButton
+        );
+
+        return SetBusinessAccountGiftSettings(ParametersValue);
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

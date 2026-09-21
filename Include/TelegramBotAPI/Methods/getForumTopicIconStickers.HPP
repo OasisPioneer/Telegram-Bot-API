@@ -12,45 +12,60 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Use this method to get custom emoji stickers, which can be used as a forum topic icon by any user. Requires no parameters. Returns an Array of Sticker objects.
+    // Use this method to get custom emoji stickers, which can be used as a forum topic icon by any user. Requires no parameters. Returns an Array of Sticker objects.
+
+struct getForumTopicIconStickersParameters {
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return false;
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        return Form;
+    }
+
+};
 
 class getForumTopicIconStickers {
-    public:
-        struct Parameters {
-            JSON::Object ToJson() const {
-                JSON::Object Object;
+public:
+    using Parameters = getForumTopicIconStickersParameters;
+    using ReturnType = std::vector<::TelegramBotAPI::Type::Sticker>;
 
-                return Object;
-            }
+    static constexpr const char *Name() noexcept {
+        return "getForumTopicIconStickers";
+    }
 
-            bool RequiresMultipart() const {
-                return false;
-            }
+    explicit getForumTopicIconStickers(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                return Form;
-            }
-
-        };
-
-        explicit getForumTopicIconStickers(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        std::vector<::TelegramBotAPI::Type::Sticker> GetForumTopicIconStickers(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<std::vector<::TelegramBotAPI::Type::Sticker>>("getForumTopicIconStickers",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<std::vector<::TelegramBotAPI::Type::Sticker>>("getForumTopicIconStickers",
-                                      ParametersValue.ToJson());
+    std::vector<::TelegramBotAPI::Type::Sticker> GetForumTopicIconStickers(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<std::vector<::TelegramBotAPI::Type::Sticker>>(
+                "getForumTopicIconStickers",
+                ParametersValue.ToMultipart()
+            );
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<std::vector<::TelegramBotAPI::Type::Sticker>>(
+            "getForumTopicIconStickers",
+            ParametersValue.ToJson()
+        );
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

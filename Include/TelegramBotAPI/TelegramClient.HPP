@@ -10,7 +10,6 @@
 #include "TelegramBotAPI/Network/IHTTPClient.HPP"
 #include "TelegramBotAPI/Network/Multipart/MultipartForm.HPP"
 #include "TelegramBotAPI/TelegramAPIException.HPP"
-
 #include "TelegramBotAPI/Types/AcceptedGiftTypes.HPP"
 #include "TelegramBotAPI/Types/AffiliateInfo.HPP"
 #include "TelegramBotAPI/Types/Animation.HPP"
@@ -392,190 +391,375 @@
 #include "TelegramBotAPI/Types/InputFile.HPP"
 
 namespace TelegramBotAPI::Methods {
+    struct addStickerToSetParameters;
     class addStickerToSet;
+    struct answerCallbackQueryParameters;
     class answerCallbackQuery;
+    struct answerChatJoinRequestQueryParameters;
     class answerChatJoinRequestQuery;
+    struct answerGuestQueryParameters;
     class answerGuestQuery;
+    struct answerInlineQueryParameters;
     class answerInlineQuery;
+    struct answerPreCheckoutQueryParameters;
     class answerPreCheckoutQuery;
+    struct answerShippingQueryParameters;
     class answerShippingQuery;
+    struct answerWebAppQueryParameters;
     class answerWebAppQuery;
+    struct approveChatJoinRequestParameters;
     class approveChatJoinRequest;
+    struct approveSuggestedPostParameters;
     class approveSuggestedPost;
+    struct banChatMemberParameters;
     class banChatMember;
+    struct banChatSenderChatParameters;
     class banChatSenderChat;
+    struct closeParameters;
     class close;
+    struct closeForumTopicParameters;
     class closeForumTopic;
+    struct closeGeneralForumTopicParameters;
     class closeGeneralForumTopic;
+    struct convertGiftToStarsParameters;
     class convertGiftToStars;
+    struct copyMessageParameters;
     class copyMessage;
+    struct copyMessagesParameters;
     class copyMessages;
+    struct createChatInviteLinkParameters;
     class createChatInviteLink;
+    struct createChatSubscriptionInviteLinkParameters;
     class createChatSubscriptionInviteLink;
+    struct createForumTopicParameters;
     class createForumTopic;
+    struct createInvoiceLinkParameters;
     class createInvoiceLink;
+    struct createNewStickerSetParameters;
     class createNewStickerSet;
+    struct declineChatJoinRequestParameters;
     class declineChatJoinRequest;
+    struct declineSuggestedPostParameters;
     class declineSuggestedPost;
+    struct deleteAllMessageReactionsParameters;
     class deleteAllMessageReactions;
+    struct deleteBusinessMessagesParameters;
     class deleteBusinessMessages;
+    struct deleteChatPhotoParameters;
     class deleteChatPhoto;
+    struct deleteChatStickerSetParameters;
     class deleteChatStickerSet;
+    struct deleteEphemeralMessageParameters;
     class deleteEphemeralMessage;
+    struct deleteForumTopicParameters;
     class deleteForumTopic;
+    struct deleteMessageParameters;
     class deleteMessage;
+    struct deleteMessageReactionParameters;
     class deleteMessageReaction;
+    struct deleteMessagesParameters;
     class deleteMessages;
+    struct deleteMyCommandsParameters;
     class deleteMyCommands;
+    struct deleteStickerFromSetParameters;
     class deleteStickerFromSet;
+    struct deleteStickerSetParameters;
     class deleteStickerSet;
+    struct deleteStoryParameters;
     class deleteStory;
+    struct deleteWebhookParameters;
     class deleteWebhook;
+    struct editChatInviteLinkParameters;
     class editChatInviteLink;
+    struct editChatSubscriptionInviteLinkParameters;
     class editChatSubscriptionInviteLink;
+    struct editEphemeralMessageCaptionParameters;
     class editEphemeralMessageCaption;
+    struct editEphemeralMessageMediaParameters;
     class editEphemeralMessageMedia;
+    struct editEphemeralMessageReplyMarkupParameters;
     class editEphemeralMessageReplyMarkup;
+    struct editEphemeralMessageTextParameters;
     class editEphemeralMessageText;
+    struct editForumTopicParameters;
     class editForumTopic;
+    struct editGeneralForumTopicParameters;
     class editGeneralForumTopic;
+    struct editMessageCaptionParameters;
     class editMessageCaption;
+    struct editMessageChecklistParameters;
     class editMessageChecklist;
+    struct editMessageLiveLocationParameters;
     class editMessageLiveLocation;
+    struct editMessageMediaParameters;
     class editMessageMedia;
+    struct editMessageReplyMarkupParameters;
     class editMessageReplyMarkup;
+    struct editMessageTextParameters;
     class editMessageText;
+    struct editStoryParameters;
     class editStory;
+    struct editUserStarSubscriptionParameters;
     class editUserStarSubscription;
+    struct exportChatInviteLinkParameters;
     class exportChatInviteLink;
+    struct forwardMessageParameters;
     class forwardMessage;
+    struct forwardMessagesParameters;
     class forwardMessages;
+    struct getAvailableGiftsParameters;
     class getAvailableGifts;
+    struct getBusinessAccountGiftsParameters;
     class getBusinessAccountGifts;
+    struct getBusinessAccountStarBalanceParameters;
     class getBusinessAccountStarBalance;
+    struct getBusinessConnectionParameters;
     class getBusinessConnection;
+    struct getChatParameters;
     class getChat;
+    struct getChatAdministratorsParameters;
     class getChatAdministrators;
+    struct getChatGiftsParameters;
     class getChatGifts;
+    struct getChatMemberParameters;
     class getChatMember;
+    struct getChatMemberCountParameters;
     class getChatMemberCount;
+    struct getChatMenuButtonParameters;
     class getChatMenuButton;
+    struct getCustomEmojiStickersParameters;
     class getCustomEmojiStickers;
+    struct getFileParameters;
     class getFile;
+    struct getForumTopicIconStickersParameters;
     class getForumTopicIconStickers;
+    struct getGameHighScoresParameters;
     class getGameHighScores;
+    struct getManagedBotAccessSettingsParameters;
     class getManagedBotAccessSettings;
+    struct getManagedBotTokenParameters;
     class getManagedBotToken;
+    struct getMeParameters;
     class getMe;
+    struct getMyCommandsParameters;
     class getMyCommands;
+    struct getMyDefaultAdministratorRightsParameters;
     class getMyDefaultAdministratorRights;
+    struct getMyDescriptionParameters;
     class getMyDescription;
+    struct getMyNameParameters;
     class getMyName;
+    struct getMyShortDescriptionParameters;
     class getMyShortDescription;
+    struct getMyStarBalanceParameters;
     class getMyStarBalance;
+    struct getStarTransactionsParameters;
     class getStarTransactions;
+    struct getStickerSetParameters;
     class getStickerSet;
+    struct getUpdatesParameters;
     class getUpdates;
+    struct getUserChatBoostsParameters;
     class getUserChatBoosts;
+    struct getUserGiftsParameters;
     class getUserGifts;
+    struct getUserPersonalChatMessagesParameters;
     class getUserPersonalChatMessages;
+    struct getUserProfileAudiosParameters;
     class getUserProfileAudios;
+    struct getUserProfilePhotosParameters;
     class getUserProfilePhotos;
+    struct getWebhookInfoParameters;
     class getWebhookInfo;
+    struct giftPremiumSubscriptionParameters;
     class giftPremiumSubscription;
+    struct hideGeneralForumTopicParameters;
     class hideGeneralForumTopic;
+    struct leaveChatParameters;
     class leaveChat;
+    struct logOutParameters;
     class logOut;
+    struct pinChatMessageParameters;
     class pinChatMessage;
+    struct postStoryParameters;
     class postStory;
+    struct promoteChatMemberParameters;
     class promoteChatMember;
+    struct readBusinessMessageParameters;
     class readBusinessMessage;
+    struct refundStarPaymentParameters;
     class refundStarPayment;
+    struct removeBusinessAccountProfilePhotoParameters;
     class removeBusinessAccountProfilePhoto;
+    struct removeChatVerificationParameters;
     class removeChatVerification;
+    struct removeMyProfilePhotoParameters;
     class removeMyProfilePhoto;
+    struct removeUserVerificationParameters;
     class removeUserVerification;
+    struct reopenForumTopicParameters;
     class reopenForumTopic;
+    struct reopenGeneralForumTopicParameters;
     class reopenGeneralForumTopic;
+    struct replaceManagedBotTokenParameters;
     class replaceManagedBotToken;
+    struct replaceStickerInSetParameters;
     class replaceStickerInSet;
+    struct repostStoryParameters;
     class repostStory;
+    struct restrictChatMemberParameters;
     class restrictChatMember;
+    struct revokeChatInviteLinkParameters;
     class revokeChatInviteLink;
+    struct savePreparedInlineMessageParameters;
     class savePreparedInlineMessage;
+    struct savePreparedKeyboardButtonParameters;
     class savePreparedKeyboardButton;
+    struct sendAnimationParameters;
     class sendAnimation;
+    struct sendAudioParameters;
     class sendAudio;
+    struct sendChatActionParameters;
     class sendChatAction;
+    struct sendChatJoinRequestWebAppParameters;
     class sendChatJoinRequestWebApp;
+    struct sendChecklistParameters;
     class sendChecklist;
+    struct sendContactParameters;
     class sendContact;
+    struct sendDiceParameters;
     class sendDice;
+    struct sendDocumentParameters;
     class sendDocument;
+    struct sendGameParameters;
     class sendGame;
+    struct sendGiftParameters;
     class sendGift;
+    struct sendInvoiceParameters;
     class sendInvoice;
+    struct sendLivePhotoParameters;
     class sendLivePhoto;
+    struct sendLocationParameters;
     class sendLocation;
+    struct sendMediaGroupParameters;
     class sendMediaGroup;
+    struct sendMessageParameters;
     class sendMessage;
+    struct sendMessageDraftParameters;
     class sendMessageDraft;
+    struct sendPaidMediaParameters;
     class sendPaidMedia;
+    struct sendPhotoParameters;
     class sendPhoto;
+    struct sendPollParameters;
     class sendPoll;
+    struct sendRichMessageParameters;
     class sendRichMessage;
+    struct sendRichMessageDraftParameters;
     class sendRichMessageDraft;
+    struct sendStickerParameters;
     class sendSticker;
+    struct sendVenueParameters;
     class sendVenue;
+    struct sendVideoParameters;
     class sendVideo;
+    struct sendVideoNoteParameters;
     class sendVideoNote;
+    struct sendVoiceParameters;
     class sendVoice;
+    struct setBusinessAccountBioParameters;
     class setBusinessAccountBio;
+    struct setBusinessAccountGiftSettingsParameters;
     class setBusinessAccountGiftSettings;
+    struct setBusinessAccountNameParameters;
     class setBusinessAccountName;
+    struct setBusinessAccountProfilePhotoParameters;
     class setBusinessAccountProfilePhoto;
+    struct setBusinessAccountUsernameParameters;
     class setBusinessAccountUsername;
+    struct setChatAdministratorCustomTitleParameters;
     class setChatAdministratorCustomTitle;
+    struct setChatDescriptionParameters;
     class setChatDescription;
+    struct setChatMemberTagParameters;
     class setChatMemberTag;
+    struct setChatMenuButtonParameters;
     class setChatMenuButton;
+    struct setChatPermissionsParameters;
     class setChatPermissions;
+    struct setChatPhotoParameters;
     class setChatPhoto;
+    struct setChatStickerSetParameters;
     class setChatStickerSet;
+    struct setChatTitleParameters;
     class setChatTitle;
+    struct setCustomEmojiStickerSetThumbnailParameters;
     class setCustomEmojiStickerSetThumbnail;
+    struct setGameScoreParameters;
     class setGameScore;
+    struct setManagedBotAccessSettingsParameters;
     class setManagedBotAccessSettings;
+    struct setMessageReactionParameters;
     class setMessageReaction;
+    struct setMyCommandsParameters;
     class setMyCommands;
+    struct setMyDefaultAdministratorRightsParameters;
     class setMyDefaultAdministratorRights;
+    struct setMyDescriptionParameters;
     class setMyDescription;
+    struct setMyNameParameters;
     class setMyName;
+    struct setMyProfilePhotoParameters;
     class setMyProfilePhoto;
+    struct setMyShortDescriptionParameters;
     class setMyShortDescription;
+    struct setPassportDataErrorsParameters;
     class setPassportDataErrors;
+    struct setStickerEmojiListParameters;
     class setStickerEmojiList;
+    struct setStickerKeywordsParameters;
     class setStickerKeywords;
+    struct setStickerMaskPositionParameters;
     class setStickerMaskPosition;
+    struct setStickerPositionInSetParameters;
     class setStickerPositionInSet;
+    struct setStickerSetThumbnailParameters;
     class setStickerSetThumbnail;
+    struct setStickerSetTitleParameters;
     class setStickerSetTitle;
+    struct setUserEmojiStatusParameters;
     class setUserEmojiStatus;
+    struct setWebhookParameters;
     class setWebhook;
+    struct stopMessageLiveLocationParameters;
     class stopMessageLiveLocation;
+    struct stopPollParameters;
     class stopPoll;
+    struct transferBusinessAccountStarsParameters;
     class transferBusinessAccountStars;
+    struct transferGiftParameters;
     class transferGift;
+    struct unbanChatMemberParameters;
     class unbanChatMember;
+    struct unbanChatSenderChatParameters;
     class unbanChatSenderChat;
+    struct unhideGeneralForumTopicParameters;
     class unhideGeneralForumTopic;
+    struct unpinAllChatMessagesParameters;
     class unpinAllChatMessages;
+    struct unpinAllForumTopicMessagesParameters;
     class unpinAllForumTopicMessages;
+    struct unpinAllGeneralForumTopicMessagesParameters;
     class unpinAllGeneralForumTopicMessages;
+    struct unpinChatMessageParameters;
     class unpinChatMessage;
+    struct upgradeGiftParameters;
     class upgradeGift;
+    struct uploadStickerFileParameters;
     class uploadStickerFile;
+    struct verifyChatParameters;
     class verifyChat;
+    struct verifyUserParameters;
     class verifyUser;
 } // namespace TelegramBotAPI::Methods
 
@@ -788,65 +972,116 @@ namespace TelegramBotAPI {
                        Network::IHTTPClient &HTTPClient);
 
         bool AddStickerToSet(
+            const Methods::addStickerToSetParameters &Parameters);
+
+        bool AddStickerToSet(
             const std::string &Name,
             const ::TelegramBotAPI::Type::InputSticker &Sticker,
             const long long &UserID);
 
         bool AnswerCallbackQuery(
+            const Methods::answerCallbackQueryParameters &Parameters);
+
+        bool AnswerCallbackQuery(
             const std::string &CallbackQueryID);
+
+        bool AnswerChatJoinRequestQuery(
+            const Methods::answerChatJoinRequestQueryParameters &Parameters);
 
         bool AnswerChatJoinRequestQuery(
             const std::string &ChatJoinRequestQueryID,
             const std::string &Result);
 
         ::TelegramBotAPI::Type::SentGuestMessage AnswerGuestQuery(
+            const Methods::answerGuestQueryParameters &Parameters);
+
+        ::TelegramBotAPI::Type::SentGuestMessage AnswerGuestQuery(
             const std::string &GuestQueryID,
             const std::variant<::TelegramBotAPI::Type::InlineQueryResultCachedAudio, ::TelegramBotAPI::Type::InlineQueryResultCachedDocument, ::TelegramBotAPI::Type::InlineQueryResultCachedGif, ::TelegramBotAPI::Type::InlineQueryResultCachedMpeg4Gif, ::TelegramBotAPI::Type::InlineQueryResultCachedPhoto, ::TelegramBotAPI::Type::InlineQueryResultCachedSticker, ::TelegramBotAPI::Type::InlineQueryResultCachedVideo, ::TelegramBotAPI::Type::InlineQueryResultCachedVoice, ::TelegramBotAPI::Type::InlineQueryResultArticle, ::TelegramBotAPI::Type::InlineQueryResultAudio, ::TelegramBotAPI::Type::InlineQueryResultContact, ::TelegramBotAPI::Type::InlineQueryResultGame, ::TelegramBotAPI::Type::InlineQueryResultDocument, ::TelegramBotAPI::Type::InlineQueryResultGif, ::TelegramBotAPI::Type::InlineQueryResultLocation, ::TelegramBotAPI::Type::InlineQueryResultMpeg4Gif, ::TelegramBotAPI::Type::InlineQueryResultPhoto, ::TelegramBotAPI::Type::InlineQueryResultVenue, ::TelegramBotAPI::Type::InlineQueryResultVideo, ::TelegramBotAPI::Type::InlineQueryResultVoice> &Result);
+
+        bool AnswerInlineQuery(
+            const Methods::answerInlineQueryParameters &Parameters);
 
         bool AnswerInlineQuery(
             const std::string &InlineQueryID,
             const std::vector<std::variant<::TelegramBotAPI::Type::InlineQueryResultCachedAudio, ::TelegramBotAPI::Type::InlineQueryResultCachedDocument, ::TelegramBotAPI::Type::InlineQueryResultCachedGif, ::TelegramBotAPI::Type::InlineQueryResultCachedMpeg4Gif, ::TelegramBotAPI::Type::InlineQueryResultCachedPhoto, ::TelegramBotAPI::Type::InlineQueryResultCachedSticker, ::TelegramBotAPI::Type::InlineQueryResultCachedVideo, ::TelegramBotAPI::Type::InlineQueryResultCachedVoice, ::TelegramBotAPI::Type::InlineQueryResultArticle, ::TelegramBotAPI::Type::InlineQueryResultAudio, ::TelegramBotAPI::Type::InlineQueryResultContact, ::TelegramBotAPI::Type::InlineQueryResultGame, ::TelegramBotAPI::Type::InlineQueryResultDocument, ::TelegramBotAPI::Type::InlineQueryResultGif, ::TelegramBotAPI::Type::InlineQueryResultLocation, ::TelegramBotAPI::Type::InlineQueryResultMpeg4Gif, ::TelegramBotAPI::Type::InlineQueryResultPhoto, ::TelegramBotAPI::Type::InlineQueryResultVenue, ::TelegramBotAPI::Type::InlineQueryResultVideo, ::TelegramBotAPI::Type::InlineQueryResultVoice>> &Results);
 
         bool AnswerPreCheckoutQuery(
+            const Methods::answerPreCheckoutQueryParameters &Parameters);
+
+        bool AnswerPreCheckoutQuery(
             const bool &Ok,
             const std::string &PreCheckoutQueryID);
+
+        bool AnswerShippingQuery(
+            const Methods::answerShippingQueryParameters &Parameters);
 
         bool AnswerShippingQuery(
             const bool &Ok,
             const std::string &ShippingQueryID);
 
         ::TelegramBotAPI::Type::SentWebAppMessage AnswerWebAppQuery(
+            const Methods::answerWebAppQueryParameters &Parameters);
+
+        ::TelegramBotAPI::Type::SentWebAppMessage AnswerWebAppQuery(
             const std::variant<::TelegramBotAPI::Type::InlineQueryResultCachedAudio, ::TelegramBotAPI::Type::InlineQueryResultCachedDocument, ::TelegramBotAPI::Type::InlineQueryResultCachedGif, ::TelegramBotAPI::Type::InlineQueryResultCachedMpeg4Gif, ::TelegramBotAPI::Type::InlineQueryResultCachedPhoto, ::TelegramBotAPI::Type::InlineQueryResultCachedSticker, ::TelegramBotAPI::Type::InlineQueryResultCachedVideo, ::TelegramBotAPI::Type::InlineQueryResultCachedVoice, ::TelegramBotAPI::Type::InlineQueryResultArticle, ::TelegramBotAPI::Type::InlineQueryResultAudio, ::TelegramBotAPI::Type::InlineQueryResultContact, ::TelegramBotAPI::Type::InlineQueryResultGame, ::TelegramBotAPI::Type::InlineQueryResultDocument, ::TelegramBotAPI::Type::InlineQueryResultGif, ::TelegramBotAPI::Type::InlineQueryResultLocation, ::TelegramBotAPI::Type::InlineQueryResultMpeg4Gif, ::TelegramBotAPI::Type::InlineQueryResultPhoto, ::TelegramBotAPI::Type::InlineQueryResultVenue, ::TelegramBotAPI::Type::InlineQueryResultVideo, ::TelegramBotAPI::Type::InlineQueryResultVoice> &Result,
             const std::string &WebAppQueryID);
+
+        bool ApproveChatJoinRequest(
+            const Methods::approveChatJoinRequestParameters &Parameters);
 
         bool ApproveChatJoinRequest(
             const std::variant<long long, std::string> &ChatID,
             const long long &UserID);
 
         bool ApproveSuggestedPost(
+            const Methods::approveSuggestedPostParameters &Parameters);
+
+        bool ApproveSuggestedPost(
             const long long &ChatID,
             const long long &MessageID);
+
+        bool BanChatMember(
+            const Methods::banChatMemberParameters &Parameters);
 
         bool BanChatMember(
             const std::variant<long long, std::string> &ChatID,
             const long long &UserID);
 
         bool BanChatSenderChat(
+            const Methods::banChatSenderChatParameters &Parameters);
+
+        bool BanChatSenderChat(
             const std::variant<long long, std::string> &ChatID,
             const long long &SenderChatID);
 
+        bool Close(
+            const Methods::closeParameters &Parameters);
+
         bool Close();
+
+        bool CloseForumTopic(
+            const Methods::closeForumTopicParameters &Parameters);
 
         bool CloseForumTopic(
             const std::variant<long long, std::string> &ChatID,
             const long long &MessageThreadID);
 
         bool CloseGeneralForumTopic(
+            const Methods::closeGeneralForumTopicParameters &Parameters);
+
+        bool CloseGeneralForumTopic(
             const std::variant<long long, std::string> &ChatID);
+
+        bool ConvertGiftToStars(
+            const Methods::convertGiftToStarsParameters &Parameters);
 
         bool ConvertGiftToStars(
             const std::string &BusinessConnectionID,
             const std::string &OwnedGiftID);
+
+        ::TelegramBotAPI::Type::MessageId CopyMessage(
+            const Methods::copyMessageParameters &Parameters);
 
         ::TelegramBotAPI::Type::MessageId CopyMessage(
             const std::variant<long long, std::string> &ChatID,
@@ -854,12 +1089,21 @@ namespace TelegramBotAPI {
             const long long &MessageID);
 
         std::vector<::TelegramBotAPI::Type::MessageId> CopyMessages(
+            const Methods::copyMessagesParameters &Parameters);
+
+        std::vector<::TelegramBotAPI::Type::MessageId> CopyMessages(
             const std::variant<long long, std::string> &ChatID,
             const std::variant<long long, std::string> &FromChatID,
             const std::vector<long long> &MessageIDs);
 
         ::TelegramBotAPI::Type::ChatInviteLink CreateChatInviteLink(
+            const Methods::createChatInviteLinkParameters &Parameters);
+
+        ::TelegramBotAPI::Type::ChatInviteLink CreateChatInviteLink(
             const std::variant<long long, std::string> &ChatID);
+
+        ::TelegramBotAPI::Type::ChatInviteLink CreateChatSubscriptionInviteLink(
+            const Methods::createChatSubscriptionInviteLinkParameters &Parameters);
 
         ::TelegramBotAPI::Type::ChatInviteLink CreateChatSubscriptionInviteLink(
             const std::variant<long long, std::string> &ChatID,
@@ -867,8 +1111,14 @@ namespace TelegramBotAPI {
             const long long &SubscriptionPrice);
 
         ::TelegramBotAPI::Type::ForumTopic CreateForumTopic(
+            const Methods::createForumTopicParameters &Parameters);
+
+        ::TelegramBotAPI::Type::ForumTopic CreateForumTopic(
             const std::variant<long long, std::string> &ChatID,
             const std::string &Name);
+
+        std::string CreateInvoiceLink(
+            const Methods::createInvoiceLinkParameters &Parameters);
 
         std::string CreateInvoiceLink(
             const std::string &Currency,
@@ -878,31 +1128,55 @@ namespace TelegramBotAPI {
             const std::string &Title);
 
         bool CreateNewStickerSet(
+            const Methods::createNewStickerSetParameters &Parameters);
+
+        bool CreateNewStickerSet(
             const std::string &Name,
             const std::vector<::TelegramBotAPI::Type::InputSticker> &Stickers,
             const std::string &Title,
             const long long &UserID);
 
         bool DeclineChatJoinRequest(
+            const Methods::declineChatJoinRequestParameters &Parameters);
+
+        bool DeclineChatJoinRequest(
             const std::variant<long long, std::string> &ChatID,
             const long long &UserID);
+
+        bool DeclineSuggestedPost(
+            const Methods::declineSuggestedPostParameters &Parameters);
 
         bool DeclineSuggestedPost(
             const long long &ChatID,
             const long long &MessageID);
 
         bool DeleteAllMessageReactions(
+            const Methods::deleteAllMessageReactionsParameters &Parameters);
+
+        bool DeleteAllMessageReactions(
             const std::variant<long long, std::string> &ChatID);
+
+        bool DeleteBusinessMessages(
+            const Methods::deleteBusinessMessagesParameters &Parameters);
 
         bool DeleteBusinessMessages(
             const std::string &BusinessConnectionID,
             const std::vector<long long> &MessageIDs);
 
         bool DeleteChatPhoto(
+            const Methods::deleteChatPhotoParameters &Parameters);
+
+        bool DeleteChatPhoto(
             const std::variant<long long, std::string> &ChatID);
 
         bool DeleteChatStickerSet(
+            const Methods::deleteChatStickerSetParameters &Parameters);
+
+        bool DeleteChatStickerSet(
             const std::variant<long long, std::string> &ChatID);
+
+        bool DeleteEphemeralMessage(
+            const Methods::deleteEphemeralMessageParameters &Parameters);
 
         bool DeleteEphemeralMessage(
             const std::variant<long long, std::string> &ChatID,
@@ -910,47 +1184,86 @@ namespace TelegramBotAPI {
             const long long &ReceiverUserID);
 
         bool DeleteForumTopic(
+            const Methods::deleteForumTopicParameters &Parameters);
+
+        bool DeleteForumTopic(
             const std::variant<long long, std::string> &ChatID,
             const long long &MessageThreadID);
+
+        bool DeleteMessage(
+            const Methods::deleteMessageParameters &Parameters);
 
         bool DeleteMessage(
             const std::variant<long long, std::string> &ChatID,
             const long long &MessageID);
 
         bool DeleteMessageReaction(
+            const Methods::deleteMessageReactionParameters &Parameters);
+
+        bool DeleteMessageReaction(
             const std::variant<long long, std::string> &ChatID,
             const long long &MessageID);
+
+        bool DeleteMessages(
+            const Methods::deleteMessagesParameters &Parameters);
 
         bool DeleteMessages(
             const std::variant<long long, std::string> &ChatID,
             const std::vector<long long> &MessageIDs);
 
+        bool DeleteMyCommands(
+            const Methods::deleteMyCommandsParameters &Parameters);
+
         bool DeleteMyCommands();
+
+        bool DeleteStickerFromSet(
+            const Methods::deleteStickerFromSetParameters &Parameters);
 
         bool DeleteStickerFromSet(
             const std::string &Sticker);
 
         bool DeleteStickerSet(
+            const Methods::deleteStickerSetParameters &Parameters);
+
+        bool DeleteStickerSet(
             const std::string &Name);
+
+        bool DeleteStory(
+            const Methods::deleteStoryParameters &Parameters);
 
         bool DeleteStory(
             const std::string &BusinessConnectionID,
             const long long &StoryID);
 
+        bool DeleteWebhook(
+            const Methods::deleteWebhookParameters &Parameters);
+
         bool DeleteWebhook();
+
+        ::TelegramBotAPI::Type::ChatInviteLink EditChatInviteLink(
+            const Methods::editChatInviteLinkParameters &Parameters);
 
         ::TelegramBotAPI::Type::ChatInviteLink EditChatInviteLink(
             const std::variant<long long, std::string> &ChatID,
             const std::string &InviteLink);
 
         ::TelegramBotAPI::Type::ChatInviteLink EditChatSubscriptionInviteLink(
+            const Methods::editChatSubscriptionInviteLinkParameters &Parameters);
+
+        ::TelegramBotAPI::Type::ChatInviteLink EditChatSubscriptionInviteLink(
             const std::variant<long long, std::string> &ChatID,
             const std::string &InviteLink);
+
+        bool EditEphemeralMessageCaption(
+            const Methods::editEphemeralMessageCaptionParameters &Parameters);
 
         bool EditEphemeralMessageCaption(
             const std::variant<long long, std::string> &ChatID,
             const long long &EphemeralMessageID,
             const long long &ReceiverUserID);
+
+        bool EditEphemeralMessageMedia(
+            const Methods::editEphemeralMessageMediaParameters &Parameters);
 
         bool EditEphemeralMessageMedia(
             const std::variant<long long, std::string> &ChatID,
@@ -959,9 +1272,15 @@ namespace TelegramBotAPI {
             const long long &ReceiverUserID);
 
         bool EditEphemeralMessageReplyMarkup(
+            const Methods::editEphemeralMessageReplyMarkupParameters &Parameters);
+
+        bool EditEphemeralMessageReplyMarkup(
             const std::variant<long long, std::string> &ChatID,
             const long long &EphemeralMessageID,
             const long long &ReceiverUserID);
+
+        bool EditEphemeralMessageText(
+            const Methods::editEphemeralMessageTextParameters &Parameters);
 
         bool EditEphemeralMessageText(
             const std::variant<long long, std::string> &ChatID,
@@ -969,14 +1288,26 @@ namespace TelegramBotAPI {
             const long long &ReceiverUserID);
 
         bool EditForumTopic(
+            const Methods::editForumTopicParameters &Parameters);
+
+        bool EditForumTopic(
             const std::variant<long long, std::string> &ChatID,
             const long long &MessageThreadID);
+
+        bool EditGeneralForumTopic(
+            const Methods::editGeneralForumTopicParameters &Parameters);
 
         bool EditGeneralForumTopic(
             const std::variant<long long, std::string> &ChatID,
             const std::string &Name);
 
+        std::variant<::TelegramBotAPI::Type::Message, bool> EditMessageCaption(
+            const Methods::editMessageCaptionParameters &Parameters);
+
         std::variant<::TelegramBotAPI::Type::Message, bool> EditMessageCaption();
+
+        ::TelegramBotAPI::Type::Message EditMessageChecklist(
+            const Methods::editMessageChecklistParameters &Parameters);
 
         ::TelegramBotAPI::Type::Message EditMessageChecklist(
             const std::string &BusinessConnectionID,
@@ -985,15 +1316,30 @@ namespace TelegramBotAPI {
             const long long &MessageID);
 
         std::variant<::TelegramBotAPI::Type::Message, bool> EditMessageLiveLocation(
+            const Methods::editMessageLiveLocationParameters &Parameters);
+
+        std::variant<::TelegramBotAPI::Type::Message, bool> EditMessageLiveLocation(
             const double &Latitude,
             const double &Longitude);
 
         std::variant<::TelegramBotAPI::Type::Message, bool> EditMessageMedia(
+            const Methods::editMessageMediaParameters &Parameters);
+
+        std::variant<::TelegramBotAPI::Type::Message, bool> EditMessageMedia(
             const std::variant<::TelegramBotAPI::Type::InputMediaAnimation, ::TelegramBotAPI::Type::InputMediaAudio, ::TelegramBotAPI::Type::InputMediaDocument, ::TelegramBotAPI::Type::InputMediaLivePhoto, ::TelegramBotAPI::Type::InputMediaPhoto, ::TelegramBotAPI::Type::InputMediaVideo> &Media);
+
+        std::variant<::TelegramBotAPI::Type::Message, bool> EditMessageReplyMarkup(
+            const Methods::editMessageReplyMarkupParameters &Parameters);
 
         std::variant<::TelegramBotAPI::Type::Message, bool> EditMessageReplyMarkup();
 
+        std::variant<::TelegramBotAPI::Type::Message, bool> EditMessageText(
+            const Methods::editMessageTextParameters &Parameters);
+
         std::variant<::TelegramBotAPI::Type::Message, bool> EditMessageText();
+
+        ::TelegramBotAPI::Type::Story EditStory(
+            const Methods::editStoryParameters &Parameters);
 
         ::TelegramBotAPI::Type::Story EditStory(
             const std::string &BusinessConnectionID,
@@ -1001,12 +1347,21 @@ namespace TelegramBotAPI {
             const long long &StoryID);
 
         bool EditUserStarSubscription(
+            const Methods::editUserStarSubscriptionParameters &Parameters);
+
+        bool EditUserStarSubscription(
             const bool &IsCanceled,
             const std::string &TelegramPaymentChargeID,
             const long long &UserID);
 
         std::string ExportChatInviteLink(
+            const Methods::exportChatInviteLinkParameters &Parameters);
+
+        std::string ExportChatInviteLink(
             const std::variant<long long, std::string> &ChatID);
+
+        ::TelegramBotAPI::Type::Message ForwardMessage(
+            const Methods::forwardMessageParameters &Parameters);
 
         ::TelegramBotAPI::Type::Message ForwardMessage(
             const std::variant<long long, std::string> &ChatID,
@@ -1014,95 +1369,197 @@ namespace TelegramBotAPI {
             const long long &MessageID);
 
         std::vector<::TelegramBotAPI::Type::MessageId> ForwardMessages(
+            const Methods::forwardMessagesParameters &Parameters);
+
+        std::vector<::TelegramBotAPI::Type::MessageId> ForwardMessages(
             const std::variant<long long, std::string> &ChatID,
             const std::variant<long long, std::string> &FromChatID,
             const std::vector<long long> &MessageIDs);
 
+        ::TelegramBotAPI::Type::Gifts GetAvailableGifts(
+            const Methods::getAvailableGiftsParameters &Parameters);
+
         ::TelegramBotAPI::Type::Gifts GetAvailableGifts();
+
+        ::TelegramBotAPI::Type::OwnedGifts GetBusinessAccountGifts(
+            const Methods::getBusinessAccountGiftsParameters &Parameters);
 
         ::TelegramBotAPI::Type::OwnedGifts GetBusinessAccountGifts(
             const std::string &BusinessConnectionID);
 
         ::TelegramBotAPI::Type::StarAmount GetBusinessAccountStarBalance(
+            const Methods::getBusinessAccountStarBalanceParameters &Parameters);
+
+        ::TelegramBotAPI::Type::StarAmount GetBusinessAccountStarBalance(
             const std::string &BusinessConnectionID);
+
+        ::TelegramBotAPI::Type::BusinessConnection GetBusinessConnection(
+            const Methods::getBusinessConnectionParameters &Parameters);
 
         ::TelegramBotAPI::Type::BusinessConnection GetBusinessConnection(
             const std::string &BusinessConnectionID);
 
         ::TelegramBotAPI::Type::ChatFullInfo GetChat(
+            const Methods::getChatParameters &Parameters);
+
+        ::TelegramBotAPI::Type::ChatFullInfo GetChat(
             const std::variant<long long, std::string> &ChatID);
+
+        std::vector<std::variant<::TelegramBotAPI::Type::ChatMemberOwner, ::TelegramBotAPI::Type::ChatMemberAdministrator, ::TelegramBotAPI::Type::ChatMemberMember, ::TelegramBotAPI::Type::ChatMemberRestricted, ::TelegramBotAPI::Type::ChatMemberLeft, ::TelegramBotAPI::Type::ChatMemberBanned>> GetChatAdministrators(
+            const Methods::getChatAdministratorsParameters &Parameters);
 
         std::vector<std::variant<::TelegramBotAPI::Type::ChatMemberOwner, ::TelegramBotAPI::Type::ChatMemberAdministrator, ::TelegramBotAPI::Type::ChatMemberMember, ::TelegramBotAPI::Type::ChatMemberRestricted, ::TelegramBotAPI::Type::ChatMemberLeft, ::TelegramBotAPI::Type::ChatMemberBanned>> GetChatAdministrators(
             const std::variant<long long, std::string> &ChatID);
 
         ::TelegramBotAPI::Type::OwnedGifts GetChatGifts(
+            const Methods::getChatGiftsParameters &Parameters);
+
+        ::TelegramBotAPI::Type::OwnedGifts GetChatGifts(
             const std::variant<long long, std::string> &ChatID);
+
+        std::variant<::TelegramBotAPI::Type::ChatMemberOwner, ::TelegramBotAPI::Type::ChatMemberAdministrator, ::TelegramBotAPI::Type::ChatMemberMember, ::TelegramBotAPI::Type::ChatMemberRestricted, ::TelegramBotAPI::Type::ChatMemberLeft, ::TelegramBotAPI::Type::ChatMemberBanned> GetChatMember(
+            const Methods::getChatMemberParameters &Parameters);
 
         std::variant<::TelegramBotAPI::Type::ChatMemberOwner, ::TelegramBotAPI::Type::ChatMemberAdministrator, ::TelegramBotAPI::Type::ChatMemberMember, ::TelegramBotAPI::Type::ChatMemberRestricted, ::TelegramBotAPI::Type::ChatMemberLeft, ::TelegramBotAPI::Type::ChatMemberBanned> GetChatMember(
             const std::variant<long long, std::string> &ChatID,
             const long long &UserID);
 
         long long GetChatMemberCount(
+            const Methods::getChatMemberCountParameters &Parameters);
+
+        long long GetChatMemberCount(
             const std::variant<long long, std::string> &ChatID);
 
+        std::variant<::TelegramBotAPI::Type::MenuButtonCommands, ::TelegramBotAPI::Type::MenuButtonWebApp, ::TelegramBotAPI::Type::MenuButtonDefault> GetChatMenuButton(
+            const Methods::getChatMenuButtonParameters &Parameters);
+
         std::variant<::TelegramBotAPI::Type::MenuButtonCommands, ::TelegramBotAPI::Type::MenuButtonWebApp, ::TelegramBotAPI::Type::MenuButtonDefault> GetChatMenuButton();
+
+        std::vector<::TelegramBotAPI::Type::Sticker> GetCustomEmojiStickers(
+            const Methods::getCustomEmojiStickersParameters &Parameters);
 
         std::vector<::TelegramBotAPI::Type::Sticker> GetCustomEmojiStickers(
             const std::vector<std::string> &CustomEmojiIDs);
 
         ::TelegramBotAPI::Type::File GetFile(
+            const Methods::getFileParameters &Parameters);
+
+        ::TelegramBotAPI::Type::File GetFile(
             const std::string &FileID);
 
+        std::vector<::TelegramBotAPI::Type::Sticker> GetForumTopicIconStickers(
+            const Methods::getForumTopicIconStickersParameters &Parameters);
+
         std::vector<::TelegramBotAPI::Type::Sticker> GetForumTopicIconStickers();
+
+        std::vector<::TelegramBotAPI::Type::GameHighScore> GetGameHighScores(
+            const Methods::getGameHighScoresParameters &Parameters);
 
         std::vector<::TelegramBotAPI::Type::GameHighScore> GetGameHighScores(
             const long long &UserID);
 
         ::TelegramBotAPI::Type::BotAccessSettings GetManagedBotAccessSettings(
+            const Methods::getManagedBotAccessSettingsParameters &Parameters);
+
+        ::TelegramBotAPI::Type::BotAccessSettings GetManagedBotAccessSettings(
             const long long &UserID);
+
+        std::string GetManagedBotToken(
+            const Methods::getManagedBotTokenParameters &Parameters);
 
         std::string GetManagedBotToken(
             const long long &UserID);
 
+        ::TelegramBotAPI::Type::User GetMe(
+            const Methods::getMeParameters &Parameters);
+
         ::TelegramBotAPI::Type::User GetMe();
+
+        std::vector<::TelegramBotAPI::Type::BotCommand> GetMyCommands(
+            const Methods::getMyCommandsParameters &Parameters);
 
         std::vector<::TelegramBotAPI::Type::BotCommand> GetMyCommands();
 
+        ::TelegramBotAPI::Type::ChatAdministratorRights GetMyDefaultAdministratorRights(
+            const Methods::getMyDefaultAdministratorRightsParameters &Parameters);
+
         ::TelegramBotAPI::Type::ChatAdministratorRights GetMyDefaultAdministratorRights();
+
+        ::TelegramBotAPI::Type::BotDescription GetMyDescription(
+            const Methods::getMyDescriptionParameters &Parameters);
 
         ::TelegramBotAPI::Type::BotDescription GetMyDescription();
 
+        ::TelegramBotAPI::Type::BotName GetMyName(
+            const Methods::getMyNameParameters &Parameters);
+
         ::TelegramBotAPI::Type::BotName GetMyName();
+
+        ::TelegramBotAPI::Type::BotShortDescription GetMyShortDescription(
+            const Methods::getMyShortDescriptionParameters &Parameters);
 
         ::TelegramBotAPI::Type::BotShortDescription GetMyShortDescription();
 
+        ::TelegramBotAPI::Type::StarAmount GetMyStarBalance(
+            const Methods::getMyStarBalanceParameters &Parameters);
+
         ::TelegramBotAPI::Type::StarAmount GetMyStarBalance();
+
+        ::TelegramBotAPI::Type::StarTransactions GetStarTransactions(
+            const Methods::getStarTransactionsParameters &Parameters);
 
         ::TelegramBotAPI::Type::StarTransactions GetStarTransactions();
 
         ::TelegramBotAPI::Type::StickerSet GetStickerSet(
+            const Methods::getStickerSetParameters &Parameters);
+
+        ::TelegramBotAPI::Type::StickerSet GetStickerSet(
             const std::string &Name);
 
+        std::vector<::TelegramBotAPI::Type::Update> GetUpdates(
+            const Methods::getUpdatesParameters &Parameters);
+
         std::vector<::TelegramBotAPI::Type::Update> GetUpdates();
+
+        ::TelegramBotAPI::Type::UserChatBoosts GetUserChatBoosts(
+            const Methods::getUserChatBoostsParameters &Parameters);
 
         ::TelegramBotAPI::Type::UserChatBoosts GetUserChatBoosts(
             const std::variant<long long, std::string> &ChatID,
             const long long &UserID);
 
         ::TelegramBotAPI::Type::OwnedGifts GetUserGifts(
+            const Methods::getUserGiftsParameters &Parameters);
+
+        ::TelegramBotAPI::Type::OwnedGifts GetUserGifts(
             const long long &UserID);
+
+        std::vector<::TelegramBotAPI::Type::Message> GetUserPersonalChatMessages(
+            const Methods::getUserPersonalChatMessagesParameters &Parameters);
 
         std::vector<::TelegramBotAPI::Type::Message> GetUserPersonalChatMessages(
             const long long &Limit,
             const long long &UserID);
 
         ::TelegramBotAPI::Type::UserProfileAudios GetUserProfileAudios(
+            const Methods::getUserProfileAudiosParameters &Parameters);
+
+        ::TelegramBotAPI::Type::UserProfileAudios GetUserProfileAudios(
             const long long &UserID);
+
+        ::TelegramBotAPI::Type::UserProfilePhotos GetUserProfilePhotos(
+            const Methods::getUserProfilePhotosParameters &Parameters);
 
         ::TelegramBotAPI::Type::UserProfilePhotos GetUserProfilePhotos(
             const long long &UserID);
 
+        ::TelegramBotAPI::Type::WebhookInfo GetWebhookInfo(
+            const Methods::getWebhookInfoParameters &Parameters);
+
         ::TelegramBotAPI::Type::WebhookInfo GetWebhookInfo();
+
+        bool GiftPremiumSubscription(
+            const Methods::giftPremiumSubscriptionParameters &Parameters);
 
         bool GiftPremiumSubscription(
             const long long &MonthCount,
@@ -1110,16 +1567,31 @@ namespace TelegramBotAPI {
             const long long &UserID);
 
         bool HideGeneralForumTopic(
+            const Methods::hideGeneralForumTopicParameters &Parameters);
+
+        bool HideGeneralForumTopic(
             const std::variant<long long, std::string> &ChatID);
+
+        bool LeaveChat(
+            const Methods::leaveChatParameters &Parameters);
 
         bool LeaveChat(
             const std::variant<long long, std::string> &ChatID);
 
+        bool LogOut(
+            const Methods::logOutParameters &Parameters);
+
         bool LogOut();
+
+        bool PinChatMessage(
+            const Methods::pinChatMessageParameters &Parameters);
 
         bool PinChatMessage(
             const std::variant<long long, std::string> &ChatID,
             const long long &MessageID);
+
+        ::TelegramBotAPI::Type::Story PostStory(
+            const Methods::postStoryParameters &Parameters);
 
         ::TelegramBotAPI::Type::Story PostStory(
             const long long &ActivePeriod,
@@ -1127,8 +1599,14 @@ namespace TelegramBotAPI {
             const std::variant<::TelegramBotAPI::Type::InputStoryContentPhoto, ::TelegramBotAPI::Type::InputStoryContentVideo> &Content);
 
         bool PromoteChatMember(
+            const Methods::promoteChatMemberParameters &Parameters);
+
+        bool PromoteChatMember(
             const std::variant<long long, std::string> &ChatID,
             const long long &UserID);
+
+        bool ReadBusinessMessage(
+            const Methods::readBusinessMessageParameters &Parameters);
 
         bool ReadBusinessMessage(
             const std::string &BusinessConnectionID,
@@ -1136,29 +1614,56 @@ namespace TelegramBotAPI {
             const long long &MessageID);
 
         bool RefundStarPayment(
+            const Methods::refundStarPaymentParameters &Parameters);
+
+        bool RefundStarPayment(
             const std::string &TelegramPaymentChargeID,
             const long long &UserID);
+
+        bool RemoveBusinessAccountProfilePhoto(
+            const Methods::removeBusinessAccountProfilePhotoParameters &Parameters);
 
         bool RemoveBusinessAccountProfilePhoto(
             const std::string &BusinessConnectionID);
 
         bool RemoveChatVerification(
+            const Methods::removeChatVerificationParameters &Parameters);
+
+        bool RemoveChatVerification(
             const std::variant<long long, std::string> &ChatID);
+
+        bool RemoveMyProfilePhoto(
+            const Methods::removeMyProfilePhotoParameters &Parameters);
 
         bool RemoveMyProfilePhoto();
 
         bool RemoveUserVerification(
+            const Methods::removeUserVerificationParameters &Parameters);
+
+        bool RemoveUserVerification(
             const long long &UserID);
+
+        bool ReopenForumTopic(
+            const Methods::reopenForumTopicParameters &Parameters);
 
         bool ReopenForumTopic(
             const std::variant<long long, std::string> &ChatID,
             const long long &MessageThreadID);
 
         bool ReopenGeneralForumTopic(
+            const Methods::reopenGeneralForumTopicParameters &Parameters);
+
+        bool ReopenGeneralForumTopic(
             const std::variant<long long, std::string> &ChatID);
 
         std::string ReplaceManagedBotToken(
+            const Methods::replaceManagedBotTokenParameters &Parameters);
+
+        std::string ReplaceManagedBotToken(
             const long long &UserID);
+
+        bool ReplaceStickerInSet(
+            const Methods::replaceStickerInSetParameters &Parameters);
 
         bool ReplaceStickerInSet(
             const std::string &Name,
@@ -1167,10 +1672,16 @@ namespace TelegramBotAPI {
             const long long &UserID);
 
         ::TelegramBotAPI::Type::Story RepostStory(
+            const Methods::repostStoryParameters &Parameters);
+
+        ::TelegramBotAPI::Type::Story RepostStory(
             const long long &ActivePeriod,
             const std::string &BusinessConnectionID,
             const long long &FromChatID,
             const long long &FromStoryID);
+
+        bool RestrictChatMember(
+            const Methods::restrictChatMemberParameters &Parameters);
 
         bool RestrictChatMember(
             const std::variant<long long, std::string> &ChatID,
@@ -1178,32 +1689,56 @@ namespace TelegramBotAPI {
             const long long &UserID);
 
         ::TelegramBotAPI::Type::ChatInviteLink RevokeChatInviteLink(
+            const Methods::revokeChatInviteLinkParameters &Parameters);
+
+        ::TelegramBotAPI::Type::ChatInviteLink RevokeChatInviteLink(
             const std::variant<long long, std::string> &ChatID,
             const std::string &InviteLink);
+
+        ::TelegramBotAPI::Type::PreparedInlineMessage SavePreparedInlineMessage(
+            const Methods::savePreparedInlineMessageParameters &Parameters);
 
         ::TelegramBotAPI::Type::PreparedInlineMessage SavePreparedInlineMessage(
             const std::variant<::TelegramBotAPI::Type::InlineQueryResultCachedAudio, ::TelegramBotAPI::Type::InlineQueryResultCachedDocument, ::TelegramBotAPI::Type::InlineQueryResultCachedGif, ::TelegramBotAPI::Type::InlineQueryResultCachedMpeg4Gif, ::TelegramBotAPI::Type::InlineQueryResultCachedPhoto, ::TelegramBotAPI::Type::InlineQueryResultCachedSticker, ::TelegramBotAPI::Type::InlineQueryResultCachedVideo, ::TelegramBotAPI::Type::InlineQueryResultCachedVoice, ::TelegramBotAPI::Type::InlineQueryResultArticle, ::TelegramBotAPI::Type::InlineQueryResultAudio, ::TelegramBotAPI::Type::InlineQueryResultContact, ::TelegramBotAPI::Type::InlineQueryResultGame, ::TelegramBotAPI::Type::InlineQueryResultDocument, ::TelegramBotAPI::Type::InlineQueryResultGif, ::TelegramBotAPI::Type::InlineQueryResultLocation, ::TelegramBotAPI::Type::InlineQueryResultMpeg4Gif, ::TelegramBotAPI::Type::InlineQueryResultPhoto, ::TelegramBotAPI::Type::InlineQueryResultVenue, ::TelegramBotAPI::Type::InlineQueryResultVideo, ::TelegramBotAPI::Type::InlineQueryResultVoice> &Result,
             const long long &UserID);
 
         ::TelegramBotAPI::Type::PreparedKeyboardButton SavePreparedKeyboardButton(
+            const Methods::savePreparedKeyboardButtonParameters &Parameters);
+
+        ::TelegramBotAPI::Type::PreparedKeyboardButton SavePreparedKeyboardButton(
             const ::TelegramBotAPI::Type::KeyboardButton &Button,
             const long long &UserID);
+
+        ::TelegramBotAPI::Type::Message SendAnimation(
+            const Methods::sendAnimationParameters &Parameters);
 
         ::TelegramBotAPI::Type::Message SendAnimation(
             const std::variant<::TelegramBotAPI::Type::InputFile, std::string> &Animation,
             const std::variant<long long, std::string> &ChatID);
 
         ::TelegramBotAPI::Type::Message SendAudio(
+            const Methods::sendAudioParameters &Parameters);
+
+        ::TelegramBotAPI::Type::Message SendAudio(
             const std::variant<::TelegramBotAPI::Type::InputFile, std::string> &Audio,
             const std::variant<long long, std::string> &ChatID);
+
+        bool SendChatAction(
+            const Methods::sendChatActionParameters &Parameters);
 
         bool SendChatAction(
             const std::string &Action,
             const std::variant<long long, std::string> &ChatID);
 
         bool SendChatJoinRequestWebApp(
+            const Methods::sendChatJoinRequestWebAppParameters &Parameters);
+
+        bool SendChatJoinRequestWebApp(
             const std::string &ChatJoinRequestQueryID,
             const std::string &WebAppURL);
+
+        ::TelegramBotAPI::Type::Message SendChecklist(
+            const Methods::sendChecklistParameters &Parameters);
 
         ::TelegramBotAPI::Type::Message SendChecklist(
             const std::string &BusinessConnectionID,
@@ -1211,23 +1746,41 @@ namespace TelegramBotAPI {
             const ::TelegramBotAPI::Type::InputChecklist &Checklist);
 
         ::TelegramBotAPI::Type::Message SendContact(
+            const Methods::sendContactParameters &Parameters);
+
+        ::TelegramBotAPI::Type::Message SendContact(
             const std::variant<long long, std::string> &ChatID,
             const std::string &FirstName,
             const std::string &PhoneNumber);
 
         ::TelegramBotAPI::Type::Message SendDice(
+            const Methods::sendDiceParameters &Parameters);
+
+        ::TelegramBotAPI::Type::Message SendDice(
             const std::variant<long long, std::string> &ChatID);
+
+        ::TelegramBotAPI::Type::Message SendDocument(
+            const Methods::sendDocumentParameters &Parameters);
 
         ::TelegramBotAPI::Type::Message SendDocument(
             const std::variant<long long, std::string> &ChatID,
             const std::variant<::TelegramBotAPI::Type::InputFile, std::string> &Document);
 
         ::TelegramBotAPI::Type::Message SendGame(
+            const Methods::sendGameParameters &Parameters);
+
+        ::TelegramBotAPI::Type::Message SendGame(
             const std::variant<long long, std::string> &ChatID,
             const std::string &GameShortName);
 
         bool SendGift(
+            const Methods::sendGiftParameters &Parameters);
+
+        bool SendGift(
             const std::string &GiftID);
+
+        ::TelegramBotAPI::Type::Message SendInvoice(
+            const Methods::sendInvoiceParameters &Parameters);
 
         ::TelegramBotAPI::Type::Message SendInvoice(
             const std::variant<long long, std::string> &ChatID,
@@ -1238,9 +1791,15 @@ namespace TelegramBotAPI {
             const std::string &Title);
 
         ::TelegramBotAPI::Type::Message SendLivePhoto(
+            const Methods::sendLivePhotoParameters &Parameters);
+
+        ::TelegramBotAPI::Type::Message SendLivePhoto(
             const std::variant<long long, std::string> &ChatID,
             const std::variant<::TelegramBotAPI::Type::InputFile, std::string> &LivePhoto,
             const std::variant<::TelegramBotAPI::Type::InputFile, std::string> &Photo);
+
+        ::TelegramBotAPI::Type::Message SendLocation(
+            const Methods::sendLocationParameters &Parameters);
 
         ::TelegramBotAPI::Type::Message SendLocation(
             const std::variant<long long, std::string> &ChatID,
@@ -1248,16 +1807,28 @@ namespace TelegramBotAPI {
             const double &Longitude);
 
         std::vector<::TelegramBotAPI::Type::Message> SendMediaGroup(
+            const Methods::sendMediaGroupParameters &Parameters);
+
+        std::vector<::TelegramBotAPI::Type::Message> SendMediaGroup(
             const std::variant<long long, std::string> &ChatID,
             const std::vector<std::variant<::TelegramBotAPI::Type::InputMediaAudio, ::TelegramBotAPI::Type::InputMediaDocument, ::TelegramBotAPI::Type::InputMediaLivePhoto, ::TelegramBotAPI::Type::InputMediaPhoto, ::TelegramBotAPI::Type::InputMediaVideo>> &Media);
+
+        ::TelegramBotAPI::Type::Message SendMessage(
+            const Methods::sendMessageParameters &Parameters);
 
         ::TelegramBotAPI::Type::Message SendMessage(
             const std::variant<long long, std::string> &ChatID,
             const std::string &Text);
 
         bool SendMessageDraft(
+            const Methods::sendMessageDraftParameters &Parameters);
+
+        bool SendMessageDraft(
             const long long &ChatID,
             const long long &DraftID);
+
+        ::TelegramBotAPI::Type::Message SendPaidMedia(
+            const Methods::sendPaidMediaParameters &Parameters);
 
         ::TelegramBotAPI::Type::Message SendPaidMedia(
             const std::variant<long long, std::string> &ChatID,
@@ -1265,8 +1836,14 @@ namespace TelegramBotAPI {
             const long long &StarCount);
 
         ::TelegramBotAPI::Type::Message SendPhoto(
+            const Methods::sendPhotoParameters &Parameters);
+
+        ::TelegramBotAPI::Type::Message SendPhoto(
             const std::variant<long long, std::string> &ChatID,
             const std::variant<::TelegramBotAPI::Type::InputFile, std::string> &Photo);
+
+        ::TelegramBotAPI::Type::Message SendPoll(
+            const Methods::sendPollParameters &Parameters);
 
         ::TelegramBotAPI::Type::Message SendPoll(
             const std::variant<long long, std::string> &ChatID,
@@ -1274,8 +1851,14 @@ namespace TelegramBotAPI {
             const std::string &Question);
 
         ::TelegramBotAPI::Type::Message SendRichMessage(
+            const Methods::sendRichMessageParameters &Parameters);
+
+        ::TelegramBotAPI::Type::Message SendRichMessage(
             const std::variant<long long, std::string> &ChatID,
             const ::TelegramBotAPI::Type::InputRichMessage &RichMessage);
+
+        bool SendRichMessageDraft(
+            const Methods::sendRichMessageDraftParameters &Parameters);
 
         bool SendRichMessageDraft(
             const long long &ChatID,
@@ -1283,8 +1866,14 @@ namespace TelegramBotAPI {
             const ::TelegramBotAPI::Type::InputRichMessage &RichMessage);
 
         ::TelegramBotAPI::Type::Message SendSticker(
+            const Methods::sendStickerParameters &Parameters);
+
+        ::TelegramBotAPI::Type::Message SendSticker(
             const std::variant<long long, std::string> &ChatID,
             const std::variant<::TelegramBotAPI::Type::InputFile, std::string> &Sticker);
+
+        ::TelegramBotAPI::Type::Message SendVenue(
+            const Methods::sendVenueParameters &Parameters);
 
         ::TelegramBotAPI::Type::Message SendVenue(
             const std::string &Address,
@@ -1294,19 +1883,34 @@ namespace TelegramBotAPI {
             const std::string &Title);
 
         ::TelegramBotAPI::Type::Message SendVideo(
+            const Methods::sendVideoParameters &Parameters);
+
+        ::TelegramBotAPI::Type::Message SendVideo(
             const std::variant<long long, std::string> &ChatID,
             const std::variant<::TelegramBotAPI::Type::InputFile, std::string> &Video);
+
+        ::TelegramBotAPI::Type::Message SendVideoNote(
+            const Methods::sendVideoNoteParameters &Parameters);
 
         ::TelegramBotAPI::Type::Message SendVideoNote(
             const std::variant<long long, std::string> &ChatID,
             const std::variant<::TelegramBotAPI::Type::InputFile, std::string> &VideoNote);
 
         ::TelegramBotAPI::Type::Message SendVoice(
+            const Methods::sendVoiceParameters &Parameters);
+
+        ::TelegramBotAPI::Type::Message SendVoice(
             const std::variant<long long, std::string> &ChatID,
             const std::variant<::TelegramBotAPI::Type::InputFile, std::string> &Voice);
 
         bool SetBusinessAccountBio(
+            const Methods::setBusinessAccountBioParameters &Parameters);
+
+        bool SetBusinessAccountBio(
             const std::string &BusinessConnectionID);
+
+        bool SetBusinessAccountGiftSettings(
+            const Methods::setBusinessAccountGiftSettingsParameters &Parameters);
 
         bool SetBusinessAccountGiftSettings(
             const ::TelegramBotAPI::Type::AcceptedGiftTypes &AcceptedGiftTypes,
@@ -1314,15 +1918,27 @@ namespace TelegramBotAPI {
             const bool &ShowGiftButton);
 
         bool SetBusinessAccountName(
+            const Methods::setBusinessAccountNameParameters &Parameters);
+
+        bool SetBusinessAccountName(
             const std::string &BusinessConnectionID,
             const std::string &FirstName);
+
+        bool SetBusinessAccountProfilePhoto(
+            const Methods::setBusinessAccountProfilePhotoParameters &Parameters);
 
         bool SetBusinessAccountProfilePhoto(
             const std::string &BusinessConnectionID,
             const std::variant<::TelegramBotAPI::Type::InputProfilePhotoStatic, ::TelegramBotAPI::Type::InputProfilePhotoAnimated> &Photo);
 
         bool SetBusinessAccountUsername(
+            const Methods::setBusinessAccountUsernameParameters &Parameters);
+
+        bool SetBusinessAccountUsername(
             const std::string &BusinessConnectionID);
+
+        bool SetChatAdministratorCustomTitle(
+            const Methods::setChatAdministratorCustomTitleParameters &Parameters);
 
         bool SetChatAdministratorCustomTitle(
             const std::variant<long long, std::string> &ChatID,
@@ -1330,75 +1946,144 @@ namespace TelegramBotAPI {
             const long long &UserID);
 
         bool SetChatDescription(
+            const Methods::setChatDescriptionParameters &Parameters);
+
+        bool SetChatDescription(
             const std::variant<long long, std::string> &ChatID);
+
+        bool SetChatMemberTag(
+            const Methods::setChatMemberTagParameters &Parameters);
 
         bool SetChatMemberTag(
             const std::variant<long long, std::string> &ChatID,
             const long long &UserID);
 
+        bool SetChatMenuButton(
+            const Methods::setChatMenuButtonParameters &Parameters);
+
         bool SetChatMenuButton();
+
+        bool SetChatPermissions(
+            const Methods::setChatPermissionsParameters &Parameters);
 
         bool SetChatPermissions(
             const std::variant<long long, std::string> &ChatID,
             const ::TelegramBotAPI::Type::ChatPermissions &Permissions);
 
         bool SetChatPhoto(
+            const Methods::setChatPhotoParameters &Parameters);
+
+        bool SetChatPhoto(
             const std::variant<long long, std::string> &ChatID);
+
+        bool SetChatStickerSet(
+            const Methods::setChatStickerSetParameters &Parameters);
 
         bool SetChatStickerSet(
             const std::variant<long long, std::string> &ChatID,
             const std::string &StickerSetName);
 
         bool SetChatTitle(
+            const Methods::setChatTitleParameters &Parameters);
+
+        bool SetChatTitle(
             const std::variant<long long, std::string> &ChatID,
             const std::string &Title);
 
         bool SetCustomEmojiStickerSetThumbnail(
+            const Methods::setCustomEmojiStickerSetThumbnailParameters &Parameters);
+
+        bool SetCustomEmojiStickerSetThumbnail(
             const std::string &Name);
+
+        std::variant<::TelegramBotAPI::Type::Message, bool> SetGameScore(
+            const Methods::setGameScoreParameters &Parameters);
 
         std::variant<::TelegramBotAPI::Type::Message, bool> SetGameScore(
             const long long &Score,
             const long long &UserID);
 
         bool SetManagedBotAccessSettings(
+            const Methods::setManagedBotAccessSettingsParameters &Parameters);
+
+        bool SetManagedBotAccessSettings(
             const bool &IsAccessRestricted,
             const long long &UserID);
+
+        bool SetMessageReaction(
+            const Methods::setMessageReactionParameters &Parameters);
 
         bool SetMessageReaction(
             const std::variant<long long, std::string> &ChatID,
             const long long &MessageID);
 
         bool SetMyCommands(
+            const Methods::setMyCommandsParameters &Parameters);
+
+        bool SetMyCommands(
             const std::vector<::TelegramBotAPI::Type::BotCommand> &Commands);
+
+        bool SetMyDefaultAdministratorRights(
+            const Methods::setMyDefaultAdministratorRightsParameters &Parameters);
 
         bool SetMyDefaultAdministratorRights();
 
+        bool SetMyDescription(
+            const Methods::setMyDescriptionParameters &Parameters);
+
         bool SetMyDescription();
+
+        bool SetMyName(
+            const Methods::setMyNameParameters &Parameters);
 
         bool SetMyName();
 
         bool SetMyProfilePhoto(
+            const Methods::setMyProfilePhotoParameters &Parameters);
+
+        bool SetMyProfilePhoto(
             const std::variant<::TelegramBotAPI::Type::InputProfilePhotoStatic, ::TelegramBotAPI::Type::InputProfilePhotoAnimated> &Photo);
 
+        bool SetMyShortDescription(
+            const Methods::setMyShortDescriptionParameters &Parameters);
+
         bool SetMyShortDescription();
+
+        bool SetPassportDataErrors(
+            const Methods::setPassportDataErrorsParameters &Parameters);
 
         bool SetPassportDataErrors(
             const std::vector<std::variant<::TelegramBotAPI::Type::PassportElementErrorDataField, ::TelegramBotAPI::Type::PassportElementErrorFrontSide, ::TelegramBotAPI::Type::PassportElementErrorReverseSide, ::TelegramBotAPI::Type::PassportElementErrorSelfie, ::TelegramBotAPI::Type::PassportElementErrorFile, ::TelegramBotAPI::Type::PassportElementErrorFiles, ::TelegramBotAPI::Type::PassportElementErrorTranslationFile, ::TelegramBotAPI::Type::PassportElementErrorTranslationFiles, ::TelegramBotAPI::Type::PassportElementErrorUnspecified>> &Errors,
             const long long &UserID);
 
         bool SetStickerEmojiList(
+            const Methods::setStickerEmojiListParameters &Parameters);
+
+        bool SetStickerEmojiList(
             const std::vector<std::string> &EmojiList,
             const std::string &Sticker);
+
+        bool SetStickerKeywords(
+            const Methods::setStickerKeywordsParameters &Parameters);
 
         bool SetStickerKeywords(
             const std::string &Sticker);
 
         bool SetStickerMaskPosition(
+            const Methods::setStickerMaskPositionParameters &Parameters);
+
+        bool SetStickerMaskPosition(
             const std::string &Sticker);
+
+        bool SetStickerPositionInSet(
+            const Methods::setStickerPositionInSetParameters &Parameters);
 
         bool SetStickerPositionInSet(
             const long long &Position,
             const std::string &Sticker);
+
+        bool SetStickerSetThumbnail(
+            const Methods::setStickerSetThumbnailParameters &Parameters);
 
         bool SetStickerSetThumbnail(
             const std::string &Format,
@@ -1406,24 +2091,45 @@ namespace TelegramBotAPI {
             const long long &UserID);
 
         bool SetStickerSetTitle(
+            const Methods::setStickerSetTitleParameters &Parameters);
+
+        bool SetStickerSetTitle(
             const std::string &Name,
             const std::string &Title);
+
+        bool SetUserEmojiStatus(
+            const Methods::setUserEmojiStatusParameters &Parameters);
 
         bool SetUserEmojiStatus(
             const long long &UserID);
 
         bool SetWebhook(
+            const Methods::setWebhookParameters &Parameters);
+
+        bool SetWebhook(
             const std::string &URL);
 
+        std::variant<::TelegramBotAPI::Type::Message, bool> StopMessageLiveLocation(
+            const Methods::stopMessageLiveLocationParameters &Parameters);
+
         std::variant<::TelegramBotAPI::Type::Message, bool> StopMessageLiveLocation();
+
+        ::TelegramBotAPI::Type::Poll StopPoll(
+            const Methods::stopPollParameters &Parameters);
 
         ::TelegramBotAPI::Type::Poll StopPoll(
             const std::variant<long long, std::string> &ChatID,
             const long long &MessageID);
 
         bool TransferBusinessAccountStars(
+            const Methods::transferBusinessAccountStarsParameters &Parameters);
+
+        bool TransferBusinessAccountStars(
             const std::string &BusinessConnectionID,
             const long long &StarCount);
+
+        bool TransferGift(
+            const Methods::transferGiftParameters &Parameters);
 
         bool TransferGift(
             const std::string &BusinessConnectionID,
@@ -1431,39 +2137,72 @@ namespace TelegramBotAPI {
             const std::string &OwnedGiftID);
 
         bool UnbanChatMember(
+            const Methods::unbanChatMemberParameters &Parameters);
+
+        bool UnbanChatMember(
             const std::variant<long long, std::string> &ChatID,
             const long long &UserID);
+
+        bool UnbanChatSenderChat(
+            const Methods::unbanChatSenderChatParameters &Parameters);
 
         bool UnbanChatSenderChat(
             const std::variant<long long, std::string> &ChatID,
             const long long &SenderChatID);
 
         bool UnhideGeneralForumTopic(
+            const Methods::unhideGeneralForumTopicParameters &Parameters);
+
+        bool UnhideGeneralForumTopic(
             const std::variant<long long, std::string> &ChatID);
 
         bool UnpinAllChatMessages(
+            const Methods::unpinAllChatMessagesParameters &Parameters);
+
+        bool UnpinAllChatMessages(
             const std::variant<long long, std::string> &ChatID);
+
+        bool UnpinAllForumTopicMessages(
+            const Methods::unpinAllForumTopicMessagesParameters &Parameters);
 
         bool UnpinAllForumTopicMessages(
             const std::variant<long long, std::string> &ChatID,
             const long long &MessageThreadID);
 
         bool UnpinAllGeneralForumTopicMessages(
+            const Methods::unpinAllGeneralForumTopicMessagesParameters &Parameters);
+
+        bool UnpinAllGeneralForumTopicMessages(
             const std::variant<long long, std::string> &ChatID);
 
         bool UnpinChatMessage(
+            const Methods::unpinChatMessageParameters &Parameters);
+
+        bool UnpinChatMessage(
             const std::variant<long long, std::string> &ChatID);
+
+        bool UpgradeGift(
+            const Methods::upgradeGiftParameters &Parameters);
 
         bool UpgradeGift(
             const std::string &BusinessConnectionID,
             const std::string &OwnedGiftID);
 
         ::TelegramBotAPI::Type::File UploadStickerFile(
+            const Methods::uploadStickerFileParameters &Parameters);
+
+        ::TelegramBotAPI::Type::File UploadStickerFile(
             const std::string &StickerFormat,
             const long long &UserID);
 
         bool VerifyChat(
+            const Methods::verifyChatParameters &Parameters);
+
+        bool VerifyChat(
             const std::variant<long long, std::string> &ChatID);
+
+        bool VerifyUser(
+            const Methods::verifyUserParameters &Parameters);
 
         bool VerifyUser(
             const long long &UserID);

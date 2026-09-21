@@ -11,65 +11,80 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Use this method to get a sticker set. On success, a StickerSet object is returned.
+    // Use this method to get a sticker set. On success, a StickerSet object is returned.
+
+struct getStickerSetParameters {
+    // Name of the sticker set
+    std::string Name;
+
+    getStickerSetParameters(const std::string &NameValue)
+        : Name(NameValue) {}
+
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        Object["name"] = JSON::ToJson(Name);
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return JSON::RequiresMultipart(Name);
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        JSON::AddMultipartField(
+            Form, "name",
+            Name);
+
+        return Form;
+    }
+
+};
 
 class getStickerSet {
-    public:
-        struct Parameters {
-            // Name of the sticker set
-            std::string Name;
+public:
+    using Parameters = getStickerSetParameters;
+    using ReturnType = ::TelegramBotAPI::Type::StickerSet;
 
-            Parameters(const std::string &NameValue)
-                : Name(NameValue) {}
+    static constexpr const char *Name() noexcept {
+        return "getStickerSet";
+    }
 
-            JSON::Object ToJson() const {
-                JSON::Object Object;
+    explicit getStickerSet(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-                Object["name"] = JSON::ToJson(Name);
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return JSON::RequiresMultipart(Name);
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                JSON::AddMultipartField(
-                    Form, "name",
-                    Name);
-
-                return Form;
-            }
-
-        };
-
-        explicit getStickerSet(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        ::TelegramBotAPI::Type::StickerSet GetStickerSet(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<::TelegramBotAPI::Type::StickerSet>("getStickerSet",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<::TelegramBotAPI::Type::StickerSet>("getStickerSet",
-                                      ParametersValue.ToJson());
-        }
-
-        ::TelegramBotAPI::Type::StickerSet GetStickerSet(std::string Name) {
-            Parameters ParametersValue(
-                Name
+    ::TelegramBotAPI::Type::StickerSet GetStickerSet(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<::TelegramBotAPI::Type::StickerSet>(
+                "getStickerSet",
+                ParametersValue.ToMultipart()
             );
-
-            return GetStickerSet(ParametersValue);
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<::TelegramBotAPI::Type::StickerSet>(
+            "getStickerSet",
+            ParametersValue.ToJson()
+        );
+    }
+
+    ::TelegramBotAPI::Type::StickerSet GetStickerSet(std::string Name) {
+        Parameters ParametersValue(
+        Name
+        );
+
+        return GetStickerSet(ParametersValue);
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

@@ -11,65 +11,80 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Use this method to generate a new primary invite link for a chat; any previously generated primary link is revoked. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Returns the new invite link as String on success.
+    // Use this method to generate a new primary invite link for a chat; any previously generated primary link is revoked. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Returns the new invite link as String on success.
+
+struct exportChatInviteLinkParameters {
+    // Unique identifier for the target chat or username of the target channel in the format @username
+    std::variant<long long, std::string> ChatID;
+
+    exportChatInviteLinkParameters(const std::variant<long long, std::string> &ChatIDValue)
+        : ChatID(ChatIDValue) {}
+
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        Object["chat_id"] = JSON::ToJson(ChatID);
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return JSON::RequiresMultipart(ChatID);
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        JSON::AddMultipartField(
+            Form, "chat_id",
+            ChatID);
+
+        return Form;
+    }
+
+};
 
 class exportChatInviteLink {
-    public:
-        struct Parameters {
-            // Unique identifier for the target chat or username of the target channel in the format @username
-            std::variant<long long, std::string> ChatID;
+public:
+    using Parameters = exportChatInviteLinkParameters;
+    using ReturnType = std::string;
 
-            Parameters(const std::variant<long long, std::string> &ChatIDValue)
-                : ChatID(ChatIDValue) {}
+    static constexpr const char *Name() noexcept {
+        return "exportChatInviteLink";
+    }
 
-            JSON::Object ToJson() const {
-                JSON::Object Object;
+    explicit exportChatInviteLink(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-                Object["chat_id"] = JSON::ToJson(ChatID);
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return JSON::RequiresMultipart(ChatID);
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                JSON::AddMultipartField(
-                    Form, "chat_id",
-                    ChatID);
-
-                return Form;
-            }
-
-        };
-
-        explicit exportChatInviteLink(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        std::string ExportChatInviteLink(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<std::string>("exportChatInviteLink",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<std::string>("exportChatInviteLink",
-                                      ParametersValue.ToJson());
-        }
-
-        std::string ExportChatInviteLink(std::variant<long long, std::string> ChatID) {
-            Parameters ParametersValue(
-                ChatID
+    std::string ExportChatInviteLink(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<std::string>(
+                "exportChatInviteLink",
+                ParametersValue.ToMultipart()
             );
-
-            return ExportChatInviteLink(ParametersValue);
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<std::string>(
+            "exportChatInviteLink",
+            ParametersValue.ToJson()
+        );
+    }
+
+    std::string ExportChatInviteLink(std::variant<long long, std::string> ChatID) {
+        Parameters ParametersValue(
+        ChatID
+        );
+
+        return ExportChatInviteLink(ParametersValue);
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

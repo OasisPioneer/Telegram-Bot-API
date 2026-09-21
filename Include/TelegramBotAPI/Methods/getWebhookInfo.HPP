@@ -11,45 +11,60 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Use this method to get current webhook status. Requires no parameters. On success, returns a WebhookInfo object. If the bot is using getUpdates, will return an object with the url field empty.
+    // Use this method to get current webhook status. Requires no parameters. On success, returns a WebhookInfo object. If the bot is using getUpdates, will return an object with the url field empty.
+
+struct getWebhookInfoParameters {
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return false;
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        return Form;
+    }
+
+};
 
 class getWebhookInfo {
-    public:
-        struct Parameters {
-            JSON::Object ToJson() const {
-                JSON::Object Object;
+public:
+    using Parameters = getWebhookInfoParameters;
+    using ReturnType = ::TelegramBotAPI::Type::WebhookInfo;
 
-                return Object;
-            }
+    static constexpr const char *Name() noexcept {
+        return "getWebhookInfo";
+    }
 
-            bool RequiresMultipart() const {
-                return false;
-            }
+    explicit getWebhookInfo(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                return Form;
-            }
-
-        };
-
-        explicit getWebhookInfo(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        ::TelegramBotAPI::Type::WebhookInfo GetWebhookInfo(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<::TelegramBotAPI::Type::WebhookInfo>("getWebhookInfo",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<::TelegramBotAPI::Type::WebhookInfo>("getWebhookInfo",
-                                      ParametersValue.ToJson());
+    ::TelegramBotAPI::Type::WebhookInfo GetWebhookInfo(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<::TelegramBotAPI::Type::WebhookInfo>(
+                "getWebhookInfo",
+                ParametersValue.ToMultipart()
+            );
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<::TelegramBotAPI::Type::WebhookInfo>(
+            "getWebhookInfo",
+            ParametersValue.ToJson()
+        );
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

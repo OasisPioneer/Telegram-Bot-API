@@ -11,65 +11,80 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Use this method to delete a chat photo. Photos can't be changed for private chats. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Returns True on success.
+    // Use this method to delete a chat photo. Photos can't be changed for private chats. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Returns True on success.
+
+struct deleteChatPhotoParameters {
+    // Unique identifier for the target chat or username of the target channel in the format @username
+    std::variant<long long, std::string> ChatID;
+
+    deleteChatPhotoParameters(const std::variant<long long, std::string> &ChatIDValue)
+        : ChatID(ChatIDValue) {}
+
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        Object["chat_id"] = JSON::ToJson(ChatID);
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return JSON::RequiresMultipart(ChatID);
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        JSON::AddMultipartField(
+            Form, "chat_id",
+            ChatID);
+
+        return Form;
+    }
+
+};
 
 class deleteChatPhoto {
-    public:
-        struct Parameters {
-            // Unique identifier for the target chat or username of the target channel in the format @username
-            std::variant<long long, std::string> ChatID;
+public:
+    using Parameters = deleteChatPhotoParameters;
+    using ReturnType = bool;
 
-            Parameters(const std::variant<long long, std::string> &ChatIDValue)
-                : ChatID(ChatIDValue) {}
+    static constexpr const char *Name() noexcept {
+        return "deleteChatPhoto";
+    }
 
-            JSON::Object ToJson() const {
-                JSON::Object Object;
+    explicit deleteChatPhoto(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-                Object["chat_id"] = JSON::ToJson(ChatID);
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return JSON::RequiresMultipart(ChatID);
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                JSON::AddMultipartField(
-                    Form, "chat_id",
-                    ChatID);
-
-                return Form;
-            }
-
-        };
-
-        explicit deleteChatPhoto(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        bool DeleteChatPhoto(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<bool>("deleteChatPhoto",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<bool>("deleteChatPhoto",
-                                      ParametersValue.ToJson());
-        }
-
-        bool DeleteChatPhoto(std::variant<long long, std::string> ChatID) {
-            Parameters ParametersValue(
-                ChatID
+    bool DeleteChatPhoto(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<bool>(
+                "deleteChatPhoto",
+                ParametersValue.ToMultipart()
             );
-
-            return DeleteChatPhoto(ParametersValue);
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<bool>(
+            "deleteChatPhoto",
+            ParametersValue.ToJson()
+        );
+    }
+
+    bool DeleteChatPhoto(std::variant<long long, std::string> ChatID) {
+        Parameters ParametersValue(
+        ChatID
+        );
+
+        return DeleteChatPhoto(ParametersValue);
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

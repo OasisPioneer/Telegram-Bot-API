@@ -10,85 +10,100 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Allows the bot to cancel or re-enable extension of a subscription paid in Telegram Stars. Returns True on success.
+    // Allows the bot to cancel or re-enable extension of a subscription paid in Telegram Stars. Returns True on success.
+
+struct editUserStarSubscriptionParameters {
+    // Pass True to cancel extension of the user subscription; the subscription must be active up to the end of the current subscription period. Pass False to allow the user to re-enable a subscription that was previously canceled by the bot.
+    bool IsCanceled;
+
+    // Telegram payment identifier for the subscription
+    std::string TelegramPaymentChargeID;
+
+    // Identifier of the user whose subscription will be edited
+    long long UserID;
+
+    editUserStarSubscriptionParameters(const bool &IsCanceledValue, const std::string &TelegramPaymentChargeIDValue, const long long &UserIDValue)
+        : IsCanceled(IsCanceledValue), TelegramPaymentChargeID(TelegramPaymentChargeIDValue), UserID(UserIDValue) {}
+
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        Object["is_canceled"] = JSON::ToJson(IsCanceled);
+
+        Object["telegram_payment_charge_id"] = JSON::ToJson(TelegramPaymentChargeID);
+
+        Object["user_id"] = JSON::ToJson(UserID);
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return JSON::RequiresMultipart(IsCanceled) || JSON::RequiresMultipart(TelegramPaymentChargeID) || JSON::RequiresMultipart(UserID);
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        JSON::AddMultipartField(
+            Form, "is_canceled",
+            IsCanceled);
+
+        JSON::AddMultipartField(
+            Form, "telegram_payment_charge_id",
+            TelegramPaymentChargeID);
+
+        JSON::AddMultipartField(
+            Form, "user_id",
+            UserID);
+
+        return Form;
+    }
+
+};
 
 class editUserStarSubscription {
-    public:
-        struct Parameters {
-            // Pass True to cancel extension of the user subscription; the subscription must be active up to the end of the current subscription period. Pass False to allow the user to re-enable a subscription that was previously canceled by the bot.
-            bool IsCanceled;
+public:
+    using Parameters = editUserStarSubscriptionParameters;
+    using ReturnType = bool;
 
-            // Telegram payment identifier for the subscription
-            std::string TelegramPaymentChargeID;
+    static constexpr const char *Name() noexcept {
+        return "editUserStarSubscription";
+    }
 
-            // Identifier of the user whose subscription will be edited
-            long long UserID;
+    explicit editUserStarSubscription(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-            Parameters(const bool &IsCanceledValue, const std::string &TelegramPaymentChargeIDValue, const long long &UserIDValue)
-                : IsCanceled(IsCanceledValue), TelegramPaymentChargeID(TelegramPaymentChargeIDValue), UserID(UserIDValue) {}
-
-            JSON::Object ToJson() const {
-                JSON::Object Object;
-
-                Object["is_canceled"] = JSON::ToJson(IsCanceled);
-
-                Object["telegram_payment_charge_id"] = JSON::ToJson(TelegramPaymentChargeID);
-
-                Object["user_id"] = JSON::ToJson(UserID);
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return JSON::RequiresMultipart(IsCanceled) || JSON::RequiresMultipart(TelegramPaymentChargeID) || JSON::RequiresMultipart(UserID);
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                JSON::AddMultipartField(
-                    Form, "is_canceled",
-                    IsCanceled);
-
-                JSON::AddMultipartField(
-                    Form, "telegram_payment_charge_id",
-                    TelegramPaymentChargeID);
-
-                JSON::AddMultipartField(
-                    Form, "user_id",
-                    UserID);
-
-                return Form;
-            }
-
-        };
-
-        explicit editUserStarSubscription(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        bool EditUserStarSubscription(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<bool>("editUserStarSubscription",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<bool>("editUserStarSubscription",
-                                      ParametersValue.ToJson());
-        }
-
-        bool EditUserStarSubscription(bool IsCanceled, std::string TelegramPaymentChargeID, long long UserID) {
-            Parameters ParametersValue(
-                IsCanceled,
-                TelegramPaymentChargeID,
-                UserID
+    bool EditUserStarSubscription(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<bool>(
+                "editUserStarSubscription",
+                ParametersValue.ToMultipart()
             );
-
-            return EditUserStarSubscription(ParametersValue);
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<bool>(
+            "editUserStarSubscription",
+            ParametersValue.ToJson()
+        );
+    }
+
+    bool EditUserStarSubscription(bool IsCanceled, std::string TelegramPaymentChargeID, long long UserID) {
+        Parameters ParametersValue(
+        IsCanceled,
+        TelegramPaymentChargeID,
+        UserID
+        );
+
+        return EditUserStarSubscription(ParametersValue);
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

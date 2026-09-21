@@ -12,75 +12,90 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Stores a keyboard button that can be used by a user within a Mini App. Returns a PreparedKeyboardButton object.
+    // Stores a keyboard button that can be used by a user within a Mini App. Returns a PreparedKeyboardButton object.
+
+struct savePreparedKeyboardButtonParameters {
+    // A JSON-serialized object describing the button to be saved. The button must be of the type request_users, request_chat, or request_managed_bot.
+    ::TelegramBotAPI::Type::KeyboardButton Button;
+
+    // Unique identifier of the target user that can use the button
+    long long UserID;
+
+    savePreparedKeyboardButtonParameters(const ::TelegramBotAPI::Type::KeyboardButton &ButtonValue, const long long &UserIDValue)
+        : Button(ButtonValue), UserID(UserIDValue) {}
+
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        Object["button"] = JSON::ToJson(Button);
+
+        Object["user_id"] = JSON::ToJson(UserID);
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return JSON::RequiresMultipart(Button) || JSON::RequiresMultipart(UserID);
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        JSON::AddMultipartField(
+            Form, "button",
+            Button);
+
+        JSON::AddMultipartField(
+            Form, "user_id",
+            UserID);
+
+        return Form;
+    }
+
+};
 
 class savePreparedKeyboardButton {
-    public:
-        struct Parameters {
-            // A JSON-serialized object describing the button to be saved. The button must be of the type request_users, request_chat, or request_managed_bot.
-            ::TelegramBotAPI::Type::KeyboardButton Button;
+public:
+    using Parameters = savePreparedKeyboardButtonParameters;
+    using ReturnType = ::TelegramBotAPI::Type::PreparedKeyboardButton;
 
-            // Unique identifier of the target user that can use the button
-            long long UserID;
+    static constexpr const char *Name() noexcept {
+        return "savePreparedKeyboardButton";
+    }
 
-            Parameters(const ::TelegramBotAPI::Type::KeyboardButton &ButtonValue, const long long &UserIDValue)
-                : Button(ButtonValue), UserID(UserIDValue) {}
+    explicit savePreparedKeyboardButton(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-            JSON::Object ToJson() const {
-                JSON::Object Object;
-
-                Object["button"] = JSON::ToJson(Button);
-
-                Object["user_id"] = JSON::ToJson(UserID);
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return JSON::RequiresMultipart(Button) || JSON::RequiresMultipart(UserID);
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                JSON::AddMultipartField(
-                    Form, "button",
-                    Button);
-
-                JSON::AddMultipartField(
-                    Form, "user_id",
-                    UserID);
-
-                return Form;
-            }
-
-        };
-
-        explicit savePreparedKeyboardButton(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        ::TelegramBotAPI::Type::PreparedKeyboardButton SavePreparedKeyboardButton(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<::TelegramBotAPI::Type::PreparedKeyboardButton>("savePreparedKeyboardButton",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<::TelegramBotAPI::Type::PreparedKeyboardButton>("savePreparedKeyboardButton",
-                                      ParametersValue.ToJson());
-        }
-
-        ::TelegramBotAPI::Type::PreparedKeyboardButton SavePreparedKeyboardButton(::TelegramBotAPI::Type::KeyboardButton Button, long long UserID) {
-            Parameters ParametersValue(
-                Button,
-                UserID
+    ::TelegramBotAPI::Type::PreparedKeyboardButton SavePreparedKeyboardButton(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<::TelegramBotAPI::Type::PreparedKeyboardButton>(
+                "savePreparedKeyboardButton",
+                ParametersValue.ToMultipart()
             );
-
-            return SavePreparedKeyboardButton(ParametersValue);
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<::TelegramBotAPI::Type::PreparedKeyboardButton>(
+            "savePreparedKeyboardButton",
+            ParametersValue.ToJson()
+        );
+    }
+
+    ::TelegramBotAPI::Type::PreparedKeyboardButton SavePreparedKeyboardButton(::TelegramBotAPI::Type::KeyboardButton Button, long long UserID) {
+        Parameters ParametersValue(
+        Button,
+        UserID
+        );
+
+        return SavePreparedKeyboardButton(ParametersValue);
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

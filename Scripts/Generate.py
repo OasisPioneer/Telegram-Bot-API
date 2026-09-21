@@ -197,7 +197,9 @@ def generate(project_root: Path, schema_path: Path) -> dict:
         ]
     )
 
-    # Methods.
+    # Methods. Each generated method header contains both its parameter
+    # structure and method façade, so no parallel parameter-header tree is
+    # required.
     for method in model.methods:
         path = methods_dir / f"{method.name}.HPP"
         write_text(path, method_generator.generate(method))

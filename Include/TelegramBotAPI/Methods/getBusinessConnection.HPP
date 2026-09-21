@@ -11,65 +11,80 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Use this method to get information about the connection of the bot with a business account. Returns a BusinessConnection object on success.
+    // Use this method to get information about the connection of the bot with a business account. Returns a BusinessConnection object on success.
+
+struct getBusinessConnectionParameters {
+    // Unique identifier of the business connection
+    std::string BusinessConnectionID;
+
+    getBusinessConnectionParameters(const std::string &BusinessConnectionIDValue)
+        : BusinessConnectionID(BusinessConnectionIDValue) {}
+
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        Object["business_connection_id"] = JSON::ToJson(BusinessConnectionID);
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return JSON::RequiresMultipart(BusinessConnectionID);
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        JSON::AddMultipartField(
+            Form, "business_connection_id",
+            BusinessConnectionID);
+
+        return Form;
+    }
+
+};
 
 class getBusinessConnection {
-    public:
-        struct Parameters {
-            // Unique identifier of the business connection
-            std::string BusinessConnectionID;
+public:
+    using Parameters = getBusinessConnectionParameters;
+    using ReturnType = ::TelegramBotAPI::Type::BusinessConnection;
 
-            Parameters(const std::string &BusinessConnectionIDValue)
-                : BusinessConnectionID(BusinessConnectionIDValue) {}
+    static constexpr const char *Name() noexcept {
+        return "getBusinessConnection";
+    }
 
-            JSON::Object ToJson() const {
-                JSON::Object Object;
+    explicit getBusinessConnection(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-                Object["business_connection_id"] = JSON::ToJson(BusinessConnectionID);
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return JSON::RequiresMultipart(BusinessConnectionID);
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                JSON::AddMultipartField(
-                    Form, "business_connection_id",
-                    BusinessConnectionID);
-
-                return Form;
-            }
-
-        };
-
-        explicit getBusinessConnection(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        ::TelegramBotAPI::Type::BusinessConnection GetBusinessConnection(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<::TelegramBotAPI::Type::BusinessConnection>("getBusinessConnection",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<::TelegramBotAPI::Type::BusinessConnection>("getBusinessConnection",
-                                      ParametersValue.ToJson());
-        }
-
-        ::TelegramBotAPI::Type::BusinessConnection GetBusinessConnection(std::string BusinessConnectionID) {
-            Parameters ParametersValue(
-                BusinessConnectionID
+    ::TelegramBotAPI::Type::BusinessConnection GetBusinessConnection(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<::TelegramBotAPI::Type::BusinessConnection>(
+                "getBusinessConnection",
+                ParametersValue.ToMultipart()
             );
-
-            return GetBusinessConnection(ParametersValue);
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<::TelegramBotAPI::Type::BusinessConnection>(
+            "getBusinessConnection",
+            ParametersValue.ToJson()
+        );
+    }
+
+    ::TelegramBotAPI::Type::BusinessConnection GetBusinessConnection(std::string BusinessConnectionID) {
+        Parameters ParametersValue(
+        BusinessConnectionID
+        );
+
+        return GetBusinessConnection(ParametersValue);
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

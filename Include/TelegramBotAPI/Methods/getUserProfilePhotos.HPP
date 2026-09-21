@@ -11,91 +11,106 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Use this method to get a list of profile pictures for a user. Returns a UserProfilePhotos object.
+    // Use this method to get a list of profile pictures for a user. Returns a UserProfilePhotos object.
+
+struct getUserProfilePhotosParameters {
+    // Limits the number of photos to be retrieved. Values between 1-100 are accepted. Defaults to 100.
+    std::optional<long long> Limit{};
+
+    // Sequential number of the first photo to be returned. By default, all photos are returned.
+    std::optional<long long> Offset{};
+
+    // Unique identifier of the target user
+    long long UserID;
+
+    getUserProfilePhotosParameters(const long long &UserIDValue)
+        : UserID(UserIDValue) {}
+
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        if (Limit.has_value()) {
+            Object["limit"] = JSON::ToJson(Limit.value());
+        }
+
+        if (Offset.has_value()) {
+            Object["offset"] = JSON::ToJson(Offset.value());
+        }
+
+        Object["user_id"] = JSON::ToJson(UserID);
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return (Limit.has_value() && JSON::RequiresMultipart(Limit.value())) || (Offset.has_value() && JSON::RequiresMultipart(Offset.value())) || JSON::RequiresMultipart(UserID);
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        if (Limit.has_value()) {
+            JSON::AddMultipartField(
+                Form, "limit",
+                Limit.value());
+        }
+
+        if (Offset.has_value()) {
+            JSON::AddMultipartField(
+                Form, "offset",
+                Offset.value());
+        }
+
+        JSON::AddMultipartField(
+            Form, "user_id",
+            UserID);
+
+        return Form;
+    }
+
+};
 
 class getUserProfilePhotos {
-    public:
-        struct Parameters {
-            // Limits the number of photos to be retrieved. Values between 1-100 are accepted. Defaults to 100.
-            std::optional<long long> Limit{};
+public:
+    using Parameters = getUserProfilePhotosParameters;
+    using ReturnType = ::TelegramBotAPI::Type::UserProfilePhotos;
 
-            // Sequential number of the first photo to be returned. By default, all photos are returned.
-            std::optional<long long> Offset{};
+    static constexpr const char *Name() noexcept {
+        return "getUserProfilePhotos";
+    }
 
-            // Unique identifier of the target user
-            long long UserID;
+    explicit getUserProfilePhotos(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-            Parameters(const long long &UserIDValue)
-                : UserID(UserIDValue) {}
-
-            JSON::Object ToJson() const {
-                JSON::Object Object;
-
-                if (Limit.has_value()) {
-                    Object["limit"] = JSON::ToJson(Limit.value());
-                }
-
-                if (Offset.has_value()) {
-                    Object["offset"] = JSON::ToJson(Offset.value());
-                }
-
-                Object["user_id"] = JSON::ToJson(UserID);
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return (Limit.has_value() && JSON::RequiresMultipart(Limit.value())) || (Offset.has_value() && JSON::RequiresMultipart(Offset.value())) || JSON::RequiresMultipart(UserID);
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                if (Limit.has_value()) {
-                    JSON::AddMultipartField(
-                        Form, "limit",
-                        Limit.value());
-                }
-
-                if (Offset.has_value()) {
-                    JSON::AddMultipartField(
-                        Form, "offset",
-                        Offset.value());
-                }
-
-                JSON::AddMultipartField(
-                    Form, "user_id",
-                    UserID);
-
-                return Form;
-            }
-
-        };
-
-        explicit getUserProfilePhotos(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        ::TelegramBotAPI::Type::UserProfilePhotos GetUserProfilePhotos(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<::TelegramBotAPI::Type::UserProfilePhotos>("getUserProfilePhotos",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<::TelegramBotAPI::Type::UserProfilePhotos>("getUserProfilePhotos",
-                                      ParametersValue.ToJson());
-        }
-
-        ::TelegramBotAPI::Type::UserProfilePhotos GetUserProfilePhotos(long long UserID) {
-            Parameters ParametersValue(
-                UserID
+    ::TelegramBotAPI::Type::UserProfilePhotos GetUserProfilePhotos(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<::TelegramBotAPI::Type::UserProfilePhotos>(
+                "getUserProfilePhotos",
+                ParametersValue.ToMultipart()
             );
-
-            return GetUserProfilePhotos(ParametersValue);
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<::TelegramBotAPI::Type::UserProfilePhotos>(
+            "getUserProfilePhotos",
+            ParametersValue.ToJson()
+        );
+    }
+
+    ::TelegramBotAPI::Type::UserProfilePhotos GetUserProfilePhotos(long long UserID) {
+        Parameters ParametersValue(
+        UserID
+        );
+
+        return GetUserProfilePhotos(ParametersValue);
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

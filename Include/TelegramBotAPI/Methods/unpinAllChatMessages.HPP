@@ -11,65 +11,80 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Use this method to clear the list of pinned messages in a chat. In private chats and channel direct messages chats, no additional rights are required to unpin all pinned messages. Conversely, the bot must be an administrator with the 'can_pin_messages' right or the 'can_edit_messages' right to unpin all pinned messages in groups and channels respectively. Returns True on success.
+    // Use this method to clear the list of pinned messages in a chat. In private chats and channel direct messages chats, no additional rights are required to unpin all pinned messages. Conversely, the bot must be an administrator with the 'can_pin_messages' right or the 'can_edit_messages' right to unpin all pinned messages in groups and channels respectively. Returns True on success.
+
+struct unpinAllChatMessagesParameters {
+    // Unique identifier for the target chat or username of the target channel in the format @username
+    std::variant<long long, std::string> ChatID;
+
+    unpinAllChatMessagesParameters(const std::variant<long long, std::string> &ChatIDValue)
+        : ChatID(ChatIDValue) {}
+
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        Object["chat_id"] = JSON::ToJson(ChatID);
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return JSON::RequiresMultipart(ChatID);
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        JSON::AddMultipartField(
+            Form, "chat_id",
+            ChatID);
+
+        return Form;
+    }
+
+};
 
 class unpinAllChatMessages {
-    public:
-        struct Parameters {
-            // Unique identifier for the target chat or username of the target channel in the format @username
-            std::variant<long long, std::string> ChatID;
+public:
+    using Parameters = unpinAllChatMessagesParameters;
+    using ReturnType = bool;
 
-            Parameters(const std::variant<long long, std::string> &ChatIDValue)
-                : ChatID(ChatIDValue) {}
+    static constexpr const char *Name() noexcept {
+        return "unpinAllChatMessages";
+    }
 
-            JSON::Object ToJson() const {
-                JSON::Object Object;
+    explicit unpinAllChatMessages(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-                Object["chat_id"] = JSON::ToJson(ChatID);
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return JSON::RequiresMultipart(ChatID);
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                JSON::AddMultipartField(
-                    Form, "chat_id",
-                    ChatID);
-
-                return Form;
-            }
-
-        };
-
-        explicit unpinAllChatMessages(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        bool UnpinAllChatMessages(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<bool>("unpinAllChatMessages",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<bool>("unpinAllChatMessages",
-                                      ParametersValue.ToJson());
-        }
-
-        bool UnpinAllChatMessages(std::variant<long long, std::string> ChatID) {
-            Parameters ParametersValue(
-                ChatID
+    bool UnpinAllChatMessages(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<bool>(
+                "unpinAllChatMessages",
+                ParametersValue.ToMultipart()
             );
-
-            return UnpinAllChatMessages(ParametersValue);
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<bool>(
+            "unpinAllChatMessages",
+            ParametersValue.ToJson()
+        );
+    }
+
+    bool UnpinAllChatMessages(std::variant<long long, std::string> ChatID) {
+        Parameters ParametersValue(
+        ChatID
+        );
+
+        return UnpinAllChatMessages(ParametersValue);
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

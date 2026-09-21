@@ -10,65 +10,80 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Use this method to get the token of a managed bot. Returns the token as String on success.
+    // Use this method to get the token of a managed bot. Returns the token as String on success.
+
+struct getManagedBotTokenParameters {
+    // User identifier of the managed bot whose token will be returned
+    long long UserID;
+
+    getManagedBotTokenParameters(const long long &UserIDValue)
+        : UserID(UserIDValue) {}
+
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        Object["user_id"] = JSON::ToJson(UserID);
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return JSON::RequiresMultipart(UserID);
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        JSON::AddMultipartField(
+            Form, "user_id",
+            UserID);
+
+        return Form;
+    }
+
+};
 
 class getManagedBotToken {
-    public:
-        struct Parameters {
-            // User identifier of the managed bot whose token will be returned
-            long long UserID;
+public:
+    using Parameters = getManagedBotTokenParameters;
+    using ReturnType = std::string;
 
-            Parameters(const long long &UserIDValue)
-                : UserID(UserIDValue) {}
+    static constexpr const char *Name() noexcept {
+        return "getManagedBotToken";
+    }
 
-            JSON::Object ToJson() const {
-                JSON::Object Object;
+    explicit getManagedBotToken(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-                Object["user_id"] = JSON::ToJson(UserID);
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return JSON::RequiresMultipart(UserID);
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                JSON::AddMultipartField(
-                    Form, "user_id",
-                    UserID);
-
-                return Form;
-            }
-
-        };
-
-        explicit getManagedBotToken(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        std::string GetManagedBotToken(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<std::string>("getManagedBotToken",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<std::string>("getManagedBotToken",
-                                      ParametersValue.ToJson());
-        }
-
-        std::string GetManagedBotToken(long long UserID) {
-            Parameters ParametersValue(
-                UserID
+    std::string GetManagedBotToken(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<std::string>(
+                "getManagedBotToken",
+                ParametersValue.ToMultipart()
             );
-
-            return GetManagedBotToken(ParametersValue);
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<std::string>(
+            "getManagedBotToken",
+            ParametersValue.ToJson()
+        );
+    }
+
+    std::string GetManagedBotToken(long long UserID) {
+        Parameters ParametersValue(
+        UserID
+        );
+
+        return GetManagedBotToken(ParametersValue);
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

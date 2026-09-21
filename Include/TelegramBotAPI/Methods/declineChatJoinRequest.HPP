@@ -11,75 +11,90 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Use this method to decline a chat join request. The bot must be an administrator in the chat for this to work and must have the can_invite_users administrator right. Returns True on success.
+    // Use this method to decline a chat join request. The bot must be an administrator in the chat for this to work and must have the can_invite_users administrator right. Returns True on success.
+
+struct declineChatJoinRequestParameters {
+    // Unique identifier for the target chat or username of the target channel in the format @username
+    std::variant<long long, std::string> ChatID;
+
+    // Unique identifier of the target user
+    long long UserID;
+
+    declineChatJoinRequestParameters(const std::variant<long long, std::string> &ChatIDValue, const long long &UserIDValue)
+        : ChatID(ChatIDValue), UserID(UserIDValue) {}
+
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        Object["chat_id"] = JSON::ToJson(ChatID);
+
+        Object["user_id"] = JSON::ToJson(UserID);
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return JSON::RequiresMultipart(ChatID) || JSON::RequiresMultipart(UserID);
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        JSON::AddMultipartField(
+            Form, "chat_id",
+            ChatID);
+
+        JSON::AddMultipartField(
+            Form, "user_id",
+            UserID);
+
+        return Form;
+    }
+
+};
 
 class declineChatJoinRequest {
-    public:
-        struct Parameters {
-            // Unique identifier for the target chat or username of the target channel in the format @username
-            std::variant<long long, std::string> ChatID;
+public:
+    using Parameters = declineChatJoinRequestParameters;
+    using ReturnType = bool;
 
-            // Unique identifier of the target user
-            long long UserID;
+    static constexpr const char *Name() noexcept {
+        return "declineChatJoinRequest";
+    }
 
-            Parameters(const std::variant<long long, std::string> &ChatIDValue, const long long &UserIDValue)
-                : ChatID(ChatIDValue), UserID(UserIDValue) {}
+    explicit declineChatJoinRequest(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-            JSON::Object ToJson() const {
-                JSON::Object Object;
-
-                Object["chat_id"] = JSON::ToJson(ChatID);
-
-                Object["user_id"] = JSON::ToJson(UserID);
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return JSON::RequiresMultipart(ChatID) || JSON::RequiresMultipart(UserID);
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                JSON::AddMultipartField(
-                    Form, "chat_id",
-                    ChatID);
-
-                JSON::AddMultipartField(
-                    Form, "user_id",
-                    UserID);
-
-                return Form;
-            }
-
-        };
-
-        explicit declineChatJoinRequest(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        bool DeclineChatJoinRequest(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<bool>("declineChatJoinRequest",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<bool>("declineChatJoinRequest",
-                                      ParametersValue.ToJson());
-        }
-
-        bool DeclineChatJoinRequest(std::variant<long long, std::string> ChatID, long long UserID) {
-            Parameters ParametersValue(
-                ChatID,
-                UserID
+    bool DeclineChatJoinRequest(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<bool>(
+                "declineChatJoinRequest",
+                ParametersValue.ToMultipart()
             );
-
-            return DeclineChatJoinRequest(ParametersValue);
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<bool>(
+            "declineChatJoinRequest",
+            ParametersValue.ToJson()
+        );
+    }
+
+    bool DeclineChatJoinRequest(std::variant<long long, std::string> ChatID, long long UserID) {
+        Parameters ParametersValue(
+        ChatID,
+        UserID
+        );
+
+        return DeclineChatJoinRequest(ParametersValue);
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

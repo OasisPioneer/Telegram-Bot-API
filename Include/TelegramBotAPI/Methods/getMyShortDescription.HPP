@@ -11,58 +11,73 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Use this method to get the current bot short description for the given user language. Returns BotShortDescription on success.
+    // Use this method to get the current bot short description for the given user language. Returns BotShortDescription on success.
 
-class getMyShortDescription {
-    public:
-        struct Parameters {
-            // A two-letter ISO 639-1 language code or an empty string
-            std::optional<std::string> LanguageCode{};
+struct getMyShortDescriptionParameters {
+    // A two-letter ISO 639-1 language code or an empty string
+    std::optional<std::string> LanguageCode{};
 
-            JSON::Object ToJson() const {
-                JSON::Object Object;
+    JSON::Object ToJson() const {
+        JSON::Object Object;
 
-                if (LanguageCode.has_value()) {
-                    Object["language_code"] = JSON::ToJson(LanguageCode.value());
-                }
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return (LanguageCode.has_value() && JSON::RequiresMultipart(LanguageCode.value()));
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                if (LanguageCode.has_value()) {
-                    JSON::AddMultipartField(
-                        Form, "language_code",
-                        LanguageCode.value());
-                }
-
-                return Form;
-            }
-
-        };
-
-        explicit getMyShortDescription(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        ::TelegramBotAPI::Type::BotShortDescription GetMyShortDescription(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<::TelegramBotAPI::Type::BotShortDescription>("getMyShortDescription",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<::TelegramBotAPI::Type::BotShortDescription>("getMyShortDescription",
-                                      ParametersValue.ToJson());
+        if (LanguageCode.has_value()) {
+            Object["language_code"] = JSON::ToJson(LanguageCode.value());
         }
 
-    private:
-        TelegramClient &Client;
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return (LanguageCode.has_value() && JSON::RequiresMultipart(LanguageCode.value()));
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        if (LanguageCode.has_value()) {
+            JSON::AddMultipartField(
+                Form, "language_code",
+                LanguageCode.value());
+        }
+
+        return Form;
+    }
+
+};
+
+class getMyShortDescription {
+public:
+    using Parameters = getMyShortDescriptionParameters;
+    using ReturnType = ::TelegramBotAPI::Type::BotShortDescription;
+
+    static constexpr const char *Name() noexcept {
+        return "getMyShortDescription";
+    }
+
+    explicit getMyShortDescription(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
+
+    ::TelegramBotAPI::Type::BotShortDescription GetMyShortDescription(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<::TelegramBotAPI::Type::BotShortDescription>(
+                "getMyShortDescription",
+                ParametersValue.ToMultipart()
+            );
+        }
+
+        return Client.Call<::TelegramBotAPI::Type::BotShortDescription>(
+            "getMyShortDescription",
+            ParametersValue.ToJson()
+        );
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

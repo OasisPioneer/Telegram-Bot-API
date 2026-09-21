@@ -10,45 +10,60 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Use this method to close the bot instance before moving it from one local server to another. You need to delete the webhook before calling this method to ensure that the bot isn't launched again after server restart. The method will return error 429 in the first 10 minutes after the bot is launched. Returns True on success. Requires no parameters.
+    // Use this method to close the bot instance before moving it from one local server to another. You need to delete the webhook before calling this method to ensure that the bot isn't launched again after server restart. The method will return error 429 in the first 10 minutes after the bot is launched. Returns True on success. Requires no parameters.
+
+struct closeParameters {
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return false;
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        return Form;
+    }
+
+};
 
 class close {
-    public:
-        struct Parameters {
-            JSON::Object ToJson() const {
-                JSON::Object Object;
+public:
+    using Parameters = closeParameters;
+    using ReturnType = bool;
 
-                return Object;
-            }
+    static constexpr const char *Name() noexcept {
+        return "close";
+    }
 
-            bool RequiresMultipart() const {
-                return false;
-            }
+    explicit close(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                return Form;
-            }
-
-        };
-
-        explicit close(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        bool Close(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<bool>("close",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<bool>("close",
-                                      ParametersValue.ToJson());
+    bool Close(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<bool>(
+                "close",
+                ParametersValue.ToMultipart()
+            );
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<bool>(
+            "close",
+            ParametersValue.ToJson()
+        );
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

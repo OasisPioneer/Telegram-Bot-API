@@ -10,45 +10,60 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Removes the profile photo of the bot. Requires no parameters. Returns True on success.
+    // Removes the profile photo of the bot. Requires no parameters. Returns True on success.
+
+struct removeMyProfilePhotoParameters {
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return false;
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        return Form;
+    }
+
+};
 
 class removeMyProfilePhoto {
-    public:
-        struct Parameters {
-            JSON::Object ToJson() const {
-                JSON::Object Object;
+public:
+    using Parameters = removeMyProfilePhotoParameters;
+    using ReturnType = bool;
 
-                return Object;
-            }
+    static constexpr const char *Name() noexcept {
+        return "removeMyProfilePhoto";
+    }
 
-            bool RequiresMultipart() const {
-                return false;
-            }
+    explicit removeMyProfilePhoto(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                return Form;
-            }
-
-        };
-
-        explicit removeMyProfilePhoto(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        bool RemoveMyProfilePhoto(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<bool>("removeMyProfilePhoto",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<bool>("removeMyProfilePhoto",
-                                      ParametersValue.ToJson());
+    bool RemoveMyProfilePhoto(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<bool>(
+                "removeMyProfilePhoto",
+                ParametersValue.ToMultipart()
+            );
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<bool>(
+            "removeMyProfilePhoto",
+            ParametersValue.ToJson()
+        );
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

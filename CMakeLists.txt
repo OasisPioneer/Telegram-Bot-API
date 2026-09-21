@@ -56,6 +56,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 
 if(TELEGRAM_BOT_API_BUILD_EXAMPLES)
     add_subdirectory(Examples/EchoBot)
+    add_subdirectory(Examples/KeyboardBot)
 endif()
 
 if(TELEGRAM_BOT_API_BUILD_TESTS)

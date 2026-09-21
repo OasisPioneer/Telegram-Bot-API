@@ -11,45 +11,60 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // A method to get the current Telegram Stars balance of the bot. Requires no parameters. On success, returns a StarAmount object.
+    // A method to get the current Telegram Stars balance of the bot. Requires no parameters. On success, returns a StarAmount object.
+
+struct getMyStarBalanceParameters {
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return false;
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        return Form;
+    }
+
+};
 
 class getMyStarBalance {
-    public:
-        struct Parameters {
-            JSON::Object ToJson() const {
-                JSON::Object Object;
+public:
+    using Parameters = getMyStarBalanceParameters;
+    using ReturnType = ::TelegramBotAPI::Type::StarAmount;
 
-                return Object;
-            }
+    static constexpr const char *Name() noexcept {
+        return "getMyStarBalance";
+    }
 
-            bool RequiresMultipart() const {
-                return false;
-            }
+    explicit getMyStarBalance(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                return Form;
-            }
-
-        };
-
-        explicit getMyStarBalance(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        ::TelegramBotAPI::Type::StarAmount GetMyStarBalance(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<::TelegramBotAPI::Type::StarAmount>("getMyStarBalance",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<::TelegramBotAPI::Type::StarAmount>("getMyStarBalance",
-                                      ParametersValue.ToJson());
+    ::TelegramBotAPI::Type::StarAmount GetMyStarBalance(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<::TelegramBotAPI::Type::StarAmount>(
+                "getMyStarBalance",
+                ParametersValue.ToMultipart()
+            );
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<::TelegramBotAPI::Type::StarAmount>(
+            "getMyStarBalance",
+            ParametersValue.ToJson()
+        );
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

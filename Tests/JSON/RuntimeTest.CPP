@@ -74,7 +74,19 @@ int main() {
     assert(User.UserName.has_value());
     assert(User.UserName.value() == "test_bot");
 
+    HTTPClient.RequestCount = 0;
+
+    const Type::User DirectUser = Client.GetMe(
+        Methods::getMeParameters{}
+    );
+
+    assert(HTTPClient.RequestCount == 1);
+    assert(DirectUser.ID == 123456789);
+    assert(DirectUser.IsBot);
+    assert(DirectUser.FirstName == "TestBot");
+
     std::cout << "getMe runtime test: PASS\n";
+    std::cout << "TelegramClient parameter overload: PASS\n";
 
     return 0;
 }

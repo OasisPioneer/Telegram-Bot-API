@@ -34,6 +34,9 @@ namespace TelegramBotAPI {
                            const std::string    &APIURL,
                            Network::IHTTPClient &HTTPClient);
 
+            TelegramClient &API() noexcept;
+            const TelegramClient &API() const noexcept;
+
             void OnMessage(MessageHandler Handler);
 
             void OnCallbackQuery(CallbackQueryHandler Handler);

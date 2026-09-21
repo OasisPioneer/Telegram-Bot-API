@@ -11,101 +11,116 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Use this method to add a message to the list of pinned messages in a chat. In private chats and channel direct messages chats, all non-service messages can be pinned. Conversely, the bot must be an administrator with the 'can_pin_messages' right or the 'can_edit_messages' right to pin messages in groups and channels respectively. Returns True on success.
+    // Use this method to add a message to the list of pinned messages in a chat. In private chats and channel direct messages chats, all non-service messages can be pinned. Conversely, the bot must be an administrator with the 'can_pin_messages' right or the 'can_edit_messages' right to pin messages in groups and channels respectively. Returns True on success.
+
+struct pinChatMessageParameters {
+    // Unique identifier of the business connection on behalf of which the message will be pinned
+    std::optional<std::string> BusinessConnectionID{};
+
+    // Unique identifier for the target chat or username of the target channel in the format @username
+    std::variant<long long, std::string> ChatID;
+
+    // Pass True if it is not necessary to send a notification to all chat members about the new pinned message. Notifications are always disabled in channels and private chats.
+    std::optional<bool> DisableNotification{};
+
+    // Identifier of a message to pin
+    long long MessageID;
+
+    pinChatMessageParameters(const std::variant<long long, std::string> &ChatIDValue, const long long &MessageIDValue)
+        : ChatID(ChatIDValue), MessageID(MessageIDValue) {}
+
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        if (BusinessConnectionID.has_value()) {
+            Object["business_connection_id"] = JSON::ToJson(BusinessConnectionID.value());
+        }
+
+        Object["chat_id"] = JSON::ToJson(ChatID);
+
+        if (DisableNotification.has_value()) {
+            Object["disable_notification"] = JSON::ToJson(DisableNotification.value());
+        }
+
+        Object["message_id"] = JSON::ToJson(MessageID);
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return (BusinessConnectionID.has_value() && JSON::RequiresMultipart(BusinessConnectionID.value())) || JSON::RequiresMultipart(ChatID) || (DisableNotification.has_value() && JSON::RequiresMultipart(DisableNotification.value())) || JSON::RequiresMultipart(MessageID);
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        if (BusinessConnectionID.has_value()) {
+            JSON::AddMultipartField(
+                Form, "business_connection_id",
+                BusinessConnectionID.value());
+        }
+
+        JSON::AddMultipartField(
+            Form, "chat_id",
+            ChatID);
+
+        if (DisableNotification.has_value()) {
+            JSON::AddMultipartField(
+                Form, "disable_notification",
+                DisableNotification.value());
+        }
+
+        JSON::AddMultipartField(
+            Form, "message_id",
+            MessageID);
+
+        return Form;
+    }
+
+};
 
 class pinChatMessage {
-    public:
-        struct Parameters {
-            // Unique identifier of the business connection on behalf of which the message will be pinned
-            std::optional<std::string> BusinessConnectionID{};
+public:
+    using Parameters = pinChatMessageParameters;
+    using ReturnType = bool;
 
-            // Unique identifier for the target chat or username of the target channel in the format @username
-            std::variant<long long, std::string> ChatID;
+    static constexpr const char *Name() noexcept {
+        return "pinChatMessage";
+    }
 
-            // Pass True if it is not necessary to send a notification to all chat members about the new pinned message. Notifications are always disabled in channels and private chats.
-            std::optional<bool> DisableNotification{};
+    explicit pinChatMessage(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-            // Identifier of a message to pin
-            long long MessageID;
-
-            Parameters(const std::variant<long long, std::string> &ChatIDValue, const long long &MessageIDValue)
-                : ChatID(ChatIDValue), MessageID(MessageIDValue) {}
-
-            JSON::Object ToJson() const {
-                JSON::Object Object;
-
-                if (BusinessConnectionID.has_value()) {
-                    Object["business_connection_id"] = JSON::ToJson(BusinessConnectionID.value());
-                }
-
-                Object["chat_id"] = JSON::ToJson(ChatID);
-
-                if (DisableNotification.has_value()) {
-                    Object["disable_notification"] = JSON::ToJson(DisableNotification.value());
-                }
-
-                Object["message_id"] = JSON::ToJson(MessageID);
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return (BusinessConnectionID.has_value() && JSON::RequiresMultipart(BusinessConnectionID.value())) || JSON::RequiresMultipart(ChatID) || (DisableNotification.has_value() && JSON::RequiresMultipart(DisableNotification.value())) || JSON::RequiresMultipart(MessageID);
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                if (BusinessConnectionID.has_value()) {
-                    JSON::AddMultipartField(
-                        Form, "business_connection_id",
-                        BusinessConnectionID.value());
-                }
-
-                JSON::AddMultipartField(
-                    Form, "chat_id",
-                    ChatID);
-
-                if (DisableNotification.has_value()) {
-                    JSON::AddMultipartField(
-                        Form, "disable_notification",
-                        DisableNotification.value());
-                }
-
-                JSON::AddMultipartField(
-                    Form, "message_id",
-                    MessageID);
-
-                return Form;
-            }
-
-        };
-
-        explicit pinChatMessage(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        bool PinChatMessage(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<bool>("pinChatMessage",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<bool>("pinChatMessage",
-                                      ParametersValue.ToJson());
-        }
-
-        bool PinChatMessage(std::variant<long long, std::string> ChatID, long long MessageID) {
-            Parameters ParametersValue(
-                ChatID,
-                MessageID
+    bool PinChatMessage(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<bool>(
+                "pinChatMessage",
+                ParametersValue.ToMultipart()
             );
-
-            return PinChatMessage(ParametersValue);
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<bool>(
+            "pinChatMessage",
+            ParametersValue.ToJson()
+        );
+    }
+
+    bool PinChatMessage(std::variant<long long, std::string> ChatID, long long MessageID) {
+        Parameters ParametersValue(
+        ChatID,
+        MessageID
+        );
+
+        return PinChatMessage(ParametersValue);
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

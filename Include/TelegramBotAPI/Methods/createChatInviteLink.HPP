@@ -12,117 +12,132 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Use this method to create an additional invite link for a chat. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. The link can be revoked using the method revokeChatInviteLink. Returns the new invite link as ChatInviteLink object.
+    // Use this method to create an additional invite link for a chat. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. The link can be revoked using the method revokeChatInviteLink. Returns the new invite link as ChatInviteLink object.
+
+struct createChatInviteLinkParameters {
+    // Unique identifier for the target chat or username of the target channel in the format @username
+    std::variant<long long, std::string> ChatID;
+
+    // True, if users joining the chat via the link need to be approved by chat administrators. If True, member_limit can't be specified.
+    std::optional<bool> CreatesJoinRequest{};
+
+    // Point in time (Unix timestamp) when the link will expire
+    std::optional<long long> ExpireDate{};
+
+    // The maximum number of users that can be members of the chat simultaneously after joining the chat via this invite link; 1-99999
+    std::optional<long long> MemberLimit{};
+
+    // Invite link name; 0-32 characters
+    std::optional<std::string> Name{};
+
+    createChatInviteLinkParameters(const std::variant<long long, std::string> &ChatIDValue)
+        : ChatID(ChatIDValue) {}
+
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        Object["chat_id"] = JSON::ToJson(ChatID);
+
+        if (CreatesJoinRequest.has_value()) {
+            Object["creates_join_request"] = JSON::ToJson(CreatesJoinRequest.value());
+        }
+
+        if (ExpireDate.has_value()) {
+            Object["expire_date"] = JSON::ToJson(ExpireDate.value());
+        }
+
+        if (MemberLimit.has_value()) {
+            Object["member_limit"] = JSON::ToJson(MemberLimit.value());
+        }
+
+        if (Name.has_value()) {
+            Object["name"] = JSON::ToJson(Name.value());
+        }
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return JSON::RequiresMultipart(ChatID) || (CreatesJoinRequest.has_value() && JSON::RequiresMultipart(CreatesJoinRequest.value())) || (ExpireDate.has_value() && JSON::RequiresMultipart(ExpireDate.value())) || (MemberLimit.has_value() && JSON::RequiresMultipart(MemberLimit.value())) || (Name.has_value() && JSON::RequiresMultipart(Name.value()));
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        JSON::AddMultipartField(
+            Form, "chat_id",
+            ChatID);
+
+        if (CreatesJoinRequest.has_value()) {
+            JSON::AddMultipartField(
+                Form, "creates_join_request",
+                CreatesJoinRequest.value());
+        }
+
+        if (ExpireDate.has_value()) {
+            JSON::AddMultipartField(
+                Form, "expire_date",
+                ExpireDate.value());
+        }
+
+        if (MemberLimit.has_value()) {
+            JSON::AddMultipartField(
+                Form, "member_limit",
+                MemberLimit.value());
+        }
+
+        if (Name.has_value()) {
+            JSON::AddMultipartField(
+                Form, "name",
+                Name.value());
+        }
+
+        return Form;
+    }
+
+};
 
 class createChatInviteLink {
-    public:
-        struct Parameters {
-            // Unique identifier for the target chat or username of the target channel in the format @username
-            std::variant<long long, std::string> ChatID;
+public:
+    using Parameters = createChatInviteLinkParameters;
+    using ReturnType = ::TelegramBotAPI::Type::ChatInviteLink;
 
-            // True, if users joining the chat via the link need to be approved by chat administrators. If True, member_limit can't be specified.
-            std::optional<bool> CreatesJoinRequest{};
+    static constexpr const char *Name() noexcept {
+        return "createChatInviteLink";
+    }
 
-            // Point in time (Unix timestamp) when the link will expire
-            std::optional<long long> ExpireDate{};
+    explicit createChatInviteLink(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-            // The maximum number of users that can be members of the chat simultaneously after joining the chat via this invite link; 1-99999
-            std::optional<long long> MemberLimit{};
-
-            // Invite link name; 0-32 characters
-            std::optional<std::string> Name{};
-
-            Parameters(const std::variant<long long, std::string> &ChatIDValue)
-                : ChatID(ChatIDValue) {}
-
-            JSON::Object ToJson() const {
-                JSON::Object Object;
-
-                Object["chat_id"] = JSON::ToJson(ChatID);
-
-                if (CreatesJoinRequest.has_value()) {
-                    Object["creates_join_request"] = JSON::ToJson(CreatesJoinRequest.value());
-                }
-
-                if (ExpireDate.has_value()) {
-                    Object["expire_date"] = JSON::ToJson(ExpireDate.value());
-                }
-
-                if (MemberLimit.has_value()) {
-                    Object["member_limit"] = JSON::ToJson(MemberLimit.value());
-                }
-
-                if (Name.has_value()) {
-                    Object["name"] = JSON::ToJson(Name.value());
-                }
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return JSON::RequiresMultipart(ChatID) || (CreatesJoinRequest.has_value() && JSON::RequiresMultipart(CreatesJoinRequest.value())) || (ExpireDate.has_value() && JSON::RequiresMultipart(ExpireDate.value())) || (MemberLimit.has_value() && JSON::RequiresMultipart(MemberLimit.value())) || (Name.has_value() && JSON::RequiresMultipart(Name.value()));
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                JSON::AddMultipartField(
-                    Form, "chat_id",
-                    ChatID);
-
-                if (CreatesJoinRequest.has_value()) {
-                    JSON::AddMultipartField(
-                        Form, "creates_join_request",
-                        CreatesJoinRequest.value());
-                }
-
-                if (ExpireDate.has_value()) {
-                    JSON::AddMultipartField(
-                        Form, "expire_date",
-                        ExpireDate.value());
-                }
-
-                if (MemberLimit.has_value()) {
-                    JSON::AddMultipartField(
-                        Form, "member_limit",
-                        MemberLimit.value());
-                }
-
-                if (Name.has_value()) {
-                    JSON::AddMultipartField(
-                        Form, "name",
-                        Name.value());
-                }
-
-                return Form;
-            }
-
-        };
-
-        explicit createChatInviteLink(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        ::TelegramBotAPI::Type::ChatInviteLink CreateChatInviteLink(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<::TelegramBotAPI::Type::ChatInviteLink>("createChatInviteLink",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<::TelegramBotAPI::Type::ChatInviteLink>("createChatInviteLink",
-                                      ParametersValue.ToJson());
-        }
-
-        ::TelegramBotAPI::Type::ChatInviteLink CreateChatInviteLink(std::variant<long long, std::string> ChatID) {
-            Parameters ParametersValue(
-                ChatID
+    ::TelegramBotAPI::Type::ChatInviteLink CreateChatInviteLink(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<::TelegramBotAPI::Type::ChatInviteLink>(
+                "createChatInviteLink",
+                ParametersValue.ToMultipart()
             );
-
-            return CreateChatInviteLink(ParametersValue);
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<::TelegramBotAPI::Type::ChatInviteLink>(
+            "createChatInviteLink",
+            ParametersValue.ToJson()
+        );
+    }
+
+    ::TelegramBotAPI::Type::ChatInviteLink CreateChatInviteLink(std::variant<long long, std::string> ChatID) {
+        Parameters ParametersValue(
+        ChatID
+        );
+
+        return CreateChatInviteLink(ParametersValue);
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

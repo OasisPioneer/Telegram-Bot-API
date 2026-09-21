@@ -11,65 +11,80 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Use this method to get the access settings of a managed bot. Returns a BotAccessSettings object on success.
+    // Use this method to get the access settings of a managed bot. Returns a BotAccessSettings object on success.
+
+struct getManagedBotAccessSettingsParameters {
+    // User identifier of the managed bot whose access settings will be returned
+    long long UserID;
+
+    getManagedBotAccessSettingsParameters(const long long &UserIDValue)
+        : UserID(UserIDValue) {}
+
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        Object["user_id"] = JSON::ToJson(UserID);
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return JSON::RequiresMultipart(UserID);
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        JSON::AddMultipartField(
+            Form, "user_id",
+            UserID);
+
+        return Form;
+    }
+
+};
 
 class getManagedBotAccessSettings {
-    public:
-        struct Parameters {
-            // User identifier of the managed bot whose access settings will be returned
-            long long UserID;
+public:
+    using Parameters = getManagedBotAccessSettingsParameters;
+    using ReturnType = ::TelegramBotAPI::Type::BotAccessSettings;
 
-            Parameters(const long long &UserIDValue)
-                : UserID(UserIDValue) {}
+    static constexpr const char *Name() noexcept {
+        return "getManagedBotAccessSettings";
+    }
 
-            JSON::Object ToJson() const {
-                JSON::Object Object;
+    explicit getManagedBotAccessSettings(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-                Object["user_id"] = JSON::ToJson(UserID);
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return JSON::RequiresMultipart(UserID);
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                JSON::AddMultipartField(
-                    Form, "user_id",
-                    UserID);
-
-                return Form;
-            }
-
-        };
-
-        explicit getManagedBotAccessSettings(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        ::TelegramBotAPI::Type::BotAccessSettings GetManagedBotAccessSettings(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<::TelegramBotAPI::Type::BotAccessSettings>("getManagedBotAccessSettings",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<::TelegramBotAPI::Type::BotAccessSettings>("getManagedBotAccessSettings",
-                                      ParametersValue.ToJson());
-        }
-
-        ::TelegramBotAPI::Type::BotAccessSettings GetManagedBotAccessSettings(long long UserID) {
-            Parameters ParametersValue(
-                UserID
+    ::TelegramBotAPI::Type::BotAccessSettings GetManagedBotAccessSettings(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<::TelegramBotAPI::Type::BotAccessSettings>(
+                "getManagedBotAccessSettings",
+                ParametersValue.ToMultipart()
             );
-
-            return GetManagedBotAccessSettings(ParametersValue);
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<::TelegramBotAPI::Type::BotAccessSettings>(
+            "getManagedBotAccessSettings",
+            ParametersValue.ToJson()
+        );
+    }
+
+    ::TelegramBotAPI::Type::BotAccessSettings GetManagedBotAccessSettings(long long UserID) {
+        Parameters ParametersValue(
+        UserID
+        );
+
+        return GetManagedBotAccessSettings(ParametersValue);
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

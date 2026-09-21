@@ -11,65 +11,80 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Use this method to hide the 'General' topic in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights. The topic will be automatically closed if it was open. Returns True on success.
+    // Use this method to hide the 'General' topic in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights. The topic will be automatically closed if it was open. Returns True on success.
+
+struct hideGeneralForumTopicParameters {
+    // Unique identifier for the target chat or username of the target supergroup in the format @username
+    std::variant<long long, std::string> ChatID;
+
+    hideGeneralForumTopicParameters(const std::variant<long long, std::string> &ChatIDValue)
+        : ChatID(ChatIDValue) {}
+
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        Object["chat_id"] = JSON::ToJson(ChatID);
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return JSON::RequiresMultipart(ChatID);
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        JSON::AddMultipartField(
+            Form, "chat_id",
+            ChatID);
+
+        return Form;
+    }
+
+};
 
 class hideGeneralForumTopic {
-    public:
-        struct Parameters {
-            // Unique identifier for the target chat or username of the target supergroup in the format @username
-            std::variant<long long, std::string> ChatID;
+public:
+    using Parameters = hideGeneralForumTopicParameters;
+    using ReturnType = bool;
 
-            Parameters(const std::variant<long long, std::string> &ChatIDValue)
-                : ChatID(ChatIDValue) {}
+    static constexpr const char *Name() noexcept {
+        return "hideGeneralForumTopic";
+    }
 
-            JSON::Object ToJson() const {
-                JSON::Object Object;
+    explicit hideGeneralForumTopic(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-                Object["chat_id"] = JSON::ToJson(ChatID);
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return JSON::RequiresMultipart(ChatID);
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                JSON::AddMultipartField(
-                    Form, "chat_id",
-                    ChatID);
-
-                return Form;
-            }
-
-        };
-
-        explicit hideGeneralForumTopic(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        bool HideGeneralForumTopic(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<bool>("hideGeneralForumTopic",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<bool>("hideGeneralForumTopic",
-                                      ParametersValue.ToJson());
-        }
-
-        bool HideGeneralForumTopic(std::variant<long long, std::string> ChatID) {
-            Parameters ParametersValue(
-                ChatID
+    bool HideGeneralForumTopic(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<bool>(
+                "hideGeneralForumTopic",
+                ParametersValue.ToMultipart()
             );
-
-            return HideGeneralForumTopic(ParametersValue);
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<bool>(
+            "hideGeneralForumTopic",
+            ParametersValue.ToJson()
+        );
+    }
+
+    bool HideGeneralForumTopic(std::variant<long long, std::string> ChatID) {
+        Parameters ParametersValue(
+        ChatID
+        );
+
+        return HideGeneralForumTopic(ParametersValue);
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

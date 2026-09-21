@@ -11,75 +11,90 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Use this method to change the list of emoji assigned to a regular or custom emoji sticker. The sticker must belong to a sticker set created by the bot. Returns True on success.
+    // Use this method to change the list of emoji assigned to a regular or custom emoji sticker. The sticker must belong to a sticker set created by the bot. Returns True on success.
+
+struct setStickerEmojiListParameters {
+    // A JSON-serialized list of 1-20 emoji associated with the sticker
+    std::vector<std::string> EmojiList;
+
+    // File identifier of the sticker
+    std::string Sticker;
+
+    setStickerEmojiListParameters(const std::vector<std::string> &EmojiListValue, const std::string &StickerValue)
+        : EmojiList(EmojiListValue), Sticker(StickerValue) {}
+
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        Object["emoji_list"] = JSON::ToJson(EmojiList);
+
+        Object["sticker"] = JSON::ToJson(Sticker);
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return JSON::RequiresMultipart(EmojiList) || JSON::RequiresMultipart(Sticker);
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        JSON::AddMultipartField(
+            Form, "emoji_list",
+            EmojiList);
+
+        JSON::AddMultipartField(
+            Form, "sticker",
+            Sticker);
+
+        return Form;
+    }
+
+};
 
 class setStickerEmojiList {
-    public:
-        struct Parameters {
-            // A JSON-serialized list of 1-20 emoji associated with the sticker
-            std::vector<std::string> EmojiList;
+public:
+    using Parameters = setStickerEmojiListParameters;
+    using ReturnType = bool;
 
-            // File identifier of the sticker
-            std::string Sticker;
+    static constexpr const char *Name() noexcept {
+        return "setStickerEmojiList";
+    }
 
-            Parameters(const std::vector<std::string> &EmojiListValue, const std::string &StickerValue)
-                : EmojiList(EmojiListValue), Sticker(StickerValue) {}
+    explicit setStickerEmojiList(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-            JSON::Object ToJson() const {
-                JSON::Object Object;
-
-                Object["emoji_list"] = JSON::ToJson(EmojiList);
-
-                Object["sticker"] = JSON::ToJson(Sticker);
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return JSON::RequiresMultipart(EmojiList) || JSON::RequiresMultipart(Sticker);
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                JSON::AddMultipartField(
-                    Form, "emoji_list",
-                    EmojiList);
-
-                JSON::AddMultipartField(
-                    Form, "sticker",
-                    Sticker);
-
-                return Form;
-            }
-
-        };
-
-        explicit setStickerEmojiList(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        bool SetStickerEmojiList(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<bool>("setStickerEmojiList",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<bool>("setStickerEmojiList",
-                                      ParametersValue.ToJson());
-        }
-
-        bool SetStickerEmojiList(std::vector<std::string> EmojiList, std::string Sticker) {
-            Parameters ParametersValue(
-                EmojiList,
-                Sticker
+    bool SetStickerEmojiList(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<bool>(
+                "setStickerEmojiList",
+                ParametersValue.ToMultipart()
             );
-
-            return SetStickerEmojiList(ParametersValue);
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<bool>(
+            "setStickerEmojiList",
+            ParametersValue.ToJson()
+        );
+    }
+
+    bool SetStickerEmojiList(std::vector<std::string> EmojiList, std::string Sticker) {
+        Parameters ParametersValue(
+        EmojiList,
+        Sticker
+        );
+
+        return SetStickerEmojiList(ParametersValue);
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

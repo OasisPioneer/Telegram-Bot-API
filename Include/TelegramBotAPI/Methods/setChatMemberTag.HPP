@@ -11,88 +11,103 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Use this method to set a tag for a regular member in a group or a supergroup. The bot must be an administrator in the chat for this to work and must have the can_manage_tags administrator right. Returns True on success.
+    // Use this method to set a tag for a regular member in a group or a supergroup. The bot must be an administrator in the chat for this to work and must have the can_manage_tags administrator right. Returns True on success.
+
+struct setChatMemberTagParameters {
+    // Unique identifier for the target chat or username of the target supergroup in the format @username
+    std::variant<long long, std::string> ChatID;
+
+    // New tag for the member; 0-16 characters, emoji are not allowed
+    std::optional<std::string> Tag{};
+
+    // Unique identifier of the target user
+    long long UserID;
+
+    setChatMemberTagParameters(const std::variant<long long, std::string> &ChatIDValue, const long long &UserIDValue)
+        : ChatID(ChatIDValue), UserID(UserIDValue) {}
+
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        Object["chat_id"] = JSON::ToJson(ChatID);
+
+        if (Tag.has_value()) {
+            Object["tag"] = JSON::ToJson(Tag.value());
+        }
+
+        Object["user_id"] = JSON::ToJson(UserID);
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return JSON::RequiresMultipart(ChatID) || (Tag.has_value() && JSON::RequiresMultipart(Tag.value())) || JSON::RequiresMultipart(UserID);
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        JSON::AddMultipartField(
+            Form, "chat_id",
+            ChatID);
+
+        if (Tag.has_value()) {
+            JSON::AddMultipartField(
+                Form, "tag",
+                Tag.value());
+        }
+
+        JSON::AddMultipartField(
+            Form, "user_id",
+            UserID);
+
+        return Form;
+    }
+
+};
 
 class setChatMemberTag {
-    public:
-        struct Parameters {
-            // Unique identifier for the target chat or username of the target supergroup in the format @username
-            std::variant<long long, std::string> ChatID;
+public:
+    using Parameters = setChatMemberTagParameters;
+    using ReturnType = bool;
 
-            // New tag for the member; 0-16 characters, emoji are not allowed
-            std::optional<std::string> Tag{};
+    static constexpr const char *Name() noexcept {
+        return "setChatMemberTag";
+    }
 
-            // Unique identifier of the target user
-            long long UserID;
+    explicit setChatMemberTag(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-            Parameters(const std::variant<long long, std::string> &ChatIDValue, const long long &UserIDValue)
-                : ChatID(ChatIDValue), UserID(UserIDValue) {}
-
-            JSON::Object ToJson() const {
-                JSON::Object Object;
-
-                Object["chat_id"] = JSON::ToJson(ChatID);
-
-                if (Tag.has_value()) {
-                    Object["tag"] = JSON::ToJson(Tag.value());
-                }
-
-                Object["user_id"] = JSON::ToJson(UserID);
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return JSON::RequiresMultipart(ChatID) || (Tag.has_value() && JSON::RequiresMultipart(Tag.value())) || JSON::RequiresMultipart(UserID);
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                JSON::AddMultipartField(
-                    Form, "chat_id",
-                    ChatID);
-
-                if (Tag.has_value()) {
-                    JSON::AddMultipartField(
-                        Form, "tag",
-                        Tag.value());
-                }
-
-                JSON::AddMultipartField(
-                    Form, "user_id",
-                    UserID);
-
-                return Form;
-            }
-
-        };
-
-        explicit setChatMemberTag(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        bool SetChatMemberTag(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<bool>("setChatMemberTag",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<bool>("setChatMemberTag",
-                                      ParametersValue.ToJson());
-        }
-
-        bool SetChatMemberTag(std::variant<long long, std::string> ChatID, long long UserID) {
-            Parameters ParametersValue(
-                ChatID,
-                UserID
+    bool SetChatMemberTag(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<bool>(
+                "setChatMemberTag",
+                ParametersValue.ToMultipart()
             );
-
-            return SetChatMemberTag(ParametersValue);
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<bool>(
+            "setChatMemberTag",
+            ParametersValue.ToJson()
+        );
+    }
+
+    bool SetChatMemberTag(std::variant<long long, std::string> ChatID, long long UserID) {
+        Parameters ParametersValue(
+        ChatID,
+        UserID
+        );
+
+        return SetChatMemberTag(ParametersValue);
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods

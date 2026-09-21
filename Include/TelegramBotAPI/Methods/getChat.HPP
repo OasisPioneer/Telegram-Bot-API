@@ -12,65 +12,80 @@
 
 namespace TelegramBotAPI::Methods {
 
-        // Use this method to get up-to-date information about the chat. Returns a ChatFullInfo object on success.
+    // Use this method to get up-to-date information about the chat. Returns a ChatFullInfo object on success.
+
+struct getChatParameters {
+    // Unique identifier for the target chat or username of the target supergroup or channel in the format @username
+    std::variant<long long, std::string> ChatID;
+
+    getChatParameters(const std::variant<long long, std::string> &ChatIDValue)
+        : ChatID(ChatIDValue) {}
+
+    JSON::Object ToJson() const {
+        JSON::Object Object;
+
+        Object["chat_id"] = JSON::ToJson(ChatID);
+
+        return Object;
+    }
+
+    bool RequiresMultipart() const {
+        return JSON::RequiresMultipart(ChatID);
+    }
+
+    ::TelegramBotAPI::Network::Multipart::MultipartForm
+    ToMultipart() const {
+        ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
+
+        JSON::AddMultipartField(
+            Form, "chat_id",
+            ChatID);
+
+        return Form;
+    }
+
+};
 
 class getChat {
-    public:
-        struct Parameters {
-            // Unique identifier for the target chat or username of the target supergroup or channel in the format @username
-            std::variant<long long, std::string> ChatID;
+public:
+    using Parameters = getChatParameters;
+    using ReturnType = ::TelegramBotAPI::Type::ChatFullInfo;
 
-            Parameters(const std::variant<long long, std::string> &ChatIDValue)
-                : ChatID(ChatIDValue) {}
+    static constexpr const char *Name() noexcept {
+        return "getChat";
+    }
 
-            JSON::Object ToJson() const {
-                JSON::Object Object;
+    explicit getChat(
+        TelegramClient &ClientValue
+    )
+        : Client(ClientValue) {}
 
-                Object["chat_id"] = JSON::ToJson(ChatID);
-
-                return Object;
-            }
-
-            bool RequiresMultipart() const {
-                return JSON::RequiresMultipart(ChatID);
-            }
-
-            ::TelegramBotAPI::Network::Multipart::MultipartForm
-            ToMultipart() const {
-                ::TelegramBotAPI::Network::Multipart::MultipartForm Form;
-
-                JSON::AddMultipartField(
-                    Form, "chat_id",
-                    ChatID);
-
-                return Form;
-            }
-
-        };
-
-        explicit getChat(TelegramClient &ClientValue)
-            : Client(ClientValue) {}
-
-        ::TelegramBotAPI::Type::ChatFullInfo GetChat(const Parameters &ParametersValue) {
-            if (ParametersValue.RequiresMultipart()) {
-                return Client.CallMultipart<::TelegramBotAPI::Type::ChatFullInfo>("getChat",
-                                                   ParametersValue.ToMultipart());
-            }
-
-            return Client.Call<::TelegramBotAPI::Type::ChatFullInfo>("getChat",
-                                      ParametersValue.ToJson());
-        }
-
-        ::TelegramBotAPI::Type::ChatFullInfo GetChat(std::variant<long long, std::string> ChatID) {
-            Parameters ParametersValue(
-                ChatID
+    ::TelegramBotAPI::Type::ChatFullInfo GetChat(
+        const Parameters &ParametersValue
+    ) {
+        if (ParametersValue.RequiresMultipart()) {
+            return Client.CallMultipart<::TelegramBotAPI::Type::ChatFullInfo>(
+                "getChat",
+                ParametersValue.ToMultipart()
             );
-
-            return GetChat(ParametersValue);
         }
 
-    private:
-        TelegramClient &Client;
+        return Client.Call<::TelegramBotAPI::Type::ChatFullInfo>(
+            "getChat",
+            ParametersValue.ToJson()
+        );
+    }
+
+    ::TelegramBotAPI::Type::ChatFullInfo GetChat(std::variant<long long, std::string> ChatID) {
+        Parameters ParametersValue(
+        ChatID
+        );
+
+        return GetChat(ParametersValue);
+    }
+
+private:
+    TelegramClient &Client;
 };
 
 } // namespace TelegramBotAPI::Methods
