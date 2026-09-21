@@ -19,32 +19,16 @@ class DeserializerGenerator:
     """
     Generate C++ deserialization helpers from TelegramModel.
 
-    Generated architecture:
+    Runtime error model:
 
-        template<class T>
-        struct Deserializer;
+        Detail::DeserializationMismatch
+            The JSON value does not match the current candidate.
 
-        template<class T>
-        T FromJson(const boost::json::value& Value);
+        std::invalid_argument
+            The JSON matched structurally but is invalid or ambiguous.
 
-    Object types are generated as explicit Deserializer<T>
-    specializations.
-
-    Named unions are generated explicitly from UnionResolution
-    instead of relying on Boost.JSON's generic std::variant
-    selection.
-
-    This is important because Telegram polymorphic unions have
-    semantic discriminators such as:
-
-        MessageOrigin       -> type
-        ChatBoostSource     -> source
-
-    and field-value resolution such as:
-
-        MaybeInaccessibleMessage
-            date == 0       -> InaccessibleMessage
-            date > 0        -> Message
+    Only DeserializationMismatch is consumed by anonymous-union
+    candidate probing.
     """
 
     def __init__(
@@ -55,38 +39,22 @@ class DeserializerGenerator:
         self.model = model
         self.context = context
 
+    # ==================================================================
+    # Public
+    # ==================================================================
+
     def generate(self) -> str:
-        includes = self._collect_includes()
-
-        sections: list[str] = []
-
-        sections.append(
-            self._render_preamble(includes)
-        )
-
-        sections.append(
-            self._render_primary_templates()
-        )
-
-        sections.append(
-            self._render_forward_declarations()
-        )
-
-        sections.append(
-            self._render_object_definitions()
-        )
-
-        sections.append(
-            self._render_union_definitions()
-        )
-
-        sections.append(
-            self._render_public_api()
-        )
-
-        sections.append(
-            self._render_epilogue()
-        )
+        sections = [
+            self._render_preamble(
+                self._collect_includes()
+            ),
+            self._render_primary_templates(),
+            self._render_forward_declarations(),
+            self._render_object_definitions(),
+            self._render_union_definitions(),
+            self._render_public_api(),
+            self._render_epilogue(),
+        ]
 
         return "\n".join(
             section
@@ -94,14 +62,14 @@ class DeserializerGenerator:
             if section
         )
 
-    # ------------------------------------------------------------------
+    # ==================================================================
     # Includes
-    # ------------------------------------------------------------------
+    # ==================================================================
 
     def _collect_includes(self) -> list[str]:
         includes: set[str] = {
             "<boost/json.hpp>",
-            "<exception>",
+            "<boost/system/system_error.hpp>",
             "<memory>",
             "<optional>",
             "<stdexcept>",
@@ -110,20 +78,11 @@ class DeserializerGenerator:
             "<vector>",
         }
 
-        # Object / enum / other named type headers.
         for item in self.model.types:
             includes.add(
                 f'"TelegramBotAPI/Types/{item.name}.HPP"'
             )
 
-        # Named union aliases themselves MUST be included.
-        #
-        # A named union is emitted by TypeGenerator as:
-        #
-        #     using MessageOrigin = std::variant<...>;
-        #
-        # The alias declaration is therefore required before
-        # Deserializer<MessageOrigin> is declared.
         for union in self.model.unions:
             includes.add(
                 f'"TelegramBotAPI/Types/{union.name}.HPP"'
@@ -162,7 +121,8 @@ class DeserializerGenerator:
 
             if type_ref.name:
                 result.add(
-                    f'"TelegramBotAPI/Types/{type_ref.name}.HPP"'
+                    f'"TelegramBotAPI/Types/'
+                    f'{type_ref.name}.HPP"'
                 )
 
             return result
@@ -198,9 +158,9 @@ class DeserializerGenerator:
 
         return result
 
-    # ------------------------------------------------------------------
+    # ==================================================================
     # Preamble
-    # ------------------------------------------------------------------
+    # ==================================================================
 
     def _render_preamble(
         self,
@@ -212,10 +172,10 @@ class DeserializerGenerator:
             "",
         ]
 
-        for include in includes:
-            lines.append(
-                f"#include {include}"
-            )
+        lines.extend(
+            f"#include {include}"
+            for include in includes
+        )
 
         lines.extend(
             [
@@ -227,197 +187,293 @@ class DeserializerGenerator:
 
         return "\n".join(lines)
 
-    # ------------------------------------------------------------------
+    # ==================================================================
     # Primary templates
-    # ------------------------------------------------------------------
+    # ==================================================================
 
     def _render_primary_templates(self) -> str:
-        return """\
-template <typename T>
-struct Deserializer;
+        lines = [
+            "namespace Detail {",
+            "",
+            "class DeserializationMismatch : public std::runtime_error",
+            "{",
+            "public:",
+            "    using std::runtime_error::runtime_error;",
+            "};",
+            "",
+            "template <typename T>",
+            "T ConvertValue(const boost::json::value& Value)",
+            "{",
+            "    try",
+            "    {",
+            "        return boost::json::value_to<T>(Value);",
+            "    }",
+            "    catch (const boost::system::system_error& Error)",
+            "    {",
+            "        throw DeserializationMismatch(Error.what());",
+            "    }",
+            "}",
+            "",
+            "inline void RequireObject(",
+            "    const boost::json::value& Value)",
+            "{",
+            "    if (!Value.is_object())",
+            "    {",
+            '        throw DeserializationMismatch("Expected JSON object");',
+            "    }",
+            "}",
+            "",
+            "inline void RequireArray(",
+            "    const boost::json::value& Value)",
+            "{",
+            "    if (!Value.is_array())",
+            "    {",
+            '        throw DeserializationMismatch("Expected JSON array");',
+            "    }",
+            "}",
+            "",
+            "} // namespace Detail",
+            "",
+            "template <typename T>",
+            "struct Deserializer;",
+            "",
+            "template <typename T>",
+            "T FromJson(const boost::json::value& Value)",
+            "{",
+            "    return Deserializer<T>::Deserialize(Value);",
+            "}",
+            "",
+        ]
 
-template <typename T>
-T FromJson(
-    const boost::json::value &Value
-) {
-    return Deserializer<T>::Deserialize(Value);
-}
+        lines.extend(
+            self._render_primitive_deserializers()
+        )
 
-template <typename T>
-T FromJson(
-    const boost::json::value *Value
-) {
-    if (Value == nullptr) {
-        throw std::invalid_argument(
-            "Cannot deserialize from null JSON value pointer"
-        );
-    }
+        lines.extend(
+            self._render_container_deserializers()
+        )
 
-    return FromJson<T>(*Value);
-}
+        return "\n".join(lines)
 
-template <>
-struct Deserializer<bool> {
-    static bool Deserialize(const boost::json::value &Value) {
-        return boost::json::value_to<bool>(Value);
-    }
-};
+    def _render_primitive_deserializers(self) -> list[str]:
+        return [
+            "template <>",
+            "struct Deserializer<long long>",
+            "{",
+            "    static long long Deserialize(",
+            "        const boost::json::value& Value)",
+            "    {",
+            "        if (!Value.is_int64() && !Value.is_uint64())",
+            "        {",
+            '            throw Detail::DeserializationMismatch(',
+            '                "Expected integer"',
+            "            );",
+            "        }",
+            "",
+            "        return Detail::ConvertValue<long long>(Value);",
+            "    }",
+            "};",
+            "",
+            "template <>",
+            "struct Deserializer<double>",
+            "{",
+            "    static double Deserialize(",
+            "        const boost::json::value& Value)",
+            "    {",
+            "        if (!Value.is_number())",
+            "        {",
+            '            throw Detail::DeserializationMismatch(',
+            '                "Expected number"',
+            "            );",
+            "        }",
+            "",
+            "        return Detail::ConvertValue<double>(Value);",
+            "    }",
+            "};",
+            "",
+            "template <>",
+            "struct Deserializer<bool>",
+            "{",
+            "    static bool Deserialize(",
+            "        const boost::json::value& Value)",
+            "    {",
+            "        if (!Value.is_bool())",
+            "        {",
+            '            throw Detail::DeserializationMismatch(',
+            '                "Expected boolean"',
+            "            );",
+            "        }",
+            "",
+            "        return Detail::ConvertValue<bool>(Value);",
+            "    }",
+            "};",
+            "",
+            "template <>",
+            "struct Deserializer<std::string>",
+            "{",
+            "    static std::string Deserialize(",
+            "        const boost::json::value& Value)",
+            "    {",
+            "        if (!Value.is_string())",
+            "        {",
+            '            throw Detail::DeserializationMismatch(',
+            '                "Expected string"',
+            "            );",
+            "        }",
+            "",
+            "        return Detail::ConvertValue<std::string>(Value);",
+            "    }",
+            "};",
+            "",
+        ]
 
-template <>
-struct Deserializer<long long> {
-    static long long Deserialize(const boost::json::value &Value) {
-        return boost::json::value_to<long long>(Value);
-    }
-};
+    def _render_container_deserializers(self) -> list[str]:
+        return [
+            "template <typename T>",
+            "struct Deserializer<std::optional<T>>",
+            "{",
+            "    static std::optional<T> Deserialize(",
+            "        const boost::json::value& Value)",
+            "    {",
+            "        if (Value.is_null())",
+            "        {",
+            "            return std::nullopt;",
+            "        }",
+            "",
+            "        return FromJson<T>(Value);",
+            "    }",
+            "};",
+            "",
+            "template <typename T>",
+            "struct Deserializer<std::shared_ptr<T>>",
+            "{",
+            "    static std::shared_ptr<T> Deserialize(",
+            "        const boost::json::value& Value)",
+            "    {",
+            "        if (Value.is_null())",
+            "        {",
+            "            return nullptr;",
+            "        }",
+            "",
+            "        return std::make_shared<T>(",
+            "            FromJson<T>(Value)",
+            "        );",
+            "    }",
+            "};",
+            "",
+            "template <typename T>",
+            "struct Deserializer<std::vector<T>>",
+            "{",
+            "    static std::vector<T> Deserialize(",
+            "        const boost::json::value& Value)",
+            "    {",
+            "        Detail::RequireArray(Value);",
+            "",
+            "        const auto& Array = Value.as_array();",
+            "",
+            "        std::vector<T> Result;",
+            "        Result.reserve(Array.size());",
+            "",
+            "        for (const auto& Element : Array)",
+            "        {",
+            "            Result.emplace_back(",
+            "                FromJson<T>(Element)",
+            "            );",
+            "        }",
+            "",
+            "        return Result;",
+            "    }",
+            "};",
+            "",
+            "template <typename... Types>",
+            "struct Deserializer<std::variant<Types...>>",
+            "{",
+            "    static std::variant<Types...> Deserialize(",
+            "        const boost::json::value& Value)",
+            "    {",
+            "        return TryAlternatives<Types...>(Value);",
+            "    }",
+            "",
+            "private:",
+            "    template <typename T>",
+            "    static std::variant<Types...> TryAlternative(",
+            "        const boost::json::value& Value)",
+            "    {",
+            "        return std::variant<Types...>(",
+            "            std::in_place_type<T>,",
+            "            FromJson<T>(Value)",
+            "        );",
+            "    }",
+            "",
+            "    template <typename First>",
+            "    static std::variant<Types...> TryAlternatives(",
+            "        const boost::json::value& Value)",
+            "    {",
+            "        return TryAlternative<First>(Value);",
+            "    }",
+            "",
+            "    template <typename First, typename Second, typename... Rest>",
+            "    static std::variant<Types...> TryAlternatives(",
+            "        const boost::json::value& Value)",
+            "    {",
+            "        try",
+            "        {",
+            "            return TryAlternative<First>(Value);",
+            "        }",
+            "        catch (const Detail::DeserializationMismatch&)",
+            "        {",
+            "            return TryAlternatives<Second, Rest...>(Value);",
+            "        }",
+            "    }",
+            "};",
+            "",
+        ]
 
-template <>
-struct Deserializer<double> {
-    static double Deserialize(const boost::json::value &Value) {
-        return boost::json::value_to<double>(Value);
-    }
-};
-
-template <>
-struct Deserializer<std::string> {
-    static std::string Deserialize(const boost::json::value &Value) {
-        return boost::json::value_to<std::string>(Value);
-    }
-};
-
-template <typename T>
-struct Deserializer<std::optional<T>> {
-    static std::optional<T> Deserialize(
-        const boost::json::value &Value
-    ) {
-        if (Value.is_null()) {
-            return std::nullopt;
-        }
-
-        return FromJson<T>(Value);
-    }
-};
-
-template <typename T>
-struct Deserializer<std::vector<T>> {
-    static std::vector<T> Deserialize(
-        const boost::json::value &Value
-    ) {
-        const auto &Array = Value.as_array();
-        std::vector<T> Result;
-        Result.reserve(Array.size());
-
-        for (const auto &Element : Array) {
-            Result.push_back(FromJson<T>(Element));
-        }
-
-        return Result;
-    }
-};
-
-template <typename... Types>
-struct Deserializer<std::variant<Types...>> {
-    static std::variant<Types...> Deserialize(
-        const boost::json::value &Value
-    ) {
-        return TryDeserialize<Types...>(Value);
-    }
-
-private:
-    template <typename First>
-    static std::variant<Types...> TryDeserialize(
-        const boost::json::value &Value
-    ) {
-        return FromJson<First>(Value);
-    }
-
-    template <typename First, typename Second, typename... Rest>
-    static std::variant<Types...> TryDeserialize(
-        const boost::json::value &Value
-    ) {
-        try {
-            return FromJson<First>(Value);
-        } catch (...) {
-            return TryDeserialize<Second, Rest...>(Value);
-        }
-    }
-};
-
-template <typename T>
-struct Deserializer<std::shared_ptr<T>> {
-    static std::shared_ptr<T> Deserialize(
-        const boost::json::value &Value
-    ) {
-        return std::make_shared<T>(FromJson<T>(Value));
-    }
-};
-"""
-
-    # ------------------------------------------------------------------
-    # Explicit specialization declarations
-    # ------------------------------------------------------------------
+    # ==================================================================
+    # Forward declarations
+    # ==================================================================
 
     def _render_forward_declarations(self) -> str:
         lines: list[str] = []
 
-        lines.append(
-            "/* Deserializer specializations */"
-        )
-        lines.append("")
-
         for item in self.model.types:
-            if item.kind != TypeKind.OBJECT or item.name == "InputFile":
+            if item.kind != TypeKind.OBJECT:
                 continue
 
-            qualified = (
-                f"{TYPE_NAMESPACE}::{item.name}"
+            lines.extend(
+                [
+                    "template <>",
+                    f"struct Deserializer<{self._qualified(item.name)}>;",
+                    "",
+                ]
             )
-
-            lines.append("template <>")
-            lines.append(
-                f"struct Deserializer<{qualified}> {{"
-            )
-            lines.append(
-                f"    static {qualified} Deserialize("
-            )
-            lines.append(
-                "        const boost::json::value &Value"
-            )
-            lines.append("    );")
-            lines.append("};")
-            lines.append("")
 
         for union in self.model.unions:
-            qualified = (
-                f"{TYPE_NAMESPACE}::{union.name}"
+            lines.extend(
+                [
+                    "template <>",
+                    (
+                        f"struct Deserializer<"
+                        f"{self._qualified(union.name)}>;"
+                    ),
+                    "",
+                ]
             )
-
-            lines.append("template <>")
-            lines.append(
-                f"struct Deserializer<{qualified}> {{"
-            )
-            lines.append(
-                f"    static {qualified} Deserialize("
-            )
-            lines.append(
-                "        const boost::json::value &Value"
-            )
-            lines.append("    );")
-            lines.append("};")
-            lines.append("")
 
         return "\n".join(lines)
 
-    # ------------------------------------------------------------------
-    # Object deserializers
-    # ------------------------------------------------------------------
+    # ==================================================================
+    # Objects
+    # ==================================================================
 
     def _render_object_definitions(self) -> str:
-        sections: list[str] = [
-            "/* Object deserializers */"
-        ]
+        sections: list[str] = []
 
         for item in self.model.types:
-            if item.kind != TypeKind.OBJECT or item.name == "InputFile":
+            if item.kind != TypeKind.OBJECT:
+                continue
+
+            if item.name == "InputFile":
                 continue
 
             sections.append(
@@ -430,93 +486,86 @@ struct Deserializer<std::shared_ptr<T>> {
         self,
         item: TelegramType,
     ) -> str:
-        qualified = (
-            f"{TYPE_NAMESPACE}::{item.name}"
-        )
+        cpp_type = self._qualified(item.name)
 
-        lines: list[str] = []
-
-        lines.append(
-            f"inline {qualified} "
-            f"Deserializer<{qualified}>::Deserialize("
-        )
-        lines.append(
-            "    const boost::json::value &Value"
-        )
-        lines.append(") {")
-
-        lines.append(
-            "    const auto &ObjectValue = Value.as_object();"
-        )
-        lines.append("")
-
-        lines.append(
-            f"    {qualified} Result{{}};"
-        )
-        lines.append("")
+        lines = [
+            "template <>",
+            f"struct Deserializer<{cpp_type}>",
+            "{",
+            f"    static {cpp_type} Deserialize(",
+            "        const boost::json::value& Value)",
+            "    {",
+            "        Detail::RequireObject(Value);",
+            "",
+            "        const auto& ObjectValue = Value.as_object();",
+            "",
+            f"        {cpp_type} Result{{}};",
+            "",
+        ]
 
         for field in item.fields:
             lines.extend(
-                self._render_field_assignment(
+                self._render_object_field(
                     field,
-                    owner=item.name,
+                    item.name,
                 )
             )
 
-        lines.append("")
-        lines.append("    return Result;")
-        lines.append("}")
+        lines.extend(
+            [
+                "",
+                "        return Result;",
+                "    }",
+                "};",
+            ]
+        )
 
         return "\n".join(lines)
 
-    def _render_field_assignment(
+    def _render_object_field(
         self,
         field,
         owner: str,
     ) -> list[str]:
-        json_name = field.name
-        cpp_name = field.cpp_name
+        field_name = field.name
+        cpp_field_name = field.cpp_name
 
-        lines: list[str] = []
+        expression = self._deserialize_expression(
+            field.type,
+            "*FieldValue",
+            owner,
+        )
+
+        lines = [
+            (
+                f'        if (const auto* FieldValue = '
+                f'ObjectValue.if_contains("{field_name}"))'
+            ),
+            "        {",
+            f"            Result.{cpp_field_name} =",
+            f"                {expression};",
+            "        }",
+        ]
 
         if field.required:
-            expression = (
-                self._deserialize_expression(
-                    field.type,
-                    f'ObjectValue.at("{json_name}")',
-                    owner=owner,
-                )
+            lines.extend(
+                [
+                    "        else",
+                    "        {",
+                    "            throw "
+                    "Detail::DeserializationMismatch(",
+                    f'                "Missing required field: '
+                    f'{field_name}"',
+                    "            );",
+                    "        }",
+                ]
             )
-
-            lines.append(
-                f"    Result.{cpp_name} = {expression};"
-            )
-
-            return lines
-
-        lines.append(
-            f'    if (ObjectValue.if_contains("{json_name}")) {{'
-        )
-
-        expression = (
-            self._deserialize_expression(
-                field.type,
-                f'ObjectValue.at("{json_name}")',
-                owner=owner,
-            )
-        )
-
-        lines.append(
-            f"        Result.{cpp_name} = {expression};"
-        )
-
-        lines.append("    }")
 
         return lines
 
-    # ------------------------------------------------------------------
-    # Generic deserialization expressions
-    # ------------------------------------------------------------------
+    # ==================================================================
+    # Expressions
+    # ==================================================================
 
     def _deserialize_expression(
         self,
@@ -526,26 +575,22 @@ struct Deserializer<std::shared_ptr<T>> {
     ) -> str:
         if type_ref.is_integer():
             return (
-                "boost::json::value_to<long long>"
-                f"({expression})"
-            )
-
-        if type_ref.is_string():
-            return (
-                "boost::json::value_to<std::string>"
-                f"({expression})"
-            )
-
-        if type_ref.is_boolean():
-            return (
-                "boost::json::value_to<bool>"
-                f"({expression})"
+                f"FromJson<long long>({expression})"
             )
 
         if type_ref.is_float():
             return (
-                "boost::json::value_to<double>"
-                f"({expression})"
+                f"FromJson<double>({expression})"
+            )
+
+        if type_ref.is_boolean():
+            return (
+                f"FromJson<bool>({expression})"
+            )
+
+        if type_ref.is_string():
+            return (
+                f"FromJson<std::string>({expression})"
             )
 
         if type_ref.is_unknown():
@@ -572,11 +617,9 @@ struct Deserializer<std::shared_ptr<T>> {
                 owner,
             )
 
-        return expression
-
-    # ------------------------------------------------------------------
-    # Object deserialization
-    # ------------------------------------------------------------------
+        raise ValueError(
+            f"Unsupported TypeRef: {type_ref!r}"
+        )
 
     def _deserialize_object_expression(
         self,
@@ -584,13 +627,9 @@ struct Deserializer<std::shared_ptr<T>> {
         expression: str,
         owner: str | None,
     ) -> str:
-        if not type_ref.name:
-            return expression
-
         if type_ref.name == "InputFile":
             raise ValueError(
-                "InputFile is an input-only transport type and "
-                "cannot be deserialized from Telegram API JSON"
+                "InputFile cannot be deserialized from JSON"
             )
 
         cpp_type = self.context.type_to_cpp(
@@ -598,14 +637,27 @@ struct Deserializer<std::shared_ptr<T>> {
             owner=owner,
         ).type
 
-        return (
-            f"FromJson<{cpp_type}>"
-            f"({expression})"
-        )
+        if (
+            type_ref.name
+            and owner is not None
+            and self.context.graph.requires_shared_ptr(
+                owner,
+                type_ref.name,
+            )
+        ):
+            qualified_type = self._qualified(
+                type_ref.name
+            )
 
-    # ------------------------------------------------------------------
-    # Array deserialization
-    # ------------------------------------------------------------------
+            return (
+                f"std::make_shared<{qualified_type}>("
+                f"FromJson<{qualified_type}>({expression})"
+                ")"
+            )
+
+        return (
+            f"FromJson<{cpp_type}>({expression})"
+        )
 
     def _deserialize_array_expression(
         self,
@@ -614,75 +666,19 @@ struct Deserializer<std::shared_ptr<T>> {
         owner: str | None,
     ) -> str:
         if type_ref.element is None:
-            return (
-                "boost::json::value_to"
-                "<std::vector<boost::json::value>>"
-                f"({expression})"
+            raise ValueError(
+                "Array TypeRef has no element type"
             )
 
-        element = type_ref.element
-
-        if (
-            element.is_integer()
-            or element.is_string()
-            or element.is_boolean()
-            or element.is_float()
-        ):
-            element_cpp = (
-                self.context.type_to_cpp(
-                    element,
-                    owner=owner,
-                ).type
-            )
-
-            return (
-                f"boost::json::value_to"
-                f"<std::vector<{element_cpp}>>"
-                f"({expression})"
-            )
-
-        return self._manual_vector_expression(
-            element,
-            expression,
-            owner,
-        )
-
-    def _manual_vector_expression(
-        self,
-        element: TypeRef,
-        expression: str,
-        owner: str | None,
-    ) -> str:
-        element_cpp = (
-            self.context.type_to_cpp(
-                element,
-                owner=owner,
-            ).type
-        )
-
-        element_expression = (
-            self._deserialize_expression(
-                element,
-                "Item",
-                owner,
-            )
-        )
+        element_cpp = self.context.type_to_cpp(
+            type_ref.element,
+            owner=owner,
+        ).type
 
         return (
-            "([&]() { "
-            f"std::vector<{element_cpp}> Result; "
-            f"for (const auto &Item : "
-            f"{expression}.as_array()) "
-            "{ "
-            f"Result.push_back({element_expression}); "
-            "} "
-            "return Result; "
-            "})()"
+            f"FromJson<std::vector<{element_cpp}>>"
+            f"({expression})"
         )
-
-    # ------------------------------------------------------------------
-    # Union deserialization
-    # ------------------------------------------------------------------
 
     def _deserialize_union_expression(
         self,
@@ -694,174 +690,139 @@ struct Deserializer<std::shared_ptr<T>> {
             type_ref.union_info is not None
             and type_ref.union_info.name
         ):
-            union_name = (
+            union_cpp = self._qualified(
                 type_ref.union_info.name
             )
 
-            qualified = (
-                f"{TYPE_NAMESPACE}::{union_name}"
-            )
-
             return (
-                f"FromJson<{qualified}>"
-                f"({expression})"
+                f"FromJson<{union_cpp}>({expression})"
             )
 
-        if not type_ref.alternatives:
-            return expression
-
-        return self._manual_inline_union_expression(
+        return self._render_inline_union_expression(
             type_ref,
             expression,
             owner,
         )
 
-    def _manual_inline_union_expression(
+    # ==================================================================
+    # Inline union
+    # ==================================================================
+
+    def _render_inline_union_expression(
         self,
         type_ref: TypeRef,
         expression: str,
         owner: str | None,
     ) -> str:
-        alternatives = [
-            alternative
-            for alternative in type_ref.alternatives
-            if alternative is not None
-        ]
+        alternatives = type_ref.alternatives
 
         if not alternatives:
-            return expression
+            raise ValueError(
+                "Inline union contains no alternatives"
+            )
 
-        return self._render_try_union(
-            alternatives,
-            expression,
-            owner,
-        )
-
-    def _render_try_union(
-        self,
-        alternatives,
-        expression: str,
-        owner: str | None,
-    ) -> str:
-        first = alternatives[0]
-
-        first_expression = (
-            self._deserialize_expression(
-                first,
+        if len(alternatives) == 1:
+            return self._deserialize_expression(
+                alternatives[0],
                 expression,
                 owner,
             )
-        )
-
-        if len(alternatives) == 1:
-            return first_expression
 
         variant_type = self._variant_cpp_type(
             alternatives,
             owner,
         )
 
-        attempts = self._render_union_attempts(
-            alternatives[1:],
+        branches = self._render_inline_union_branches(
+            alternatives,
+            variant_type,
             expression,
             owner,
         )
 
         return (
             "([&]() -> "
-            f"{variant_type} "
-            "{ "
-            "std::exception_ptr LastError; "
-            f"try {{ return {first_expression}; }} "
-            "catch (...) { "
-            "LastError = std::current_exception(); "
-            "} "
-            f"{attempts} "
-            "if (LastError) { "
-            "std::rethrow_exception(LastError); "
-            "} "
-            'throw std::invalid_argument('
-            '"Unable to deserialize inline union"'
-            "); "
-            "})()"
+            f"{variant_type}"
+            "\n"
+            "        {\n"
+            f"{branches}\n"
+            "        })()"
         )
 
-    def _render_union_attempts(
+    def _render_inline_union_branches(
         self,
-        alternatives,
+        alternatives: list[TypeRef],
+        variant_type: str,
         expression: str,
         owner: str | None,
     ) -> str:
-        if not alternatives:
-            return ""
-
-        alternative = alternatives[0]
-
-        alternative_expression = (
-            self._deserialize_expression(
-                alternative,
-                expression,
-                owner,
-            )
-        )
-
-        remaining = self._render_union_attempts(
-            alternatives[1:],
-            expression,
-            owner,
-        )
-
-        return (
-            f"try {{ return {alternative_expression}; }} "
-            "catch (...) { "
-            f"{remaining}"
-            "} "
-        )
-
-    def _variant_cpp_type(
-        self,
-        alternatives,
-        owner: str | None,
-    ) -> str:
-        cpp_types: list[str] = []
+        lines: list[str] = []
 
         for alternative in alternatives:
-            cpp_type = (
-                self.context.type_to_cpp(
+            alternative_cpp = self.context.type_to_cpp(
+                alternative,
+                owner=owner,
+            ).type
+
+            deserialize_expression = (
+                self._deserialize_expression(
                     alternative,
-                    owner=owner,
-                ).type
+                    expression,
+                    owner,
+                )
             )
 
-            if cpp_type not in cpp_types:
-                cpp_types.append(cpp_type)
+            lines.extend(
+                [
+                    "            try",
+                    "            {",
+                    f"                return {variant_type}(",
+                    (
+                        "                    "
+                        f"std::in_place_type<{alternative_cpp}>,"
+                    ),
+                    (
+                        "                    "
+                        f"{deserialize_expression}"
+                    ),
+                    "                );",
+                    "            }",
+                    (
+                        "            catch "
+                        "(const Detail::DeserializationMismatch&)"
+                    ),
+                    "            {",
+                    "            }",
+                    "",
+                ]
+            )
 
-        if len(cpp_types) == 1:
-            return cpp_types[0]
-
-        return (
-            "std::variant<"
-            + ", ".join(cpp_types)
-            + ">"
+        lines.extend(
+            [
+                "            throw "
+                "Detail::DeserializationMismatch(",
+                '                "No inline union alternative matched"',
+                "            );",
+            ]
         )
 
-    # ------------------------------------------------------------------
-    # Named union definitions
-    # ------------------------------------------------------------------
+        return "\n".join(lines)
+
+    # ==================================================================
+    # Named unions
+    # ==================================================================
 
     def _render_union_definitions(self) -> str:
-        sections: list[str] = [
-            "/* Named union deserializers */"
-        ]
+        sections: list[str] = []
 
         for union in self.model.unions:
             sections.append(
-                self._render_union_definition(union)
+                self._render_named_union_definition(union)
             )
 
         return "\n\n".join(sections)
 
-    def _render_union_definition(
+    def _render_named_union_definition(
         self,
         union: UnionDefinition,
     ) -> str:
@@ -869,557 +830,768 @@ struct Deserializer<std::shared_ptr<T>> {
 
         if resolution is None:
             raise ValueError(
-                f"Union {union.name!r} has no resolution"
+                f"Union '{union.name}' has no resolution"
             )
 
-        if (
-            resolution.kind
-            == UnionResolutionKind.DISCRIMINATOR
-        ):
-            return self._render_discriminator_union(
-                union,
-                resolution.field,
-                resolution.mapping,
+        union_cpp = self._union_cpp_type(union)
+
+        lines = [
+            "template <>",
+            (
+                f"struct Deserializer<"
+                f"{self._qualified(union.name)}>"
+            ),
+            "{",
+            f"    static {union_cpp} Deserialize(",
+            "        const boost::json::value& Value)",
+            "    {",
+            "        Detail::RequireObject(Value);",
+            "",
+            "        const auto& ObjectValue = Value.as_object();",
+            "",
+        ]
+
+        renderer = {
+            UnionResolutionKind.DISCRIMINATOR:
+                self._render_discriminator_union,
+
+            UnionResolutionKind.DISCRIMINATOR_PRESENCE:
+                self._render_discriminator_presence_union,
+
+            UnionResolutionKind.PRESENCE:
+                self._render_presence_union,
+
+            UnionResolutionKind.FIELD_VALUE:
+                self._render_field_value_union,
+        }.get(resolution.kind)
+
+        if renderer is None:
+            lines.extend(
+                [
+                    "        throw "
+                    "Detail::DeserializationMismatch(",
+                    (
+                        f'            "Unsupported resolution strategy '
+                        f'for union {union.name}"'
+                    ),
+                    "        );",
+                ]
+            )
+        else:
+            lines.extend(
+                renderer(
+                    union,
+                    indent="        ",
+                )
             )
 
-        if (
-            resolution.kind
-            == UnionResolutionKind.DISCRIMINATOR_PRESENCE
-        ):
-            return self._render_discriminator_presence_union(
-                union,
-                resolution.field,
-                resolution.mapping,
-                resolution.presence_mapping,
-            )
-
-        if (
-            resolution.kind
-            == UnionResolutionKind.PRESENCE
-        ):
-            return self._render_presence_union(
-                union,
-                resolution.presence_requirements,
-            )
-
-        if (
-            resolution.kind
-            == UnionResolutionKind.FIELD_VALUE
-        ):
-            return self._render_field_value_union(
-                union,
-                resolution.field,
-                resolution.mapping,
-            )
-
-        raise ValueError(
-            "Cannot generate deserializer for "
-            f"unresolved union {union.name!r}"
+        lines.extend(
+            [
+                "    }",
+                "};",
+            ]
         )
 
-    # ------------------------------------------------------------------
-    # Discriminator unions
-    # ------------------------------------------------------------------
+        return "\n".join(lines)
+
+    # ==================================================================
+    # Discriminator
+    # ==================================================================
 
     def _render_discriminator_union(
         self,
-        union,
-        field,
-        mapping,
-    ):
-        if not field:
+        union: UnionDefinition,
+        indent: str,
+    ) -> list[str]:
+        resolution = union.resolution
+
+        if resolution is None or not resolution.field:
             raise ValueError(
-                f"Discriminator union {union.name!r} "
+                f"Discriminator union '{union.name}' "
                 "has no discriminator field"
             )
 
-        qualified_union = (
-            f"{TYPE_NAMESPACE}::{union.name}"
-        )
+        field = resolution.field
 
-        lines: list[str] = []
+        lines = [
+            (
+                f'{indent}const auto* DiscriminatorValue = '
+                f'ObjectValue.if_contains("{field}");'
+            ),
+            f"{indent}if (DiscriminatorValue == nullptr)",
+            f"{indent}{{",
+            (
+                f"{indent}    throw "
+                f"Detail::DeserializationMismatch("
+            ),
+            (
+                f'{indent}        "Missing discriminator field: '
+                f'{field}"'
+            ),
+            f"{indent}    );",
+            f"{indent}}}",
+            "",
+            (
+                f"{indent}const auto Discriminator = "
+                f"FromJson<std::string>(*DiscriminatorValue);"
+            ),
+            "",
+        ]
 
-        lines.append(
-            f"inline {qualified_union} "
-            f"Deserializer<{qualified_union}>::Deserialize("
-        )
-        lines.append(
-            "    const boost::json::value &Value"
-        )
-        lines.append(") {")
-
-        lines.append(
-            "    const auto &ObjectValue = "
-            "Value.as_object();"
-        )
-        lines.append("")
-
-        lines.append(
-            f'    const auto &Discriminator = '
-            f'ObjectValue.at("{field}");'
-        )
-
-        lines.append(
-            "    const std::string "
-            "DiscriminatorValue = "
-            "boost::json::value_to<std::string>"
-            "(Discriminator);"
-        )
-
-        lines.append("")
-
-        for index, (
-            value,
-            alternative_name,
-        ) in enumerate(
-            sorted(mapping.items())
+        for value, alternative_name in (
+            resolution.mapping.items()
         ):
-            keyword = (
-                "if"
-                if index == 0
-                else "else if"
+            alternative = self._find_union_alternative(
+                union,
+                alternative_name,
             )
 
-            qualified_alternative = (
-                f"{TYPE_NAMESPACE}::{alternative_name}"
+            cpp_type = (
+                self._named_union_alternative_cpp_type(
+                    union,
+                    alternative,
+                )
             )
 
-            lines.append(
-                f'    {keyword} '
-                f'(DiscriminatorValue == "{value}") {{'
+            lines.extend(
+                [
+                    (
+                        f'{indent}if '
+                        f'(Discriminator == "{value}")'
+                    ),
+                    f"{indent}{{",
+                    (
+                        f"{indent}    return "
+                        f"FromJson<{cpp_type}>(Value);"
+                    ),
+                    f"{indent}}}",
+                    "",
+                ]
             )
 
-            lines.append(
-                f"        return "
-                f"FromJson<{qualified_alternative}>"
-                "(Value);"
-            )
-
-            lines.append("    }")
-
-        lines.append("")
-
-        lines.append(
-            "    throw std::invalid_argument("
+        lines.extend(
+            [
+                (
+                    f"{indent}throw "
+                    f"Detail::DeserializationMismatch("
+                ),
+                (
+                    f'{indent}    "Unknown discriminator value for '
+                    f'union {union.name}"'
+                ),
+                f"{indent});",
+            ]
         )
 
-        lines.append(
-            f'        "Unknown discriminator value '
-            f'for {union.name}: " '
-            '+ DiscriminatorValue'
-        )
+        return lines
 
-        lines.append("    );")
-        lines.append("}")
-
-        return "\n".join(lines)
-
-    # ------------------------------------------------------------------
-    # Discriminator + presence unions
-    # ------------------------------------------------------------------
+    # ==================================================================
+    # Discriminator + presence
+    # ==================================================================
 
     def _render_discriminator_presence_union(
         self,
-        union,
-        field,
-        mapping,
-        presence_mapping,
-    ):
-        """
-        Render a union whose primary discriminator may have duplicate
-        values, with required-field presence resolving the duplicates.
+        union: UnionDefinition,
+        indent: str,
+    ) -> list[str]:
+        resolution = union.resolution
 
-        Example::
-
-            type == "audio"
-                audio_file_id present -> CachedAudio
-                audio_url present      -> Audio
-        """
-        if not field:
+        if resolution is None or not resolution.field:
             raise ValueError(
-                f"Discriminator-presence union {union.name!r} "
+                f"Discriminator-presence union '{union.name}' "
                 "has no discriminator field"
             )
 
-        qualified_union = (
-            f"{TYPE_NAMESPACE}::{union.name}"
-        )
+        field = resolution.field
 
-        lines: list[str] = []
+        lines = [
+            (
+                f'{indent}const auto* DiscriminatorValue = '
+                f'ObjectValue.if_contains("{field}");'
+            ),
+            f"{indent}if (DiscriminatorValue == nullptr)",
+            f"{indent}{{",
+            (
+                f"{indent}    throw "
+                f"Detail::DeserializationMismatch("
+            ),
+            (
+                f'{indent}        "Missing discriminator field: '
+                f'{field}"'
+            ),
+            f"{indent}    );",
+            f"{indent}}}",
+            "",
+            (
+                f"{indent}const auto Discriminator = "
+                f"FromJson<std::string>(*DiscriminatorValue);"
+            ),
+            "",
+        ]
 
-        lines.append(
-            f"inline {qualified_union} "
-            f"Deserializer<{qualified_union}>::Deserialize("
-        )
-        lines.append(
-            "    const boost::json::value &Value"
-        )
-        lines.append(") {")
-
-        lines.append(
-            "    const auto &ObjectValue = "
-            "Value.as_object();"
-        )
-        lines.append("")
-
-        lines.append(
-            f'    const auto &Discriminator = '
-            f'ObjectValue.at("{field}");'
-        )
-
-        lines.append(
-            "    const std::string "
-            "DiscriminatorValue = "
-            "boost::json::value_to<std::string>"
-            "(Discriminator);"
-        )
-
-        lines.append("")
-
-        first = True
-
-        for value, alternative_name in sorted(
-            mapping.items()
+        for value, alternative_name in (
+            resolution.mapping.items()
         ):
-            keyword = "if" if first else "else if"
-            first = False
-
-            qualified_alternative = (
-                f"{TYPE_NAMESPACE}::{alternative_name}"
-            )
-
-            lines.append(
-                f'    {keyword} '
-                f'(DiscriminatorValue == "{value}") {{'
-            )
-
-            lines.append(
-                f"        return "
-                f"FromJson<{qualified_alternative}>"
-                "(Value);"
-            )
-
-            lines.append("    }")
-
-        for value, field_mapping in sorted(
-            presence_mapping.items()
-        ):
-            keyword = "if" if first else "else if"
-            first = False
-
-            lines.append(
-                f'    {keyword} '
-                f'(DiscriminatorValue == "{value}") {{'
-            )
-
-            for index, (
-                presence_field,
+            alternative = self._find_union_alternative(
+                union,
                 alternative_name,
-            ) in enumerate(
-                sorted(field_mapping.items())
+            )
+
+            cpp_type = (
+                self._named_union_alternative_cpp_type(
+                    union,
+                    alternative,
+                )
+            )
+
+            lines.extend(
+                [
+                    (
+                        f'{indent}if '
+                        f'(Discriminator == "{value}")'
+                    ),
+                    f"{indent}{{",
+                    (
+                        f"{indent}    return "
+                        f"FromJson<{cpp_type}>(Value);"
+                    ),
+                    f"{indent}}}",
+                    "",
+                ]
+            )
+
+        for discriminator_value, mapping in (
+            resolution.presence_mapping.items()
+        ):
+            lines.extend(
+                [
+                    (
+                        f'{indent}if '
+                        f'(Discriminator == "{discriminator_value}")'
+                    ),
+                    f"{indent}{{",
+                    f"{indent}    int MatchCount = 0;",
+                    f"{indent}    int MatchIndex = -1;",
+                    "",
+                ]
+            )
+
+            candidates: list[
+                tuple[TypeRef, str]
+            ] = []
+
+            for presence_field, alternative_name in (
+                mapping.items()
             ):
-                nested_keyword = (
-                    "if"
-                    if index == 0
-                    else "else if"
+                alternative = self._find_union_alternative(
+                    union,
+                    alternative_name,
                 )
 
-                qualified_alternative = (
-                    f"{TYPE_NAMESPACE}::{alternative_name}"
+                candidates.append(
+                    (
+                        alternative,
+                        presence_field,
+                    )
                 )
 
-                lines.append(
-                    f'        {nested_keyword} '
-                    f'(ObjectValue.if_contains("{presence_field}")) {{'
+            for index, (_, presence_field) in enumerate(
+                candidates
+            ):
+                lines.extend(
+                    [
+                        (
+                            f'{indent}    if '
+                            f'(ObjectValue.if_contains('
+                            f'"{presence_field}"'
+                            f') != nullptr)'
+                        ),
+                        f"{indent}    {{",
+                        f"{indent}        ++MatchCount;",
+                        f"{indent}        MatchIndex = {index};",
+                        f"{indent}    }}",
+                        "",
+                    ]
                 )
 
-                lines.append(
-                    f"            return "
-                    f"FromJson<{qualified_alternative}>"
-                    "(Value);"
-                )
-
-                lines.append("        }")
-
-            lines.append("")
-            lines.append(
-                "        throw std::invalid_argument("
+            lines.extend(
+                [
+                    f"{indent}    if (MatchCount == 1)",
+                    f"{indent}    {{",
+                    f"{indent}        switch (MatchIndex)",
+                    f"{indent}        {{",
+                ]
             )
-            lines.append(
-                f'            "Unable to resolve '
-                f'{union.name} for discriminator value '
-                f'{value}"'
+
+            for index, (alternative, _) in enumerate(
+                candidates
+            ):
+                cpp_type = (
+                    self._named_union_alternative_cpp_type(
+                        union,
+                        alternative,
+                    )
+                )
+
+                lines.extend(
+                    [
+                        f"{indent}            case {index}:",
+                        (
+                            f"{indent}                return "
+                            f"FromJson<{cpp_type}>(Value);"
+                        ),
+                    ]
+                )
+
+            lines.extend(
+                [
+                    f"{indent}        }}",
+                    f"{indent}    }}",
+                    "",
+                    f"{indent}    if (MatchCount > 1)",
+                    f"{indent}    {{",
+                    (
+                        f"{indent}        throw "
+                        f"std::invalid_argument("
+                    ),
+                    (
+                        f'{indent}            "Ambiguous discriminator '
+                        f'presence union: {union.name}"'
+                    ),
+                    f"{indent}        );",
+                    f"{indent}    }}",
+                    "",
+                    (
+                        f"{indent}    throw "
+                        f"Detail::DeserializationMismatch("
+                    ),
+                    (
+                        f'{indent}        "No presence alternative '
+                        f'matched for union {union.name}"'
+                    ),
+                    f"{indent}    );",
+                    f"{indent}}}",
+                    "",
+                ]
             )
-            lines.append("        );")
-            lines.append("    }")
 
-        lines.append("")
-        lines.append(
-            "    throw std::invalid_argument("
+        lines.extend(
+            [
+                (
+                    f"{indent}throw "
+                    f"Detail::DeserializationMismatch("
+                ),
+                (
+                    f'{indent}    "Unknown discriminator value for '
+                    f'union {union.name}"'
+                ),
+                f"{indent});",
+            ]
         )
-        lines.append(
-            f'        "Unknown discriminator value '
-            f'for {union.name}: " '
-            '+ DiscriminatorValue'
-        )
-        lines.append("    );")
-        lines.append("}")
 
-        return "\n".join(lines)
+        return lines
 
-    # ------------------------------------------------------------------
-    # Presence-only unions
-    # ------------------------------------------------------------------
+    # ==================================================================
+    # Presence
+    # ==================================================================
 
     def _render_presence_union(
         self,
-        union,
-        presence_requirements,
-    ):
-        """
-        Render a polymorphic union with no common discriminator field.
+        union: UnionDefinition,
+        indent: str,
+    ) -> list[str]:
+        resolution = union.resolution
 
-        Each alternative is described by its complete set of required JSON
-        fields.  More specific signatures are tested first, so an object
-        satisfying both a base-like alternative and a more specific
-        alternative resolves to the more specific alternative.
-        """
-        qualified_union = (
-            f"{TYPE_NAMESPACE}::{union.name}"
-        )
+        if resolution is None:
+            raise ValueError(
+                f"Presence union '{union.name}' has no resolution"
+            )
 
-        lines: list[str] = []
+        candidates: list[
+            tuple[TypeRef, list[str]]
+        ] = []
 
-        lines.append(
-            f"inline {qualified_union} "
-            f"Deserializer<{qualified_union}>::Deserialize("
-        )
-        lines.append(
-            "    const boost::json::value &Value"
-        )
-        lines.append(") {")
+        for alternative in union.alternatives:
+            alternative_name = self._alternative_name(
+                alternative
+            )
 
-        lines.append(
-            "    const auto &ObjectValue = "
-            "Value.as_object();"
-        )
-        lines.append("")
+            required_fields = (
+                resolution.presence_requirements.get(
+                    alternative_name,
+                    [],
+                )
+            )
 
-        # Test the most specific required-field signatures first.
-        ordered = sorted(
-            presence_requirements.items(),
-            key=lambda item: (
-                -len(item[1]),
-                item[0],
-            ),
-        )
+            if not required_fields:
+                raise ValueError(
+                    f"Presence union '{union.name}' "
+                    f"alternative '{alternative_name}' "
+                    "has no required-field signature"
+                )
 
-        for index, (
-            alternative_name,
-            required_fields,
-        ) in enumerate(ordered):
-            keyword = "if" if index == 0 else "else if"
+            candidates.append(
+                (
+                    alternative,
+                    required_fields,
+                )
+            )
 
+        lines = [
+            f"{indent}int MatchCount = 0;",
+            f"{indent}int MatchIndex = -1;",
+            "",
+        ]
+
+        for index, (_, required_fields) in enumerate(
+            candidates
+        ):
             condition = " && ".join(
-                f'ObjectValue.if_contains("{field}")'
+                (
+                    f'ObjectValue.if_contains("{field}")'
+                    f" != nullptr"
+                )
                 for field in required_fields
             )
 
-            qualified_alternative = (
-                f"{TYPE_NAMESPACE}::{alternative_name}"
+            lines.extend(
+                [
+                    f"{indent}if ({condition})",
+                    f"{indent}{{",
+                    f"{indent}    ++MatchCount;",
+                    f"{indent}    MatchIndex = {index};",
+                    f"{indent}}}",
+                    "",
+                ]
             )
 
-            lines.append(
-                f"    {keyword} ({condition}) {{"
-            )
-
-            lines.append(
-                f"        return "
-                f"FromJson<{qualified_alternative}>"
-                "(Value);"
-            )
-
-            lines.append("    }")
-
-        lines.append("")
-        lines.append(
-            "    throw std::invalid_argument("
+        lines.extend(
+            [
+                f"{indent}if (MatchCount == 1)",
+                f"{indent}{{",
+                f"{indent}    switch (MatchIndex)",
+                f"{indent}    {{",
+            ]
         )
-        lines.append(
-            f'        "Unable to resolve presence union '
-            f'{union.name}"'
+
+        for index, (alternative, _) in enumerate(
+            candidates
+        ):
+            cpp_type = (
+                self._named_union_alternative_cpp_type(
+                    union,
+                    alternative,
+                )
+            )
+
+            lines.extend(
+                [
+                    f"{indent}        case {index}:",
+                    (
+                        f"{indent}            return "
+                        f"FromJson<{cpp_type}>(Value);"
+                    ),
+                ]
+            )
+
+        lines.extend(
+            [
+                f"{indent}    }}",
+                f"{indent}}}",
+                "",
+                f"{indent}if (MatchCount > 1)",
+                f"{indent}{{",
+                (
+                    f"{indent}    throw "
+                    f"std::invalid_argument("
+                ),
+                (
+                    f'{indent}        "Ambiguous presence union: '
+                    f'{union.name}"'
+                ),
+                f"{indent}    );",
+                f"{indent}}}",
+                "",
+                (
+                    f"{indent}throw "
+                    f"Detail::DeserializationMismatch("
+                ),
+                (
+                    f'{indent}    "No presence alternative matched '
+                    f'for union {union.name}"'
+                ),
+                f"{indent});",
+            ]
         )
-        lines.append("    );")
-        lines.append("}")
 
-        return "\n".join(lines)
+        return lines
 
-    # ------------------------------------------------------------------
-    # Field-value unions
-    # ------------------------------------------------------------------
+    # ==================================================================
+    # Field-value
+    # ==================================================================
 
     def _render_field_value_union(
         self,
-        union,
-        field,
-        mapping,
-    ):
-        if not field:
+        union: UnionDefinition,
+        indent: str,
+    ) -> list[str]:
+        resolution = union.resolution
+
+        if resolution is None or not resolution.field:
             raise ValueError(
-                f"Field-value union {union.name!r} "
-                "has no resolution field"
+                f"Field-value union '{union.name}' "
+                "has no field"
             )
 
-        qualified_union = (
-            f"{TYPE_NAMESPACE}::{union.name}"
-        )
+        field = resolution.field
 
-        lines: list[str] = []
+        lines = [
+            (
+                f'{indent}const auto* FieldValue = '
+                f'ObjectValue.if_contains("{field}");'
+            ),
+            f"{indent}if (FieldValue == nullptr)",
+            f"{indent}{{",
+            (
+                f"{indent}    throw "
+                f"Detail::DeserializationMismatch("
+            ),
+            (
+                f'{indent}        "Missing field-value discriminator: '
+                f'{field}"'
+            ),
+            f"{indent}    );",
+            f"{indent}}}",
+            "",
+            (
+                f"{indent}const auto NumericValue = "
+                f"FromJson<long long>(*FieldValue);"
+            ),
+            "",
+        ]
 
-        lines.append(
-            f"inline {qualified_union} "
-            f"Deserializer<{qualified_union}>::Deserialize("
-        )
+        for key, alternative_name in (
+            resolution.mapping.items()
+        ):
+            alternative = self._find_union_alternative(
+                union,
+                alternative_name,
+            )
 
-        lines.append(
-            "    const boost::json::value &Value"
-        )
-
-        lines.append(") {")
-
-        lines.append(
-            "    const auto &ObjectValue = "
-            "Value.as_object();"
-        )
-
-        lines.append("")
-
-        lines.append(
-            f'    const auto &ResolutionValue = '
-            f'ObjectValue.at("{field}");'
-        )
-
-        lines.append("")
-
-        if "0" in mapping:
-            alternative_name = mapping["0"]
-
-            alternative_cpp_type = (
+            cpp_type = (
                 self._named_union_alternative_cpp_type(
-                    union.name,
-                    alternative_name,
+                    union,
+                    alternative,
                 )
             )
 
-            lines.append(
-                "    if ("
-                "boost::json::value_to<long long>"
-                "(ResolutionValue) == 0"
-                ") {"
+            condition = self._field_value_condition(
+                key,
+                "NumericValue",
             )
 
-            lines.append(
-                f"        return "
-                f"FromJson<{alternative_cpp_type}>"
-                "(Value);"
+            lines.extend(
+                [
+                    f"{indent}if ({condition})",
+                    f"{indent}{{",
+                    (
+                        f"{indent}    return "
+                        f"FromJson<{cpp_type}>(Value);"
+                    ),
+                    f"{indent}}}",
+                    "",
+                ]
             )
 
-            lines.append("    }")
-
-        if "positive" in mapping:
-            alternative_name = mapping["positive"]
-
-            alternative_cpp_type = (
-                self._named_union_alternative_cpp_type(
-                    union.name,
-                    alternative_name,
-                )
-            )
-
-            lines.append(
-                "    if ("
-                "boost::json::value_to<long long>"
-                "(ResolutionValue) > 0"
-                ") {"
-            )
-
-            lines.append(
-                f"        return "
-                f"FromJson<{alternative_cpp_type}>"
-                "(Value);"
-            )
-
-            lines.append("    }")
-
-        lines.append("")
-
-        lines.append(
-            "    throw std::invalid_argument("
+        lines.extend(
+            [
+                (
+                    f"{indent}throw "
+                    f"Detail::DeserializationMismatch("
+                ),
+                (
+                    f'{indent}    "Invalid field-value discriminator '
+                    f'for union {union.name}"'
+                ),
+                f"{indent});",
+            ]
         )
 
-        lines.append(
-            f'        "Invalid field-value '
-            f'discriminator for {union.name}"'
+        return lines
+
+    def _field_value_condition(
+        self,
+        key: str,
+        expression: str,
+    ) -> str:
+        if key == "0":
+            return f"{expression} == 0"
+
+        if key == "positive":
+            return f"{expression} > 0"
+
+        raise ValueError(
+            f"Unsupported field-value resolution key: {key!r}"
         )
 
-        lines.append("    );")
-        lines.append("}")
+    # ==================================================================
+    # Type helpers
+    # ==================================================================
 
-        return "\n".join(lines)
+    def _qualified(
+        self,
+        name: str,
+    ) -> str:
+        return f"{TYPE_NAMESPACE}::{name}"
+
+    def _union_cpp_type(
+        self,
+        union: UnionDefinition,
+    ) -> str:
+        types: list[str] = []
+
+        for alternative in union.alternatives:
+            cpp_type = self._named_union_alternative_cpp_type(
+                union,
+                alternative,
+            )
+
+            if cpp_type not in types:
+                types.append(cpp_type)
+
+        if not types:
+            raise ValueError(
+                "Cannot generate empty std::variant"
+            )
+
+        return (
+            "std::variant<"
+            + ", ".join(types)
+            + ">"
+        )
+
+    def _variant_cpp_type(
+        self,
+        alternatives: list[TypeRef],
+        owner: str | None,
+    ) -> str:
+        types: list[str] = []
+
+        for alternative in alternatives:
+            cpp_type = self.context.type_to_cpp(
+                alternative,
+                owner=owner,
+            ).type
+
+            if cpp_type not in types:
+                types.append(cpp_type)
+
+        if not types:
+            raise ValueError(
+                "Cannot generate empty std::variant"
+            )
+
+        if len(types) == 1:
+            return types[0]
+
+        return (
+            "std::variant<"
+            + ", ".join(types)
+            + ">"
+        )
 
     def _named_union_alternative_cpp_type(
         self,
-        union_name: str,
-        alternative_name: str,
+        union: UnionDefinition,
+        alternative: TypeRef,
     ) -> str:
-        """
-        Return the exact C++ alternative type used by the
-        generated named-union alias.
-
-        Recursive alternatives must use std::shared_ptr<T>
-        because the named union itself uses shared_ptr for
-        recursive alternatives.
-        """
+        alternative_name = self._alternative_name(
+            alternative
+        )
 
         recursive_alternatives = (
             self.context.graph
             .recursive_union_alternatives_global(
-                union_name
+                union.name
             )
         )
 
-        qualified = (
-            f"{TYPE_NAMESPACE}::{alternative_name}"
-        )
-
-        if alternative_name in recursive_alternatives:
+        if (
+            alternative.is_object()
+            and alternative_name in recursive_alternatives
+        ):
             return (
-                f"std::shared_ptr<{qualified}>"
+                f"std::shared_ptr<"
+                f"{TYPE_NAMESPACE}::{alternative_name}"
+                f">"
             )
 
-        return qualified
+        return self.context.type_to_cpp(
+            alternative,
+            owner=union.name,
+        ).type
 
-    # ------------------------------------------------------------------
+    def _alternative_name(
+        self,
+        alternative: TypeRef,
+    ) -> str:
+        if alternative.name:
+            return alternative.name
+
+        if (
+            alternative.union_info is not None
+            and alternative.union_info.name
+        ):
+            return alternative.union_info.name
+
+        raise ValueError(
+            f"Union alternative has no name: {alternative!r}"
+        )
+
+    def _find_union_alternative(
+        self,
+        union: UnionDefinition,
+        alternative_name: str,
+    ) -> TypeRef:
+        matches = [
+            alternative
+            for alternative in union.alternatives
+            if self._alternative_name(alternative)
+            == alternative_name
+        ]
+
+        if len(matches) != 1:
+            raise ValueError(
+                f"Union '{union.name}' alternative "
+                f"'{alternative_name}' resolves to "
+                f"{len(matches)} alternatives"
+            )
+
+        return matches[0]
+
+    # ==================================================================
     # Public API
-    # ------------------------------------------------------------------
+    # ==================================================================
 
-    def _render_public_api(self):
-        return """\
-template <typename T>
-T Deserialize(
-    const boost::json::value &Value
-) {
-    return FromJson<T>(Value);
-}
-"""
+    def _render_public_api(self) -> str:
+        return "\n".join(
+            [
+                "template <typename T>",
+                "T Deserialize(const boost::json::value& Value)",
+                "{",
+                "    return FromJson<T>(Value);",
+                "}",
+                "",
+            ]
+        )
 
-    # ------------------------------------------------------------------
+    # ==================================================================
     # Epilogue
-    # ------------------------------------------------------------------
+    # ==================================================================
 
-    def _render_epilogue(self):
-        return """\
-}
-
-#endif // TELEGRAMBOTAPI_JSON_DESERIALIZER_HPP
-"""
+    def _render_epilogue(self) -> str:
+        return (
+            f"}} // namespace {JSON_NAMESPACE}\n"
+            "\n"
+            "#endif // TELEGRAMBOTAPI_JSON_DESERIALIZER_HPP"
+        )
