@@ -26,82 +26,86 @@
 
 <hr/>
 
-## Overview
+## 项目简介
 
-This project provides a modern C++17 interface to the Telegram Bot API.
+本项目提供一个现代化的 **C++17 Telegram Bot API 库**。
 
-The public API is generated from the Telegram Bot API schema. The generator produces:
+项目的公共 API 根据 Telegram Bot API Schema 自动生成。代码生成器负责生成：
 
-* Telegram Bot API types
-* Telegram Bot API methods
-* JSON serialization and deserialization
-* `TelegramClient` convenience methods
-* Recursive type and union support
-* Multipart file upload support
+* Telegram Bot API 类型
+* Telegram Bot API 方法
+* JSON 序列化与反序列化
+* `TelegramClient` 便捷方法
+* 递归类型与 Union 类型支持
+* Multipart 文件上传支持
 
-The current schema is Telegram Bot API **10.3** and generates:
+当前使用的 Telegram Bot API Schema 版本为 **10.3**，生成：
 
-* **379** types
-* **23** unions
-* **185** methods
+* **379** 个类型
+* **23** 个 Union
+* **185** 个方法
 
-The library uses Boost.JSON for JSON processing, OpenSSL for TLS support, and a small HTTP abstraction that can be replaced for testing or custom transports.
+底层使用 Boost.JSON 进行 JSON 处理，使用 OpenSSL 提供 TLS 支持，并提供一个轻量级 HTTP 抽象层，可以替换为自定义实现，也方便进行单元测试。
 
-## Requirements
+## 环境要求
 
-* C++17-compatible compiler
-* CMake 3.20 or newer
-* Boost with:
+### C++ 库
+
+* 支持 C++17 的编译器
+* CMake 3.20 或更高版本
+* Boost，包含：
 
     * `system`
     * `json`
 * OpenSSL
 * Threads
 
-The generator requires:
+### 代码生成器
 
-* Python 3.11 or newer
+代码生成器需要：
+
+* Python 3.11 或更高版本
 * PyYAML
 
-## Build
+## 构建
 
-Clone the repository and configure the project:
+克隆仓库后配置项目：
 
 ```bash
 cmake -S . -B build
 ```
 
-Build the library:
+构建库：
 
 ```bash
 cmake --build build -j
 ```
 
-The static library is produced as:
+默认生成静态库：
 
 ```text
 build/libTelegramBotAPI.a
 ```
 
-### Build options
+### 构建选项
 
-Tests and examples are enabled by default.
+测试和示例默认启用。
 
-Disable tests:
+禁用测试：
 
 ```bash
 cmake -S . -B build \
     -DTELEGRAM_BOT_API_BUILD_TESTS=OFF
 ```
 
-Disable examples:
+禁用示例：
 
 ```bash
 cmake -S . -B build \
     -DTELEGRAM_BOT_API_BUILD_EXAMPLES=OFF
 ```
 
-Both can be configured together:
+同时禁用测试和示例：
 
 ```bash
 cmake -S . -B build \
@@ -109,22 +113,22 @@ cmake -S . -B build \
     -DTELEGRAM_BOT_API_BUILD_EXAMPLES=OFF
 ```
 
-## Installation
+## 安装
 
-Install the library to a custom prefix:
+可以将库安装到指定目录：
 
 ```bash
 cmake --install build --prefix /usr/local
 ```
 
-The installation provides:
+安装内容包括：
 
-* Public headers
-* Static library
-* CMake package configuration
-* Exported `TelegramBotAPI::TelegramBotAPI` target
+* 公共头文件
+* 静态库
+* CMake Package 配置
+* 导出的 `TelegramBotAPI::TelegramBotAPI` Target
 
-A consumer project can use:
+其他 CMake 项目可以使用：
 
 ```cmake
 find_package(TelegramBotAPI CONFIG REQUIRED)
@@ -135,22 +139,22 @@ target_link_libraries(MyApplication
 )
 ```
 
-For a custom installation prefix:
+如果安装到了自定义路径，可以通过 `CMAKE_PREFIX_PATH` 指定：
 
 ```bash
 cmake -S . -B build \
     -DCMAKE_PREFIX_PATH=/path/to/telegram-bot-api/install
 ```
 
-## Basic Usage
+## 基本用法
 
-Include the main public header:
+包含主公共头文件：
 
 ```cpp
 #include <TelegramBotAPI/TelegramBotAPI.HPP>
 ```
 
-Create a client using a Telegram bot token:
+使用 Telegram Bot Token 创建客户端：
 
 ```cpp
 #include <TelegramBotAPI/TelegramBotAPI.HPP>
@@ -164,11 +168,15 @@ int main() {
 }
 ```
 
-`GetMe()` returns a `TelegramBotAPI::Type::User`.
+`GetMe()` 返回：
 
-### Sending a message
+```text
+TelegramBotAPI::Type::User
+```
 
-`ChatID` accepts either a numeric chat ID or a string such as `@channelusername`.
+### 发送消息
+
+`ChatID` 支持数字类型的 Chat ID，也支持类似 `@channelusername` 的字符串用户名。
 
 ```cpp
 #include <TelegramBotAPI/TelegramBotAPI.HPP>
@@ -185,7 +193,7 @@ int main() {
 }
 ```
 
-A username can also be used:
+也可以使用用户名：
 
 ```cpp
 const auto Message = Client.SendMessage(
@@ -194,7 +202,7 @@ const auto Message = Client.SendMessage(
 );
 ```
 
-### Sending a photo by URL
+### 通过 URL 发送图片
 
 ```cpp
 #include <TelegramBotAPI/TelegramBotAPI.HPP>
@@ -213,9 +221,11 @@ int main() {
 }
 ```
 
-### Sending a local file
+### 发送本地文件
 
-`InputFile::FromFile()` marks the file as a local upload. The HTTP layer sends it using multipart/form-data.
+`InputFile::FromFile()` 用于指定本地文件。
+
+HTTP 层会通过 `multipart/form-data` 上传该文件。
 
 ```cpp
 #include <TelegramBotAPI/TelegramBotAPI.HPP>
@@ -234,7 +244,9 @@ int main() {
 }
 ```
 
-### Using an existing Telegram file ID
+### 使用已有的 Telegram File ID
+
+如果已经拥有 Telegram 返回的 `file_id`，可以直接使用：
 
 ```cpp
 const auto Message = Client.SendPhoto(
@@ -245,19 +257,19 @@ const auto Message = Client.SendPhoto(
 );
 ```
 
-`InputFile` supports three source types:
+`InputFile` 支持三种来源：
 
-| Factory        | Telegram representation     |
-| -------------- | --------------------------- |
-| `FromFileID()` | Existing Telegram `file_id` |
-| `FromURL()`    | HTTP/HTTPS URL              |
-| `FromFile()`   | Local filesystem path       |
+| 工厂方法           | Telegram 表示形式           |
+| -------------- | ----------------------- |
+| `FromFileID()` | 已存在的 Telegram `file_id` |
+| `FromURL()`    | HTTP/HTTPS URL          |
+| `FromFile()`   | 本地文件系统路径                |
 
-## TelegramClient Configuration
+## TelegramClient 配置
 
-The client provides several constructors.
+`TelegramClient` 提供多个构造函数，可以配置 API 地址、请求超时时间以及 HTTP 客户端。
 
-### Custom API URL
+### 自定义 API URL
 
 ```cpp
 TelegramBotAPI::TelegramClient Client(
@@ -266,7 +278,7 @@ TelegramBotAPI::TelegramClient Client(
 );
 ```
 
-### Custom timeout
+### 自定义请求超时时间
 
 ```cpp
 TelegramBotAPI::TelegramClient Client(
@@ -275,7 +287,7 @@ TelegramBotAPI::TelegramClient Client(
 );
 ```
 
-### Custom API URL and timeout
+### 同时自定义 API URL 和超时时间
 
 ```cpp
 TelegramBotAPI::TelegramClient Client(
@@ -285,9 +297,11 @@ TelegramBotAPI::TelegramClient Client(
 );
 ```
 
-### Custom HTTP client
+### 自定义 HTTP Client
 
-The client can also receive an implementation of `Network::IHTTPClient`. This is useful for testing and for applications that need to control the underlying HTTP transport.
+`TelegramClient` 也可以接收 `Network::IHTTPClient` 的实现。
+
+这对于测试以及需要控制底层 HTTP Transport 的应用非常有用。
 
 ```cpp
 TelegramBotAPI::TelegramClient Client(
@@ -296,11 +310,11 @@ TelegramBotAPI::TelegramClient Client(
 );
 ```
 
-## Generated API
+## 自动生成的 API
 
-The generator exposes all methods through `TelegramClient`.
+代码生成器会将 Telegram Bot API 的全部方法暴露到 `TelegramClient`。
 
-For example:
+例如：
 
 ```cpp
 Client.GetMe();
@@ -320,31 +334,40 @@ Client.SendPhoto(
 );
 ```
 
-The generated method names use PascalCase while following the corresponding Telegram Bot API method names.
+生成的方法名称采用 PascalCase，并对应 Telegram Bot API 的原始方法名称。
 
-The lower-level generated method classes are also available under:
+例如：
+
+```text
+getMe        → GetMe()
+getChat      → GetChat()
+sendMessage  → SendMessage()
+sendPhoto    → SendPhoto()
+```
+
+底层生成的 Method 类也可以直接使用，位于：
 
 ```text
 Include/TelegramBotAPI/Methods/
 ```
 
-Generated Telegram types are available under:
+生成的 Telegram API 类型位于：
 
 ```text
 Include/TelegramBotAPI/Types/
 ```
 
-JSON support is available under:
+JSON 相关组件位于：
 
 ```text
 Include/TelegramBotAPI/JSON/
 ```
 
-## Error Handling
+## 错误处理
 
-Telegram API failures and client-side errors are represented by the library's exception types.
+Telegram API 错误以及客户端内部错误通过库提供的异常类型表示。
 
-Applications should handle exceptions around API calls when failure needs to be recovered or reported:
+如果应用程序需要处理 API 调用失败，可以在 API 调用外围捕获异常：
 
 ```cpp
 try {
@@ -353,66 +376,66 @@ try {
     const auto Me = Client.GetMe();
 }
 catch (const std::exception &Error) {
-    // Handle API, HTTP, JSON, or client errors.
+    // 处理 API、HTTP、JSON 或客户端错误。
 }
 ```
 
-See:
+Telegram API 异常类型位于：
 
 ```text
 Include/TelegramBotAPI/TelegramAPIException.HPP
 ```
 
-for the library's Telegram API exception type.
+## 代码生成
 
-## Code Generation
+C++ API 根据 Telegram Bot API Schema 自动生成。
 
-The C++ API is generated from the Telegram Bot API schema.
-
-The generator is located under:
+代码生成器位于：
 
 ```text
 Scripts/
 ```
 
-Generate the current API:
+生成当前 Schema 对应的 C++ API：
 
 ```bash
 python3 Scripts/Generate.py
 ```
 
-The schema is stored at:
+Schema 文件位于：
 
 ```text
 Scripts/schema/telegram-bot-api.yaml
 ```
 
-The generator produces the public headers under:
+生成器会生成：
 
 ```text
 Include/TelegramBotAPI/
 ```
 
-Generation is deterministic and is tested for idempotency.
+下的公共头文件。
 
-After modifying the schema or generator, regenerate the API and verify the generated tree:
+代码生成具有确定性，并且通过幂等性测试。
+
+修改 Schema 或生成器之后，可以重新生成并检查生成结果：
 
 ```bash
 python3 Scripts/Generate.py
 git status --short
 ```
 
-The Python project metadata is defined in:
+Python 项目元数据位于：
 
 ```text
 pyproject.toml
 ```
 
-The project uses Python 3.11 or newer.
+代码生成器要求 Python 3.11 或更高版本。
 
-## Testing
+## 测试
 
-Configure and build the test suite:
+配置并构建测试：
 
 ```bash
 cmake -S . -B build \
@@ -421,38 +444,38 @@ cmake -S . -B build \
 cmake --build build -j
 ```
 
-Run all tests:
+运行全部测试：
 
 ```bash
 ctest --test-dir build --output-on-failure
 ```
 
-The test suite covers:
+测试套件覆盖：
 
-* JSON serialization and deserialization
-* HTTP request construction
-* Runtime behavior
-* Multipart requests
-* Telegram client behavior
-* Generator model validation
-* Generated code validation
-* Union handling
-* Full generation
-* Generation idempotency
-* Telegram API end-to-end behavior
+* JSON 序列化与反序列化
+* HTTP 请求构造
+* Runtime 行为
+* Multipart 请求
+* Telegram Client 行为
+* Generator Model 验证
+* 生成代码验证
+* Union 类型处理
+* 完整代码生成
+* 代码生成幂等性
+* Telegram API 端到端测试
 
-## End-to-End Testing
+## 端到端测试
 
-The Telegram E2E test requires a real Telegram bot token and a chat ID.
+Telegram E2E 测试需要一个真实的 Telegram Bot Token 和 Chat ID。
 
-Set the credentials in the environment:
+将凭据设置为环境变量：
 
 ```bash
 export TELEGRAM_BOT_TOKEN="YOUR_BOT_TOKEN"
 export TELEGRAM_CHAT_ID="YOUR_CHAT_ID"
 ```
 
-Then run:
+然后运行：
 
 ```bash
 ctest --test-dir build \
@@ -460,24 +483,26 @@ ctest --test-dir build \
     --output-on-failure
 ```
 
-The E2E test exercises real Telegram API operations including:
+E2E 测试会执行真实的 Telegram API 操作，包括：
 
 * `getMe`
 * `sendMessage`
-* `sendPhoto` using a URL
-* `sendPhoto` using a local file upload
+* 使用 URL 的 `sendPhoto`
+* 使用本地文件上传的 `sendPhoto`
 
-Do not commit bot tokens or other credentials to the repository.
+**不要将 Bot Token 或其他敏感凭据提交到 Git 仓库。**
 
-## Examples
+如果没有设置 E2E 环境变量，测试会被自动跳过，而不是导致整个测试套件失败。
 
-The repository contains an example application under:
+## 示例
+
+项目包含一个 Echo Bot 示例：
 
 ```text
 Examples/EchoBot/
 ```
 
-Build it with:
+启用示例并构建：
 
 ```bash
 cmake -S . -B build \
@@ -486,7 +511,7 @@ cmake -S . -B build \
 cmake --build build -j
 ```
 
-## Project Structure
+## 项目结构
 
 ```text
 .
@@ -523,5 +548,7 @@ cmake --build build -j
 ```
 
 ## License
+
+项目许可证请参阅：
 
 See [LICENSE](LICENSE) for the project license.
