@@ -15,11 +15,29 @@
 #include "TelegramBotAPI/Network/HTTPException.HPP"
 
 namespace TelegramBotAPI::Network {
+// Constructor implementations / 构造函数实现
     HTTPClient::HTTPClient() : Timeout(std::chrono::seconds(30)) {}
 
     HTTPClient::HTTPClient(std::chrono::seconds TimeoutValue)
         : Timeout(TimeoutValue) {}
 
+/**
+ * @brief Performs an HTTPS request using Boost.Beast and Boost.Asio.
+ * @brief 使用 Boost.Beast 和 Boost.Asio 执行 HTTPS 请求。
+ *
+ * Supports both HTTP and HTTPS schemes. For HTTPS, configures SSL context
+ * with peer verification and default certificate paths. Applies timeout to
+ * all network operations. Converts Boost.Beast exceptions to HTTPException.
+ * 支持 HTTP 和 HTTPS scheme。对于 HTTPS，配置具有对等验证和默认证书路径的 SSL 上下文。
+ * 对所有网络操作应用超时。将 Boost.Beast 异常转换为 HTTPException。
+ *
+ * @param Request HTTP request to perform.
+ *               要执行的 HTTP 请求。
+ * @return HTTP response.
+ *         HTTP 响应。
+ * @throws HTTPException On network errors, SSL errors, or invalid requests.
+ *                      发生网络错误、SSL 错误或无效请求时抛出。
+ */
     HTTPResponse HTTPClient::PerformHTTPS(const HTTPRequest &Request) {
         if (Request.Scheme != "http" && Request.Scheme != "https") {
             throw HTTPException(HTTPException::ErrorType::UnsupportedScheme,

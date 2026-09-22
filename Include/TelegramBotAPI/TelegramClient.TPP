@@ -10,6 +10,17 @@
 #include "TelegramBotAPI/Types/ResponseParameters.HPP"
 
 namespace TelegramBotAPI {
+/**
+ * @brief Calls a Telegram Bot API method with no parameters.
+ * @brief 调用没有参数的 Telegram Bot API 方法。
+ *
+ * @tparam ReturnType Type of the API response.
+ *                    API 响应的类型。
+ * @param Method      API method name.
+ *                    API 方法名称。
+ * @return API response deserialized to ReturnType.
+ *         反序列化为 ReturnType 的 API 响应。
+ */
     template <typename ReturnType>
     ReturnType TelegramClient::Call(const std::string &Method) {
         JSON::Object Parameters;
@@ -17,6 +28,19 @@ namespace TelegramBotAPI {
         return Call<ReturnType>(Method, Parameters);
     }
 
+/**
+ * @brief Calls a Telegram Bot API method with JSON parameters.
+ * @brief 使用 JSON 参数调用 Telegram Bot API 方法。
+ *
+ * @tparam ReturnType Type of the API response.
+ *                    API 响应的类型。
+ * @param Method      API method name.
+ *                    API 方法名称。
+ * @param Parameters  JSON object containing method parameters.
+ *                    包含方法参数的 JSON 对象。
+ * @return API response deserialized to ReturnType.
+ *         反序列化为 ReturnType 的 API 响应。
+ */
     template <typename ReturnType>
     ReturnType TelegramClient::Call(const std::string  &Method,
                                     const JSON::Object &Parameters) {
@@ -25,6 +49,22 @@ namespace TelegramBotAPI {
         return ParseResponse<ReturnType>(Response);
     }
 
+/**
+ * @brief Calls a Telegram Bot API method with multipart/form-data parameters.
+ * @brief 使用 multipart/form-data 参数调用 Telegram Bot API 方法。
+ *
+ * Used for file uploads and other multipart requests.
+ * 用于文件上传和其他 multipart 请求。
+ *
+ * @tparam ReturnType Type of the API response.
+ *                    API 响应的类型。
+ * @param Method      API method name.
+ *                    API 方法名称。
+ * @param Form        Multipart form containing fields and files.
+ *                    包含字段和文件的 multipart 表单。
+ * @return API response deserialized to ReturnType.
+ *         反序列化为 ReturnType 的 API 响应。
+ */
     template <typename ReturnType>
     ReturnType TelegramClient::CallMultipart(
         const std::string                       &Method,
@@ -34,6 +74,25 @@ namespace TelegramBotAPI {
         return ParseResponse<ReturnType>(Response);
     }
 
+/**
+ * @brief Parses an HTTP response from the Telegram Bot API.
+ * @brief 解析来自 Telegram Bot API 的 HTTP 响应。
+ *
+ * Handles JSON parsing, validates the response structure,
+ * checks for API errors, and deserializes the result.
+ * Throws TelegramAPIException on errors.
+ * 处理 JSON 解析、验证响应结构、检查 API 错误并反序列化结果。
+ * 发生错误时抛出 TelegramAPIException。
+ *
+ * @tparam ReturnType Type of the API response.
+ *                    API 响应的类型。
+ * @param Response    HTTP response from the API.
+ *                    来自 API 的 HTTP 响应。
+ * @return API response deserialized to ReturnType.
+ *         反序列化为 ReturnType 的 API 响应。
+ * @throws TelegramAPIException On HTTP errors, JSON parsing errors, or API errors.
+ *                              发生 HTTP 错误、JSON 解析错误或 API 错误时抛出。
+ */
     template <typename ReturnType>
     ReturnType
     TelegramClient::ParseResponse(const Network::HTTPResponse &Response) {

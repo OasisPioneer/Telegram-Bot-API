@@ -764,6 +764,22 @@ namespace TelegramBotAPI::Methods {
 } // namespace TelegramBotAPI::Methods
 
 namespace TelegramBotAPI {
+/**
+ * @brief Direct Telegram Bot API client.
+ * @brief 直接的 Telegram Bot API 客户端。
+ *
+ * Provides direct access to Telegram Bot API methods.
+ * Handles HTTP requests, JSON serialization/deserialization, and error handling.
+ * Supports both regular JSON requests and multipart/form-data requests for file uploads.
+ * 提供对 Telegram Bot API 方法的直接访问。
+ * 处理 HTTP 请求、JSON 序列化/反序列化和错误处理。
+ * 支持常规 JSON 请求和用于文件上传的 multipart/form-data 请求。
+ *
+ * All Telegram Bot API methods are generated from the OpenAPI schema
+ * and exposed as member functions with both parameter-struct and individual-parameter overloads.
+ * 所有 Telegram Bot API 方法都从 OpenAPI schema 生成，
+ * 并作为成员函数公开，同时提供参数结构和单独参数的重载。
+ */
     class TelegramClient {
         friend class Methods::addStickerToSet;
         friend class Methods::answerCallbackQuery;
@@ -952,21 +968,77 @@ namespace TelegramBotAPI {
         friend class Methods::verifyUser;
 
     public:
+/**
+ * @brief Constructs a client with the default Telegram API URL and default HTTP client.
+ * @brief 使用默认 Telegram API URL 和默认 HTTP 客户端构造客户端。
+ *
+ * @param BotToken Telegram bot token.
+ *                 Telegram Bot Token。
+ */
         explicit TelegramClient(const std::string &BotToken);
 
+/**
+ * @brief Constructs a client with a custom Telegram API URL and default HTTP client.
+ * @brief 使用自定义 Telegram API URL 和默认 HTTP 客户端构造客户端。
+ *
+ * @param BotToken Telegram bot token.
+ *                 Telegram Bot Token。
+ * @param APIURL   Telegram API URL.
+ *                 Telegram API URL。
+ */
         TelegramClient(const std::string &BotToken,
                        const std::string &APIURL);
 
+/**
+ * @brief Constructs a client with the default Telegram API URL and custom timeout.
+ * @brief 使用默认 Telegram API URL 和自定义超时构造客户端。
+ *
+ * @param BotToken Telegram bot token.
+ *                 Telegram Bot Token。
+ * @param Timeout  Request timeout duration.
+ *                 请求超时时长。
+ */
         TelegramClient(const std::string   &BotToken,
                        std::chrono::seconds Timeout);
 
+/**
+ * @brief Constructs a client with custom API URL and timeout.
+ * @brief 使用自定义 API URL 和超时构造客户端。
+ *
+ * @param BotToken Telegram bot token.
+ *                 Telegram Bot Token。
+ * @param APIURL   Telegram API URL.
+ *                 Telegram API URL。
+ * @param Timeout  Request timeout duration.
+ *                 请求超时时长。
+ */
         TelegramClient(const std::string   &BotToken,
                        const std::string   &APIURL,
                        std::chrono::seconds Timeout);
 
+/**
+ * @brief Constructs a client with a custom HTTP client.
+ * @brief 使用自定义 HTTP 客户端构造客户端。
+ *
+ * @param BotToken   Telegram bot token.
+ *                   Telegram Bot Token。
+ * @param HTTPClient Custom HTTP client implementation.
+ *                   自定义 HTTP 客户端实现。
+ */
         TelegramClient(const std::string    &BotToken,
                        Network::IHTTPClient &HTTPClient);
 
+/**
+ * @brief Constructs a client with custom API URL and HTTP client.
+ * @brief 使用自定义 API URL 和 HTTP 客户端构造客户端。
+ *
+ * @param BotToken   Telegram bot token.
+ *                   Telegram Bot Token。
+ * @param APIURL     Telegram API URL.
+ *                   Telegram API URL。
+ * @param HTTPClient Custom HTTP client implementation.
+ *                   自定义 HTTP 客户端实现。
+ */
         TelegramClient(const std::string    &BotToken,
                        const std::string    &APIURL,
                        Network::IHTTPClient &HTTPClient);

@@ -7,6 +7,7 @@
 
 namespace TelegramBotAPI {
     namespace {
+// Helper structures for URL parsing / URL 解析的辅助结构
         struct ParsedURL {
                 std::string Scheme;
                 std::string Host;
@@ -14,6 +15,15 @@ namespace TelegramBotAPI {
                 std::string BasePath;
         };
 
+/**
+ * @brief Parses a Telegram API URL into components.
+ * @brief 将 Telegram API URL 解析为组件。
+ *
+ * @param URL URL to parse.
+ *           要解析的 URL。
+ * @return Parsed components.
+ *         解析的组件。
+ */
         ParsedURL ParseAPIURL(const std::string &URL) {
             ParsedURL Result;
 
@@ -108,6 +118,18 @@ namespace TelegramBotAPI {
             return Result;
         }
 
+/**
+ * @brief Normalizes a Telegram API URL.
+ * @brief 规范化 Telegram API URL。
+ *
+ * Removes default ports and ensures proper format.
+ * 移除默认端口并确保格式正确。
+ *
+ * @param URL URL to normalize.
+ *           要规范化的 URL。
+ * @return Normalized URL.
+ *         规范化的 URL。
+ */
         std::string NormalizeAPIURL(const std::string &URL) {
             if (URL.empty()) {
                 return "https://api.telegram.org";
@@ -123,6 +145,13 @@ namespace TelegramBotAPI {
                    (IsDefaultPort ? "" : ":" + Parsed.Port) + Parsed.BasePath;
         }
 
+/**
+ * @brief Validates that a bot token is non-empty.
+ * @brief 验证 Bot Token 非空。
+ *
+ * @param BotToken Bot token to validate.
+ *                 要验证的 Bot Token。
+ */
         void ValidateBotToken(const std::string &BotToken) {
             if (BotToken.empty()) {
                 throw TelegramAPIException(
@@ -131,6 +160,7 @@ namespace TelegramBotAPI {
         }
     } // namespace
 
+// Constructor implementations / 构造函数实现
     TelegramClient::TelegramClient(const std::string &BotTokenValue)
         : BotToken(BotTokenValue), APIURL("https://api.telegram.org"),
           DefaultHTTPClient(), HTTPClient(&DefaultHTTPClient) {
@@ -174,6 +204,23 @@ namespace TelegramBotAPI {
         ValidateBotToken(BotToken);
     }
 
+// HTTP request construction / HTTP 请求构造
+/**
+ * @brief Performs an HTTP request with JSON parameters.
+ * @brief 使用 JSON 参数执行 HTTP 请求。
+ *
+ * Constructs an HTTP request with the method name and JSON-encoded parameters.
+ * GET is used for empty parameters, POST with JSON body otherwise.
+ * 使用方法名称和 JSON 编码的参数构造 HTTP 请求。
+ * 空参数使用 GET，否则使用 POST 和 JSON 请求体。
+ *
+ * @param Method     API method name.
+ *                   API 方法名称。
+ * @param Parameters JSON object containing method parameters.
+ *                   包含方法参数的 JSON 对象。
+ * @return HTTP response.
+ *         HTTP 响应。
+ */
     Network::HTTPResponse
     TelegramClient::PerformRequest(const std::string  &Method,
                                    const JSON::Object &Parameters) {
@@ -209,6 +256,20 @@ namespace TelegramBotAPI {
         return HTTPClient->PerformHTTPS(Request);
     }
 
+/**
+ * @brief Performs an HTTP request with multipart/form-data.
+ * @brief 使用 multipart/form-data 执行 HTTP 请求。
+ *
+ * Used for file uploads and other multipart requests.
+ * 用于文件上传和其他 multipart 请求。
+ *
+ * @param Method API method name.
+ *              API 方法名称。
+ * @param Form   Multipart form containing fields and files.
+ *               包含字段和文件的 multipart 表单。
+ * @return HTTP response.
+ *         HTTP 响应。
+ */
     Network::HTTPResponse TelegramClient::PerformMultipartRequest(
         const std::string                       &Method,
         const Network::Multipart::MultipartForm &Form) {

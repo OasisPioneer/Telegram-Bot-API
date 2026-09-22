@@ -8,6 +8,7 @@
 #include "TelegramBotAPI/Methods/sendPhoto.HPP"
 
 namespace TelegramBotAPI {
+// Constructor implementations / 构造函数实现
     TelegramBotAPI::TelegramBotAPI(const std::string &BotToken)
         : Client(BotToken) {}
 
@@ -32,6 +33,7 @@ namespace TelegramBotAPI {
         return Client;
     }
 
+// Handler registration / 处理器注册
     void TelegramBotAPI::OnMessage(MessageHandler Handler) {
         MessageHandlerFunction = std::move(Handler);
     }
@@ -40,6 +42,7 @@ namespace TelegramBotAPI {
         CallbackQueryHandlerFunction = std::move(Handler);
     }
 
+// Convenience methods / 便捷方法
     bool
     TelegramBotAPI::AnswerCallbackQuery(const std::string &CallbackQueryID) {
         Methods::answerCallbackQuery AnswerCallbackQueryMethod(Client);
@@ -98,6 +101,7 @@ namespace TelegramBotAPI {
         return SendPhotoMethod.SendPhoto(Parameters);
     }
 
+// Long-polling runtime / 长轮询运行时
     void TelegramBotAPI::Run() {
         Running.store(true);
 
@@ -126,6 +130,7 @@ namespace TelegramBotAPI {
 
     void TelegramBotAPI::Stop() { Running.store(false); }
 
+// Update processing / 更新处理
     void
     TelegramBotAPI::ProcessUpdates(const std::vector<Type::Update> &Updates) {
         for (const Type::Update &Update : Updates) {
@@ -139,6 +144,8 @@ namespace TelegramBotAPI {
                 // Individual update handler failures must not terminate
                 // the long-polling loop. The update is still acknowledged
                 // by advancing the offset below.
+                // 单个更新处理器的失败不得终止长轮询循环。
+                // 通过推进下面的偏移量，更新仍然会被确认。
             }
 
             Offset = Update.UpdateID + 1;
