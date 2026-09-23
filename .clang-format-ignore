@@ -1,0 +1,12 @@
+build/
+Build/
+Bin/
+
+Include/TelegramBotAPI/Methods/
+Include/TelegramBotAPI/Types/
+
+Third_Party/
+Scripts/
+
+Data/
+Resources/
